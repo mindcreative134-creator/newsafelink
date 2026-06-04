@@ -22,29 +22,18 @@ body {
 }
 
 /* =========================================================
-   AdSense Container — Policy Compliant Layout
+   AdSense Container — Zero-placeholder, natural flow
    ========================================================= */
 .adsense-container {
-  margin: 1.5rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(244, 244, 245, 0.4);
-  border: 1px dashed rgba(228, 228, 231, 0.8);
-  border-radius: 1rem;
-  padding: 0.75rem;
-  min-height: 100px;
+  /* No min-height, no background, no border — takes space only when ad renders */
   overflow: hidden;
+  margin: 10px 0;
+  line-height: 0;
+  font-size: 0;
 }
-.dark .adsense-container {
-  background-color: rgba(24, 24, 27, 0.4);
-  border-color: rgba(63, 63, 70, 0.5);
-}
-@media (min-width: 640px) {
-  .adsense-container {
-    min-height: 250px;
-  }
+.adsense-container ins {
+  display: block !important;
+  margin: 0 auto;
 }
 
 /* =========================================================
@@ -190,4 +179,121 @@ html {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* =========================================================
+   Safelink Flow — Compact Natural Layout
+   ========================================================= */
+
+.safelink-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  margin: 12px 0;
+}
+
+/* Instruction banner */
+.safelink-instructions {
+  width: 100%;
+  padding: 9px 13px;
+  background: #fefce8;
+  border-left: 3px solid #f59e0b;
+  border-radius: 6px;
+  margin: 8px 0;
+}
+.dark .safelink-instructions {
+  background: rgba(120, 53, 15, 0.12);
+  border-left-color: #d97706;
+}
+.safelink-inst-en {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1c1917;
+  margin: 0 0 3px;
+  line-height: 1.4;
+}
+.dark .safelink-inst-en { color: #fafaf9; }
+.safelink-inst-hi {
+  font-size: 12px;
+  color: #57534e;
+  margin: 0;
+  line-height: 1.7;
+}
+.dark .safelink-inst-hi { color: #a8a29e; }
+
+/* Timer pill */
+.safelink-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 999px;
+  padding: 5px 14px;
+  margin: 6px 0;
+}
+.dark .safelink-timer {
+  background: rgba(220,38,38,0.08);
+  border-color: rgba(220,38,38,0.25);
+  color: #f87171;
+}
+.safelink-timer-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #dc2626;
+  animation: pulse-dot 1s infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* Scroll hint */
+.safelink-scroll-hint {
+  font-size: 12px;
+  color: #71717a;
+  text-align: center;
+  margin: 6px 0;
+  padding: 0 6px;
+}
+.dark .safelink-scroll-hint { color: #a1a1aa; }
+
+/* Bottom continue section */
+.safelink-bottom-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  border-top: 1px solid #e4e4e7;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+.dark .safelink-bottom-trigger { border-top-color: #3f3f46; }
+
+/* Wait label */
+.safelink-wait-label {
+  font-size: 12px;
+  color: #a1a1aa;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 8px;
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+}
+.dark .safelink-wait-label {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #71717a;
+}
+
+@media (max-width: 640px) {
+  .safelink-inst-en { font-size: 12px; }
+  .safelink-inst-hi { font-size: 11px; }
 }
