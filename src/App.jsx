@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { useSafelink } from './context/SafelinkContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -36,10 +37,12 @@ function HeaderAdSlot() {
 }
 
 export default function App() {
+  const { currentStep } = useSafelink();
+
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
-      {/* Top Banner Ad above navigation header */}
-      <HeaderAdSlot />
+      {/* Top Banner Ad above navigation header - only visible during active safelink redirection */}
+      {currentStep > 0 && <HeaderAdSlot />}
 
       {/* Dynamic Navigation Header */}
       <Header />
