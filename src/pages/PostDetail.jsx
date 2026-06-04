@@ -279,8 +279,7 @@ export default function PostDetail() {
         {/* Timer (visible only while countdown running) */}
         {timerActive && (
           <div className="safelink-timer">
-            <span className="safelink-timer-dot" />
-            <span>Please wait <strong>{timeLeft}s</strong> — Verifying...</span>
+            <span>Please wait {timeLeft} Seconds...</span>
           </div>
         )}
 

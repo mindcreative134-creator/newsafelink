@@ -265,29 +265,24 @@ html {
 
 /* Timer pill */
 .safelink-timer {
-  display: inline-flex;
+  width: 100%;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #dc2626;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 999px;
-  padding: 5px 14px;
-  margin: 6px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  background-color: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  margin: 4px 0 !important;
+  text-align: center;
 }
 .dark .safelink-timer {
-  background: rgba(220,38,38,0.08);
-  border-color: rgba(220,38,38,0.25);
-  color: #f87171;
-}
-.safelink-timer-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: #dc2626;
-  animation: pulse-dot 1s infinite;
-  flex-shrink: 0;
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #f1f5f9;
 }
 @keyframes pulse-dot {
   0%,100% { opacity: 1; transform: scale(1); }
