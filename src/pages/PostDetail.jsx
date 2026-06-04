@@ -305,8 +305,8 @@ export default function PostDetail() {
           )
         )}
 
-        {/* Ad 3 — below button (Uses Banner unit) */}
-        <AdSlot format="auto" />
+        {/* Ad 3 — below button (Uses Display ads unit) */}
+        <AdSlot format="display-second" />
 
         {/* Ad 4 — bottom of block (Uses Multiplex grid recommendations) */}
         <AdSlot format="autorelaxed" />
