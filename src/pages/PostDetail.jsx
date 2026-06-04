@@ -7,7 +7,7 @@ import StepHeader from '../components/StepHeader';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
 // ─── Ad Slot — Multi-format, zero placeholder ─────────────────────────────────
-// format: 'auto' | 'fluid' (in-article) | 'autorelaxed' (multiplex/native)
+// format: 'auto' | 'fluid' (in-article) | 'autorelaxed' (multiplex/native) | 'display-second'
 function AdSlot({ format = 'auto', layout = '' }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -18,8 +18,24 @@ function AdSlot({ format = 'auto', layout = '' }) {
     } catch (_) {}
   }, []);
 
-  // In-article ads need layout="in-article" and format="fluid"
-  const isInArticle = format === 'fluid';
+  // Map format/type to the user's specific AdSense Ad Unit IDs
+  let adSlotId = "7317709042"; // Default: "Banner" (Display format)
+  let adFormat = format;
+  let adLayout = layout;
+
+  if (format === 'fluid') {
+    // "Article" In-article unit
+    adSlotId = "1641433819";
+  } else if (format === 'autorelaxed') {
+    // "multi" Multiplex unit
+    adSlotId = "8617081290";
+  } else if (format === 'display-second') {
+    // "Display ads" unit
+    adSlotId = "5754054742";
+    adFormat = "auto";
+  }
+
+  const isInArticle = adFormat === 'fluid';
 
   return (
     <div className="adsense-container">
@@ -28,11 +44,11 @@ function AdSlot({ format = 'auto', layout = '' }) {
         className="adsbygoogle"
         style={{ display: 'block', width: '100%' }}
         data-ad-client="ca-pub-9543073887536718"
-        data-ad-slot="7317709042"
-        data-ad-format={format}
+        data-ad-slot={adSlotId}
+        data-ad-format={adFormat}
         data-full-width-responsive="true"
         {...(isInArticle ? { 'data-ad-layout': 'in-article' } : {})}
-        {...(layout ? { 'data-ad-layout': layout } : {})}
+        {...(adLayout ? { 'data-ad-layout': adLayout } : {})}
       />
     </div>
   );
@@ -184,12 +200,13 @@ export default function PostDetail() {
     );
   }
 
-  // Inject ads into blogger content
+  // Inject ads into blogger content using the In-article ad unit
   const injectAds = (html) => {
     if (!html) return '';
     const paras = html.split('</p>');
     if (paras.length <= 3) return html;
-    const adUnit = `<div class="adsense-container"><ins class="adsbygoogle" style="display:block;width:100%" data-ad-client="ca-pub-9543073887536718" data-ad-slot="7317709042" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>`;
+    // In-article ad unit slot is 1641433819
+    const adUnit = `<div class="adsense-container"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-9543073887536718" data-ad-slot="1641433819"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>`;
     let out = '';
     for (let i = 0; i < paras.length; i++) {
       out += paras[i];
@@ -215,8 +232,8 @@ export default function PostDetail() {
     return (
       <div className="safelink-flow">
 
-        {/* Ad 1 — above instructions */}
-        <AdSlot />
+        {/* Ad 1 — above instructions (Uses Banner unit) */}
+        <AdSlot format="auto" />
 
         {/* Compact instruction text — same style as image */}
         <div className="safelink-instructions">
@@ -224,12 +241,12 @@ export default function PostDetail() {
             👉 <strong>Click Image &amp; Wait, then Come Back to Get Your Link</strong>
           </p>
           <p className="safelink-inst-hi font-hindi">
-            ▼ LINK पाने के लिए — 👇 फोटो पर क्लिक करें, 15 सेकंड रुकें, फिर इसी पेज पर वापस आएं
+            ▼ LINK पाने के लिए — 👇 फोटो पर क्लिक करें, 15 सेकंड रुकें, फिर इसी PC/Mobile स्क्रीन पर वापस आएं
           </p>
         </div>
 
-        {/* Ad 2 — between instructions and button */}
-        <AdSlot />
+        {/* Ad 2 — between instructions and button (Uses Display ads unit) */}
+        <AdSlot format="display-second" />
 
         {/* Timer (visible only while countdown running) */}
         {timerActive && (
@@ -262,8 +279,8 @@ export default function PostDetail() {
           )
         )}
 
-        {/* Ad 3 — below button */}
-        <AdSlot />
+        {/* Ad 3 — below button (Uses Banner unit) */}
+        <AdSlot format="auto" />
 
         {/* Scroll hint — only on step 1 after verify */}
         {timerDone && currentStep === 1 && (
@@ -274,8 +291,8 @@ export default function PostDetail() {
           </p>
         )}
 
-        {/* Ad 4 — bottom of block */}
-        <AdSlot />
+        {/* Ad 4 — bottom of block (Uses Multiplex grid recommendations) */}
+        <AdSlot format="autorelaxed" />
       </div>
     );
   };
@@ -292,14 +309,16 @@ export default function PostDetail() {
           </span>
         ) : (
           <>
-            <AdSlot />
+            {/* Uses Display ads unit */}
+            <AdSlot format="display-second" />
             <button
               onClick={handleStepTransition}
               className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 text-sm"
             >
               Continue to Step 2 <ArrowRight className="w-4 h-4" />
             </button>
-            <AdSlot />
+            {/* Uses Multiplex grid unit */}
+            <AdSlot format="autorelaxed" />
           </>
         )}
       </div>
