@@ -333,6 +333,32 @@ html {
   color: #71717a;
 }
 
+/* Remove all margins on AdSense containers inside the Safelink flow and verification widgets */
+.safelink-flow .adsense-container,
+.safelink-bottom-trigger .adsense-container,
+.safelink-verification-widget .adsense-container {
+  margin: 0 !important;
+}
+
+/* Minimize vertical gaps for internal elements */
+.safelink-flow .safelink-timer,
+.safelink-flow button,
+.safelink-flow .safelink-verified-label,
+.safelink-bottom-trigger button,
+.safelink-bottom-trigger .safelink-wait-label {
+  margin-top: 4px !important;
+  margin-bottom: 4px !important;
+}
+
+/* Remove extra gap inside Safelink Verification Widget */
+.safelink-verification-widget {
+  gap: 4px !important;
+}
+.safelink-verification-widget > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 @media (max-width: 640px) {
   .safelink-inst-en { font-size: 12px; }
   .safelink-inst-hi { font-size: 11px; }

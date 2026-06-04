@@ -201,7 +201,7 @@ export default function Home() {
 
       {/* ── Safelink Verification Widget ─────────────────── */}
       {showVerification && (
-        <div className="bg-gradient-to-br from-indigo-50 via-purple-50/50 to-white dark:from-indigo-950/20 dark:via-purple-950/10 dark:to-zinc-900 border border-indigo-100 dark:border-indigo-900/30 rounded-3xl p-5 sm:p-6 flex flex-col items-center gap-3 mb-12 shadow-sm">
+        <div className="safelink-verification-widget bg-gradient-to-br from-indigo-50 via-purple-50/50 to-white dark:from-indigo-950/20 dark:via-purple-950/10 dark:to-zinc-900 border border-indigo-100 dark:border-indigo-900/30 rounded-3xl p-4 sm:p-5 flex flex-col items-center gap-1.5 mb-10 shadow-sm">
           
           <div className="text-center">
             <p className="text-sm sm:text-base font-extrabold text-zinc-800 dark:text-zinc-200 uppercase tracking-wide">
@@ -213,7 +213,7 @@ export default function Home() {
           <AdSlot slot="7317709042" />
 
           {/* Checkbox box */}
-          <div className="flex items-center gap-4 bg-white dark:bg-zinc-950 px-6 py-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm min-w-[280px] sm:min-w-[320px] justify-between my-1">
+          <div className="flex items-center gap-4 bg-white dark:bg-zinc-950 px-6 py-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm min-w-[280px] sm:min-w-[320px] justify-between m-0">
             <div className="flex items-center gap-3">
               {verifying ? (
                 <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
