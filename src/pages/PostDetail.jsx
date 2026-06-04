@@ -4,36 +4,46 @@ import { getPostById, getPosts } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import StepHeader from '../components/StepHeader';
-import { Calendar, User, ArrowRight } from 'lucide-react';
+import { Calendar, User, ArrowRight, Shield, CheckCircle2, Clock } from 'lucide-react';
 
-// Ad slot component to reuse easily and ensure standard execution (no label)
-function AdSlot() {
+// ─── Ad Slot Component ────────────────────────────────────────────────────────
+// Each <AdSlot> manages its own push; no duplicate push needed elsewhere.
+function AdSlot({ slot = '7317709042', format = 'auto' }) {
+  const containerRef = useRef(null);
+
   useEffect(() => {
+    // Only push once after mount, guarded by a flag on the element
+    const el = containerRef.current?.querySelector('ins');
+    if (!el) return;
+    if (el.getAttribute('data-pushed') === 'true') return;
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
+      el.setAttribute('data-pushed', 'true');
     } catch (e) {
-      // ignore adsbygoogle push errors
+      // ignore adsbygoogle errors in dev
     }
   }, []);
 
   return (
-    <div className="adsense-container w-full overflow-hidden flex items-center justify-center">
-      <ins className="adsbygoogle"
-           style={{ display: "block" }}
-           data-ad-client="ca-pub-9543073887536718"
-           data-ad-slot="7317709042"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+    <div ref={containerRef} className="adsense-container w-full overflow-hidden">
+      <ins
+        className="adsbygoogle"
+        style={{ display: 'block', width: '100%' }}
+        data-ad-client="ca-pub-9543073887536718"
+        data-ad-slot={slot}
+        data-ad-format={format}
+        data-full-width-responsive="true"
+      />
     </div>
   );
 }
 
-// Shimmer skeleton screen for Post Detail
+// ─── Shimmer Skeleton ─────────────────────────────────────────────────────────
 function PostDetailSkeleton() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-pulse">
       <div className="flex flex-col lg:flex-row gap-12">
-        {/* Article Column Skeleton */}
+        {/* Article skeleton */}
         <div className="flex-1 min-w-0">
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col gap-6">
             <div className="flex gap-2">
@@ -47,25 +57,22 @@ function PostDetailSkeleton() {
             </div>
             <div className="w-full aspect-video bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />
             <div className="space-y-3 mt-4">
-              <div className="h-4 w-full bg-zinc-200 dark:bg-zinc-800 rounded" />
-              <div className="h-4 w-full bg-zinc-200 dark:bg-zinc-800 rounded" />
-              <div className="h-4 w-5/6 bg-zinc-200 dark:bg-zinc-800 rounded" />
-              <div className="h-4 w-full bg-zinc-200 dark:bg-zinc-800 rounded" />
-              <div className="h-4 w-4/5 bg-zinc-200 dark:bg-zinc-800 rounded" />
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded" style={{ width: `${85 + Math.random() * 15}%` }} />
+              ))}
             </div>
           </div>
         </div>
-
-        {/* Sidebar Skeleton */}
-        <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
+        {/* Sidebar skeleton */}
+        <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-6">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6">
             <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 rounded mb-4" />
             <div className="space-y-2">
               <div className="h-3 w-full bg-zinc-200 dark:bg-zinc-800 rounded" />
               <div className="h-3 w-5/6 bg-zinc-200 dark:bg-zinc-800 rounded" />
             </div>
           </div>
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6">
             <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-800 rounded mb-4" />
             <div className="flex flex-wrap gap-2">
               <div className="h-7 w-16 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
@@ -79,6 +86,7 @@ function PostDetailSkeleton() {
   );
 }
 
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function PostDetail() {
   const { postId } = useParams();
   const navigate = useNavigate();
@@ -88,29 +96,32 @@ export default function PostDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Timer logic for Safelink
-  const [timeLeft, setTimeLeft] = useState(15);
+  // Timer state
+  const TIMER_DURATION = 15;
+  const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
   const [timerActive, setTimerActive] = useState(false);
   const [timerDone, setTimerDone] = useState(false);
   const timerRef = useRef(null);
 
-  // Scroll to top when post changes
+  // Scroll to top on post change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [postId]);
 
-  // Fetch post details
+  // Fetch post
   useEffect(() => {
     setLoading(true);
     setError('');
     getPostById(postId)
       .then((data) => {
         setPost(data);
+
+        // Update document title
         document.title = `${data.title} - SarkariTrend`;
-        
-        // Update Meta Description
-        const plainText = data.content ? data.content.replace(/<\/?[^>]+(>|$)/g, "") : '';
-        const excerpt = plainText.length > 150 ? plainText.substring(0, 150) + '...' : plainText;
+
+        // Update meta description
+        const plainText = data.content ? data.content.replace(/<\/?[^>]+(>|$)/g, '') : '';
+        const excerpt = plainText.length > 160 ? plainText.substring(0, 160) + '...' : plainText;
         let metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) {
           metaDesc.setAttribute('content', excerpt);
@@ -121,7 +132,7 @@ export default function PostDetail() {
           document.head.appendChild(metaDesc);
         }
 
-        // Update Canonical URL
+        // Update canonical URL
         let canonical = document.querySelector('link[rel="canonical"]');
         if (canonical) {
           canonical.setAttribute('href', window.location.href);
@@ -140,10 +151,10 @@ export default function PostDetail() {
       });
   }, [postId]);
 
-  // Handle safelink timer initialization
+  // Safelink timer — runs each time step changes (and post is ready)
   useEffect(() => {
     if (currentStep > 0 && post) {
-      setTimeLeft(15);
+      setTimeLeft(TIMER_DURATION);
       setTimerActive(true);
       setTimerDone(false);
 
@@ -167,34 +178,17 @@ export default function PostDetail() {
     };
   }, [currentStep, post, postId]);
 
-  // Load AdSense ads dynamically once content is rendered
-  useEffect(() => {
-    if (post) {
-      try {
-        const ads = document.querySelectorAll('.adsense-container ins.adsbygoogle');
-        ads.forEach(() => {
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-        });
-      } catch (e) {
-        // ignore adsbygoogle push errors
-      }
-    }
-  }, [post]);
-
-  // Safelink navigation step transition (Steps 1 & 2)
+  // Step transition (Steps 1 → 2 → 3)
   const handleStepTransition = () => {
     setLoading(true);
     getPosts({ maxResults: 20 })
       .then((data) => {
         if (data.items && data.items.length > 0) {
-          // Exclude current post
           const filtered = data.items.filter((item) => item.id !== postId);
-          const postsList = filtered.length > 0 ? filtered : data.items;
-          const randomIndex = Math.floor(Math.random() * postsList.length);
-          const nextPost = postsList[randomIndex];
-          
+          const list = filtered.length > 0 ? filtered : data.items;
+          const next = list[Math.floor(Math.random() * list.length)];
           nextStep();
-          navigate(`/post/${nextPost.id}`);
+          navigate(`/post/${next.id}`);
         } else {
           nextStep();
           setLoading(false);
@@ -206,7 +200,7 @@ export default function PostDetail() {
       });
   };
 
-  // Final redirection (Step 3)
+  // Final redirect (Step 3 complete)
   const handleFinalRedirect = () => {
     if (targetUrl) {
       clearSafelink();
@@ -214,18 +208,21 @@ export default function PostDetail() {
     }
   };
 
-  if (loading) {
-    return <PostDetailSkeleton />;
-  }
+  if (loading) return <PostDetailSkeleton />;
 
   if (error || !post) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-2xl font-bold text-red-600 mb-4 font-heading">Error</h2>
-        <p className="text-zinc-500 dark:text-zinc-400 mb-8">{error || 'Article not found.'}</p>
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-950/30 mb-6">
+          <span className="text-red-500 text-2xl">⚠</span>
+        </div>
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-3 font-heading">
+          {error ? 'Something went wrong' : 'Article not found'}
+        </h2>
+        <p className="text-zinc-500 dark:text-zinc-400 mb-8">{error || 'This article could not be located.'}</p>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold shadow-md"
+          className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow-md transition-all"
         >
           Return Home
         </button>
@@ -233,71 +230,64 @@ export default function PostDetail() {
     );
   }
 
-  // Parse and inject Ads into the blogger content (no Advertisement label text)
+  // Inject ad units into Blogger HTML content
   const injectAds = (html) => {
     if (!html) return '';
     const paras = html.split('</p>');
-    
-    if (paras.length <= 3) {
-      return html;
-    }
+    if (paras.length <= 3) return html;
 
     const adUnit = `
-      <div class="adsense-container w-full overflow-hidden flex items-center justify-center">
+      <div class="adsense-container w-full overflow-hidden">
         <ins class="adsbygoogle"
-             style="display:block"
+             style="display:block;width:100%"
              data-ad-client="ca-pub-9543073887536718"
              data-ad-slot="7317709042"
              data-ad-format="auto"
              data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
       </div>
     `;
 
     let finalHtml = '';
     for (let i = 0; i < paras.length; i++) {
       finalHtml += paras[i];
-      if (i < paras.length - 1) {
-        finalHtml += '</p>';
-      }
-      
-      // Inject after 2nd paragraph
-      if (i === 1) {
-        finalHtml += adUnit;
-      }
-      // Inject before the last paragraph
-      if (i === paras.length - 3) {
-        finalHtml += adUnit;
-      }
+      if (i < paras.length - 1) finalHtml += '</p>';
+      if (i === 1) finalHtml += adUnit;
+      if (i === paras.length - 3) finalHtml += adUnit;
     }
     return finalHtml;
   };
 
-  // Helper to extract first image
-  const getPostImage = (post) => {
-    if (!post.content) return 'https://picsum.photos/1200/600';
-    const match = post.content.match(/<img[^>]+src="([^">]+)"/);
+  // Extract first image from blogger content
+  const getPostImage = (p) => {
+    if (!p.content) return 'https://picsum.photos/1200/600';
+    const match = p.content.match(/<img[^>]+src="([^">]+)"/);
     return match ? match[1] : 'https://picsum.photos/1200/600';
   };
 
+  const isStepComplete = timerDone;
+
   return (
     <>
+      {/* Sticky step progress banner */}
       {currentStep > 0 && (
-        <StepHeader timerActive={timerActive} timeLeft={timeLeft} />
+        <StepHeader timerActive={timerActive} timeLeft={timeLeft} totalTime={TIMER_DURATION} />
       )}
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
         <div className="flex flex-col lg:flex-row gap-12">
-          {/* Article Column */}
+
+          {/* ── Article Column ─────────────────────────────────── */}
           <main className="flex-1 min-w-0">
-            <article className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm p-6 sm:p-8 flex flex-col gap-6">
-              
-              {/* Labels / Categories */}
+            <article className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm">
+
+              {/* Labels */}
               {post.labels && post.labels.length > 0 && (
-                <div className="flex gap-2">
+                <div className="flex gap-2 px-6 sm:px-8 pt-6 sm:pt-8">
                   {post.labels.map((label) => (
                     <span
                       key={label}
-                      className="px-3 py-1 text-xs font-bold uppercase rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400"
+                      className="px-3 py-1 text-xs font-bold uppercase rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/40"
                     >
                       {label}
                     </span>
@@ -306,18 +296,18 @@ export default function PostDetail() {
               )}
 
               {/* Title */}
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-white leading-tight font-heading m-0">
-                {post.title}
-              </h1>
+              <div className="px-6 sm:px-8 pt-4">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-zinc-900 dark:text-white leading-tight font-heading">
+                  {post.title}
+                </h1>
+              </div>
 
               {/* Meta */}
-              <div className="flex items-center text-sm text-zinc-400 dark:text-zinc-500 gap-4 pb-6 border-b border-zinc-200 dark:border-zinc-800">
+              <div className="flex items-center text-sm text-zinc-400 dark:text-zinc-500 gap-4 px-6 sm:px-8 py-4 border-b border-zinc-100 dark:border-zinc-800">
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />
                   {new Date(post.published).toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
+                    year: 'numeric', month: 'long', day: 'numeric',
                   })}
                 </span>
                 <span className="flex items-center gap-1.5">
@@ -327,7 +317,7 @@ export default function PostDetail() {
               </div>
 
               {/* Featured Image */}
-              <div className="w-full rounded-2xl overflow-hidden shadow-sm aspect-video">
+              <div className="w-full aspect-video overflow-hidden">
                 <img
                   src={getPostImage(post)}
                   alt={post.title}
@@ -335,116 +325,145 @@ export default function PostDetail() {
                 />
               </div>
 
-              {/* Safelink Timer/Action Widget */}
+              {/* ── Safelink Verification Widget ──────────────── */}
               {currentStep > 0 && (
-                <div className="flex flex-col gap-4 my-4 items-center w-full">
-                  
-                  {/* Top Ad */}
+                <div className="flex flex-col gap-4 px-6 sm:px-8 py-6">
+
+                  {/* Top AdSense */}
                   <AdSlot />
 
-                  {/* Verification Instructions Alert (Hinglish/Hindi compliant) */}
-                  <div className="w-full p-5 bg-amber-50/70 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/40 rounded-2xl text-center text-sm font-semibold text-amber-800 dark:text-amber-300 space-y-2.5 backdrop-blur-sm">
-                    <p className="flex items-center justify-center gap-1.5 font-extrabold text-zinc-900 dark:text-zinc-100">
-                      👇 Click Image & Wait & Come back this page to Get Link - Download.
+                  {/* Instruction Banner */}
+                  <div className="w-full p-4 sm:p-5 bg-amber-50 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/40 rounded-2xl text-center space-y-2">
+                    <p className="flex items-center justify-center gap-2 font-extrabold text-sm sm:text-base text-zinc-900 dark:text-zinc-100">
+                      👇 Click Image &amp; Wait, then Come Back to Get Your Link
                     </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-hindi">
-                      👇 LINK पाने और DOWNLOAD करने के लिए, 👇 फोटो पर क्लिक करें, 15 सेकंड रुकें और फिर इसी पेज पर वापस आएं
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-hindi leading-relaxed">
+                      👇 LINK पाने के लिए — नीचे फोटो पर क्लिक करें, 15 सेकंड रुकें, फिर इसी पेज पर वापस आएं
                     </p>
                   </div>
 
-                  {/* Modern Horizontal Countdown Timer Widget */}
-                  <div className="bg-gradient-to-br from-red-50/40 to-rose-50/20 dark:from-zinc-900/50 dark:to-zinc-900/30 border border-red-100/70 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-6 w-full shadow-sm">
-                    <div className="flex flex-col items-center gap-1">
-                      <h3 className="text-lg font-bold text-zinc-900 dark:text-white font-heading">
-                        Link Security Analysis
+                  {/* Timer / Action Widget */}
+                  <div className="bg-gradient-to-br from-slate-50 to-zinc-50 dark:from-zinc-900 dark:to-zinc-900/80 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col items-center gap-6 shadow-sm">
+                    {/* Header */}
+                    <div className="flex flex-col items-center gap-1.5 text-center">
+                      <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center mb-1">
+                        <Shield className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <h3 className="text-base font-bold text-zinc-900 dark:text-white font-heading">
+                        Link Security Check
                       </h3>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">
                         {currentStep === 3
-                          ? 'Finalizing direct transit credentials'
-                          : `Step ${currentStep} of 3: Processing encryption tags`}
+                          ? 'Finalizing secure transit credentials...'
+                          : `Step ${currentStep} of 3 — Processing verification parameters`}
                       </p>
                     </div>
 
+                    {/* Step Indicators */}
+                    <div className="flex items-center gap-2 w-full max-w-xs">
+                      {[1, 2, 3].map((step) => (
+                        <React.Fragment key={step}>
+                          <div className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold border-2 transition-all ${
+                            step < currentStep
+                              ? 'bg-green-500 border-green-500 text-white'
+                              : step === currentStep
+                                ? 'bg-indigo-600 border-indigo-600 text-white'
+                                : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-400'
+                          }`}>
+                            {step < currentStep ? '✓' : step}
+                          </div>
+                          {step < 3 && (
+                            <div className={`flex-1 h-0.5 rounded transition-all ${step < currentStep ? 'bg-green-400' : 'bg-zinc-200 dark:bg-zinc-700'}`} />
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+
+                    {/* Timer or Done */}
                     {timerActive ? (
-                      <div className="flex flex-col items-center gap-3.5 w-full max-w-sm">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-base font-extrabold text-red-600 dark:text-red-400 font-mono animate-pulse">
-                            Please wait {timeLeft}s
+                      <div className="flex flex-col items-center gap-3 w-full max-w-sm">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-red-500 animate-pulse" />
+                          <span className="text-lg font-extrabold text-red-600 dark:text-red-400 font-mono tabular-nums">
+                            {timeLeft}s remaining
                           </span>
                         </div>
-                        {/* Shimmer linear progress bar */}
-                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
+                        {/* Progress bar */}
+                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
                           <div
-                            className="bg-red-600 h-full rounded-full transition-all duration-1000 ease-linear shadow-inner"
-                            style={{ width: `${(timeLeft / 15) * 100}%` }}
+                            className="bg-gradient-to-r from-red-600 to-red-500 h-full rounded-full transition-all duration-1000 ease-linear"
+                            style={{ width: `${(timeLeft / TIMER_DURATION) * 100}%` }}
                           />
                         </div>
+                        <p className="text-xs text-zinc-400">Please stay on this page while we verify...</p>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center gap-3">
-                        <span className="text-xs text-green-600 dark:text-green-400 font-bold flex items-center gap-1.5 bg-green-50 dark:bg-green-950/40 px-4 py-1.5 rounded-full border border-green-200 dark:border-green-800/60 shadow-sm">
-                          <span className="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+                      <div className="flex flex-col items-center gap-3 w-full">
+                        <div className="flex items-center gap-2 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 px-4 py-2 rounded-full border border-green-200 dark:border-green-800/50 text-sm font-bold">
+                          <CheckCircle2 className="w-4 h-4" />
                           Parameters Authenticated
-                        </span>
-                        
-                        {/* Verify Scroll Button */}
+                        </div>
                         <button
                           onClick={() => {
-                            const bottomEl = document.getElementById('safelink-bottom-trigger');
-                            if (bottomEl) {
-                              bottomEl.scrollIntoView({ behavior: 'smooth' });
-                            } else {
-                              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                            }
+                            const el = document.getElementById('safelink-bottom-trigger');
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                            else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
                           }}
-                          className="px-8 py-3 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 text-xs sm:text-sm uppercase tracking-wide"
+                          className="px-8 py-3 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all text-sm uppercase tracking-wide"
                         >
-                          Verify / Scroll Down
+                          ↓ Scroll Down to Continue
                         </button>
                       </div>
                     )}
                   </div>
 
-                  {/* Bottom Ad */}
+                  {/* Bottom AdSense */}
                   <AdSlot />
                 </div>
               )}
 
-              {/* Dynamic Post Content with Ads Injected */}
+              {/* Post Content */}
               <div
-                className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed font-sans text-base sm:text-lg space-y-6 break-words"
+                className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed text-base sm:text-lg break-words px-6 sm:px-8 pb-6 sm:pb-8"
                 dangerouslySetInnerHTML={{ __html: injectAds(post.content) }}
               />
 
               {/* Bottom Safelink Action Trigger */}
               {currentStep > 0 && (
-                <div id="safelink-bottom-trigger" className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center gap-4">
-                  {!timerDone ? (
-                    <div className="text-sm font-semibold text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-950 px-6 py-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800/80 cursor-not-allowed">
-                      Please complete verification above first
+                <div
+                  id="safelink-bottom-trigger"
+                  className="px-6 sm:px-8 pb-8 pt-6 border-t border-zinc-100 dark:border-zinc-800 flex flex-col items-center gap-4"
+                >
+                  {!isStepComplete ? (
+                    <div className="flex items-center gap-2 text-sm font-semibold text-zinc-400 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-950 px-6 py-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                      <Clock className="w-4 h-4" />
+                      Complete verification above first
                     </div>
                   ) : currentStep === 1 ? (
                     <button
                       onClick={handleStepTransition}
-                      className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider"
+                      className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold px-10 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all text-sm uppercase tracking-wide"
                     >
                       Continue to Step 2 <ArrowRight className="w-4 h-4" />
                     </button>
                   ) : currentStep === 2 ? (
                     <button
                       onClick={handleStepTransition}
-                      className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider"
+                      className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold px-10 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all text-sm uppercase tracking-wide"
                     >
                       Continue to Step 3 <ArrowRight className="w-4 h-4" />
                     </button>
                   ) : (
                     <button
                       onClick={handleFinalRedirect}
-                      className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider"
+                      className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 active:scale-95 text-white font-bold px-12 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all text-sm uppercase tracking-wide"
                     >
-                      Go to Secured Link <ArrowRight className="w-4 h-4" />
+                      🔓 Go to Secured Link <ArrowRight className="w-4 h-4" />
                     </button>
                   )}
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                    {currentStep < 3 ? `Step ${currentStep} of 3` : 'Final Step — Your link is ready!'}
+                  </p>
                 </div>
               )}
 

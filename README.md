@@ -1,79 +1,133 @@
-# SarkariTrend News Safelink Portal
+# SarkariTrend — Safelink Portal
 
-SarkariTrend News is a premium, high-performance headless safelink gateway portal powered by **React**, **Tailwind CSS**, and the **Google Blogger API v3**. It provides a fully AdSense-compliant validation gateway layout featuring a secure 3-step verification flow, elegant shimmer loading skeletons, and dark/light mode optimization.
+**SarkariTrend** is a premium, high-performance headless Safelink gateway portal powered by **React 18**, **Tailwind CSS**, and the **Google Blogger API v3**. It features a fully AdSense-compliant 3-step verification flow, elegant shimmer loading skeletons, dark/light mode, and SEO-optimized routing.
 
 ---
 
 ## 🚀 Key Features
 
-* **3-Step Security Verification**: Secure gateway routing that guides users sequentially through 3 posts (`currentStep` 1 -> 2 -> 3) before redirecting to the target URL.
-* **Modern Shimmer Skeleton Screens**: Beautiful component placeholders loading instead of spinners for a fast, layout-stable, premium feel.
-* **Color Contrast Override**: Integrated index-level CSS fixes to ensure inline text styling (often copied from external editors into Blogger) inherits correct theme colors, maintaining readability in both dark and light modes.
-* **AdSense Policy Ready**: Structured ad slots designed to maximize revenue without explicitly injecting text indicators like `"Advertisement"`.
-* **Dynamic SEO Meta & Routing**: Updates canonical links, titles, and meta descriptions dynamically per post on the fly.
+| Feature | Description |
+|---|---|
+| **3-Step Gateway** | Sequential post-based verification (Step 1 → 2 → 3) before the final redirect |
+| **Shimmer Skeletons** | Beautiful shimmer placeholders instead of spinners for layout stability |
+| **AdSense Ready** | Inline + sidebar ad slots that are policy-compliant (no "Advertisement" label text) |
+| **Dark / Light Mode** | System-aware with localStorage persistence |
+| **SEO Optimized** | Dynamic titles, meta descriptions, Open Graph tags, and canonical URLs per page |
+| **Category Archive** | Auto-generated from Blogger post labels |
+| **Safelink Flow** | `?url=` and `?o=` query parameters with Base64 decoding support |
 
 ---
 
-## 🛠️ Redirection Mechanics (How it Works)
+## ⚙️ Configuration
 
-The safelink flow is triggered using standard query parameters on the homepage:
-
-### 1. Direct Redirection Link
-`http://localhost:5173/?url=https://example.com`
-* Opens the gateway check, starts Step 1, and redirects directly to `https://example.com` after validation.
-
-### 2. Base64 Encoded Redirect
-`http://localhost:5173/?url=aHR0cHM6Ly9leGFtcGxlLmNvbQ==`
-* Automatically decodes the Base64 value (`aHR0cHM6Ly9leGFtcGxlLmNvbQ==`) back to `https://example.com` and executes the 3-step gateway safely.
-
----
-
-## ⚙️ Configuration Details
-
-To connect your own Blogger site, edit the API constants located in:
-**[src/services/bloggerApi.js](src/services/bloggerApi.js)**
+To connect your own Blogger blog, edit the API config in:  
+**`src/services/bloggerApi.js`**
 
 ```javascript
 const API_KEY = 'YOUR_GOOGLE_BLOGGER_API_KEY';
 const BLOG_ID = 'YOUR_BLOGGER_BLOG_ID';
 ```
 
+To change the AdSense publisher ID, search for:  
+`ca-pub-9543073887536718` across the project and replace with your own Publisher ID.
+
 ---
 
-## 💻 Commands
+## 🔗 Safelink URL Formats
 
-Follow these scripts to run the portal locally:
+### Direct URL Redirect
+```
+https://yourdomain.com/?url=https://example.com
+```
+
+### Base64 Encoded Redirect
+```
+https://yourdomain.com/?url=aHR0cHM6Ly9leGFtcGxlLmNvbQ==
+```
+*(Decodes `aHR0cHM6Ly9leGFtcGxlLmNvbQ==` → `https://example.com`)*
+
+### Short Link Service (Piko)
+```
+https://yourdomain.com/?o=YOUR_PIKO_CODE
+```
+*(Redirects through `https://piko.site.je/?o=YOUR_PIKO_CODE`)*
+
+---
+
+## 💻 Local Development
 
 ### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. Run Local Development Server
+### 2. Start Dev Server
 ```bash
 npm run dev
 ```
-Serves the local portal at: **[http://localhost:5173/](http://localhost:5173/)**
+Portal runs at: **http://localhost:5173/**
 
-### 3. Build Production Bundle
+### 3. Build for Production
 ```bash
 npm run build
 ```
-Generates optimized static build assets inside the `/dist` directory.
+Outputs optimized assets to the `/dist` folder.
+
+---
+
+## 📤 GitHub Upload Instructions
+
+Follow these steps to push the project to GitHub:
+
+### First Time Setup
+```bash
+# Initialize git (if not already done)
+git init
+
+# Add all files
+git add .
+
+# Commit everything
+git commit -m "feat: initial SarkariTrend safelink portal"
+
+# Add your GitHub remote
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+
+# Push to main branch
+git push -u origin main
+```
+
+### Subsequent Updates
+```bash
+git add .
+git commit -m "fix: describe your changes here"
+git push
+```
+
+> **Tip:** Never commit your `node_modules/` — the `.gitignore` already excludes it.
 
 ---
 
 ## ⚡ Vercel Deployment Instructions
 
-To deploy this React + Vite SPA on **Vercel**, follow these configuration parameters:
+### Step 1 — Import Project on Vercel
+1. Go to **[vercel.com](https://vercel.com)** and sign in
+2. Click **"Add New Project"** → **"Import Git Repository"**
+3. Select your GitHub repository
 
-### 1. Build and Output Settings
-* **Framework Preset**: `Vite`
-* **Build Command**: `npm run build` or `vite build`
-* **Output Directory**: `dist`
+### Step 2 — Configure Build Settings
 
-### 2. Client-Side Routing (vercel.json)
-We have included a **[vercel.json](vercel.json)** file in the root directory to handle client-side routing rewrites for Single Page Applications (SPAs):
+| Setting | Value |
+|---|---|
+| **Framework Preset** | `Vite` |
+| **Build Command** | `npm run build` |
+| **Output Directory** | `dist` |
+| **Install Command** | `npm install` |
+
+### Step 3 — Client-Side Routing (SPA Rewrites)
+
+A `vercel.json` is already included at the project root:
+
 ```json
 {
   "rewrites": [
@@ -81,5 +135,52 @@ We have included a **[vercel.json](vercel.json)** file in the root directory to 
   ]
 }
 ```
-This configuration redirects all request paths to `index.html`, letting React Router resolve the client-side paths (like `/post/:postId` or `/category/:label`) without triggering Vercel 404 errors.
 
+This ensures React Router paths (e.g., `/post/:id`, `/category/:label`) don't return 404 on page refresh.
+
+### Step 4 — Deploy!
+Click **"Deploy"**. Vercel will build and publish automatically.
+
+### Auto-Deploy on Push
+After the initial deployment, any `git push` to your `main` branch will automatically trigger a new build and deploy on Vercel.
+
+---
+
+## 📁 Project Structure
+
+```
+theam/
+├── public/              # Static assets
+├── src/
+│   ├── components/
+│   │   ├── Header.jsx   # Sticky navigation with dark mode toggle
+│   │   ├── Footer.jsx   # 3-column footer with legal links
+│   │   ├── Sidebar.jsx  # About, categories, ads, recent posts
+│   │   └── StepHeader.jsx  # Safelink step progress banner
+│   ├── context/
+│   │   └── SafelinkContext.jsx  # Global safelink state management
+│   ├── pages/
+│   │   ├── Home.jsx     # Hero + post grid + safelink check widget
+│   │   ├── PostDetail.jsx  # Article + safelink 3-step timer
+│   │   ├── Category.jsx    # Category archive page
+│   │   └── StaticPages.jsx # About, Contact, Privacy, Disclaimer, ToS
+│   ├── services/
+│   │   └── bloggerApi.js  # Blogger API v3 integration
+│   ├── App.jsx
+│   ├── index.css        # Global styles
+│   └── main.jsx
+├── index.html           # Entry HTML with AdSense, fonts, Tailwind CDN
+├── vercel.json          # SPA rewrites for Vercel
+├── vite.config.js
+└── package.json
+```
+
+---
+
+## 🛡️ AdSense Policy Notes
+
+- Ad slots use `data-ad-format="auto"` with `data-full-width-responsive="true"`
+- No "Advertisement" or ad label text is shown (policy compliant)
+- Ads are injected between content paragraphs in `PostDetail.jsx` and in the sidebar
+- Publisher ID: `ca-pub-9543073887536718` (replace with your own)
+- Ad Slot ID: `7317709042` (replace with your own)

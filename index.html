@@ -5,10 +5,31 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- Primary Meta Tags -->
+    <title>SarkariTrend — Career Guidance, Job Notifications & Education Updates</title>
+    <meta name="title" content="SarkariTrend — Career Guidance, Job Notifications & Education Updates" />
+    <meta name="description" content="SarkariTrend is your premium source for sarkari job notifications, exam updates, career guidance, educational resources, and secure link gateway services." />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="SarkariTrend" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sarkaritrend.news/" />
+    <meta property="og:title" content="SarkariTrend — Career Guidance & Job Notifications" />
+    <meta property="og:description" content="Premium career guidance, sarkari job notifications, exam updates, and educational resources." />
+    <meta property="og:image" content="https://sarkaritrend.news/og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://sarkaritrend.news/" />
+    <meta property="twitter:title" content="SarkariTrend — Career Guidance & Job Notifications" />
+    <meta property="twitter:description" content="Premium career guidance, sarkari job notifications, exam updates, and educational resources." />
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,21 +39,27 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              heading: ['Outfit', 'sans-serif'],
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              heading: ['Outfit', 'system-ui', 'sans-serif'],
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.3s ease-out',
+              'slide-up': 'slideUp 0.4s ease-out',
+            },
+            keyframes: {
+              fadeIn: { from: { opacity: '0' }, to: { opacity: '1' } },
+              slideUp: { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
             }
           }
         }
       }
     </script>
-    
+
     <!-- AdSense Script -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9543073887536718"
          crossorigin="anonymous"></script>
-         
-    <title>SarkariTrend News</title>
   </head>
-  <body class="bg-zinc-55 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen transition-colors duration-200">
+  <body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen transition-colors duration-200">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
