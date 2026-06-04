@@ -201,23 +201,19 @@ export default function Home() {
 
       {/* ── Safelink Verification Widget ─────────────────── */}
       {showVerification && (
-        <div className="bg-gradient-to-br from-indigo-50 via-purple-50/50 to-white dark:from-indigo-950/20 dark:via-purple-950/10 dark:to-zinc-900 border border-indigo-100 dark:border-indigo-900/30 rounded-3xl p-8 sm:p-12 flex flex-col items-center gap-6 mb-12 shadow-sm">
-          {/* Ad above verification content */}
-          <AdSlot slot="7317709042" />
-
-          <div className="flex flex-col items-center gap-2 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center mb-2">
-              <span className="text-2xl">🛡️</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-white font-heading">
-              Gateway Access Verification
-            </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm">
-              Please confirm you are not a robot to continue to your secure destination.
+        <div className="bg-gradient-to-br from-indigo-50 via-purple-50/50 to-white dark:from-indigo-950/20 dark:via-purple-950/10 dark:to-zinc-900 border border-indigo-100 dark:border-indigo-900/30 rounded-3xl p-5 sm:p-6 flex flex-col items-center gap-3 mb-12 shadow-sm">
+          
+          <div className="text-center">
+            <p className="text-sm sm:text-base font-extrabold text-zinc-800 dark:text-zinc-200 uppercase tracking-wide">
+              Please confirm you are not a robot to continue
             </p>
           </div>
 
-          <div className="flex items-center gap-4 bg-white dark:bg-zinc-950 px-6 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm min-w-[280px] sm:min-w-[320px] justify-between">
+          {/* Ad directly above the verification box */}
+          <AdSlot slot="7317709042" />
+
+          {/* Checkbox box */}
+          <div className="flex items-center gap-4 bg-white dark:bg-zinc-950 px-6 py-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm min-w-[280px] sm:min-w-[320px] justify-between my-1">
             <div className="flex items-center gap-3">
               {verifying ? (
                 <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
@@ -243,7 +239,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Ad below verification (In-feed Ad unit) */}
+          {/* Ad directly below the verification box */}
           <AdSlot slot="1909584638" />
         </div>
       )}

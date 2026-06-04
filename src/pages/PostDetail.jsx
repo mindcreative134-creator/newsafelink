@@ -413,10 +413,7 @@ export default function PostDetail() {
                 </span>
               </div>
 
-              {/* Featured Image */}
-              <div className="w-full aspect-video overflow-hidden">
-                <img src={getPostImage(post)} alt={post.title} className="w-full h-full object-cover" />
-              </div>
+
 
               {/* ── Safelink Block (natural flow, compact) ─── */}
               <div className="px-5 sm:px-7">
