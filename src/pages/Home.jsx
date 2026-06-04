@@ -60,6 +60,32 @@ function HomeSkeleton() {
   );
 }
 
+// ── Ad Slot Component ────────────────────────────────────────────────────────
+function AdSlot({ format = 'auto', slot = '7317709042' }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const ins = ref.current;
+    if (!ins || ins.getAttribute('data-ad-status')) return;
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (_) {}
+  }, []);
+
+  return (
+    <div className="adsense-container w-full overflow-hidden">
+      <ins
+        ref={ref}
+        className="adsbygoogle"
+        style={{ display: 'block', width: '100%' }}
+        data-ad-client="ca-pub-9543073887536718"
+        data-ad-slot={slot}
+        data-ad-format={format}
+        data-full-width-responsive="true"
+      />
+    </div>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -172,6 +198,9 @@ export default function Home() {
       {/* ── Safelink Verification Widget ─────────────────── */}
       {showVerification && (
         <div className="bg-gradient-to-br from-indigo-50 via-purple-50/50 to-white dark:from-indigo-950/20 dark:via-purple-950/10 dark:to-zinc-900 border border-indigo-100 dark:border-indigo-900/30 rounded-3xl p-8 sm:p-12 flex flex-col items-center gap-6 mb-12 shadow-sm">
+          {/* Ad above verification content */}
+          <AdSlot slot="7317709042" />
+
           <div className="flex flex-col items-center gap-2 text-center">
             <div className="w-14 h-14 rounded-2xl bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center mb-2">
               <span className="text-2xl">🛡️</span>
@@ -209,6 +238,9 @@ export default function Home() {
               <span className="text-[8px] font-bold uppercase tracking-wider text-zinc-400">Shield</span>
             </div>
           </div>
+
+          {/* Ad below verification (In-feed Ad unit) */}
+          <AdSlot slot="1909584638" />
         </div>
       )}
 
@@ -268,50 +300,58 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post) => (
-              <article
-                key={post.id}
-                onClick={() => navigate(`/post/${post.id}`)}
-                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col group cursor-pointer"
-              >
-                {/* Image */}
-                <div className="aspect-video w-full overflow-hidden relative">
-                  <img
-                    src={getPostImage(post)}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  {post.labels && post.labels[0] && (
-                    <span className="absolute top-3 left-3 px-2.5 py-1 text-[10px] font-bold uppercase rounded-full bg-indigo-600 text-white">
-                      {post.labels[0]}
-                    </span>
-                  )}
-                </div>
+            {posts.map((post, index) => (
+              <React.Fragment key={post.id}>
+                <article
+                  onClick={() => navigate(`/post/${post.id}`)}
+                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col group cursor-pointer"
+                >
+                  {/* Image */}
+                  <div className="aspect-video w-full overflow-hidden relative">
+                    <img
+                      src={getPostImage(post)}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    {post.labels && post.labels[0] && (
+                      <span className="absolute top-3 left-3 px-2.5 py-1 text-[10px] font-bold uppercase rounded-full bg-indigo-600 text-white">
+                        {post.labels[0]}
+                      </span>
+                    )}
+                  </div>
 
-                {/* Content */}
-                <div className="p-5 flex-1 flex flex-col gap-3">
-                  <div className="flex items-center text-xs text-zinc-400 dark:text-zinc-500 gap-3">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {new Date(post.published).toLocaleDateString()}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <User className="w-3 h-3" />
-                      Staff
-                    </span>
+                  {/* Content */}
+                  <div className="p-5 flex-1 flex flex-col gap-3">
+                    <div className="flex items-center text-xs text-zinc-400 dark:text-zinc-500 gap-3">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(post.published).toLocaleDateString()}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Staff
+                      </span>
+                    </div>
+                    <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-2 leading-snug font-heading transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm line-clamp-2 flex-1">
+                      {getExcerpt(post.content, 100)}
+                    </p>
+                    <div className="flex items-center text-indigo-600 dark:text-indigo-400 font-semibold text-xs gap-1 group-hover:gap-2 transition-all mt-auto">
+                      Read More <ArrowRight className="w-3.5 h-3.5" />
+                    </div>
                   </div>
-                  <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-2 leading-snug font-heading transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm line-clamp-2 flex-1">
-                    {getExcerpt(post.content, 100)}
-                  </p>
-                  <div className="flex items-center text-indigo-600 dark:text-indigo-400 font-semibold text-xs gap-1 group-hover:gap-2 transition-all mt-auto">
-                    Read More <ArrowRight className="w-3.5 h-3.5" />
+                </article>
+
+                {/* Render In-feed Ad card after the 3rd post */}
+                {index === 2 && (
+                  <div className="col-span-1 sm:col-span-2 lg:col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+                    <AdSlot slot="1909584638" format="auto" />
                   </div>
-                </div>
-              </article>
+                )}
+              </React.Fragment>
             ))}
           </div>
 
