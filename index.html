@@ -55,9 +55,17 @@
       }
     </script>
 
-    <!-- AdSense Script -->
+    <!-- Google AdSense — Auto Ads enabled (Vignette + Anchor + In-page) -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9543073887536718"
          crossorigin="anonymous"></script>
+    <!-- Auto Ads config: enables Vignette (between page loads) + Anchor (sticky bottom) -->
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-9543073887536718",
+        enable_page_level_ads: true,
+        overlays: { bottom: true }
+      });
+    </script>
   </head>
   <body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen transition-colors duration-200">
     <div id="root"></div>

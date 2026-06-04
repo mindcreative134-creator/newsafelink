@@ -6,9 +6,9 @@ import Sidebar from '../components/Sidebar';
 import StepHeader from '../components/StepHeader';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
-// ─── Ad Slot — No placeholder, zero space until rendered ──────────────────────
-let adPushCount = 0;
-function AdSlot() {
+// ─── Ad Slot — Multi-format, zero placeholder ─────────────────────────────────
+// format: 'auto' | 'fluid' (in-article) | 'autorelaxed' (multiplex/native)
+function AdSlot({ format = 'auto', layout = '' }) {
   const ref = useRef(null);
   useEffect(() => {
     const ins = ref.current;
@@ -18,6 +18,9 @@ function AdSlot() {
     } catch (_) {}
   }, []);
 
+  // In-article ads need layout="in-article" and format="fluid"
+  const isInArticle = format === 'fluid';
+
   return (
     <div className="adsense-container">
       <ins
@@ -26,8 +29,10 @@ function AdSlot() {
         style={{ display: 'block', width: '100%' }}
         data-ad-client="ca-pub-9543073887536718"
         data-ad-slot="7317709042"
-        data-ad-format="auto"
+        data-ad-format={format}
         data-full-width-responsive="true"
+        {...(isInArticle ? { 'data-ad-layout': 'in-article' } : {})}
+        {...(layout ? { 'data-ad-layout': layout } : {})}
       />
     </div>
   );
