@@ -60,3 +60,26 @@ Serves the local portal at: **[http://localhost:5173/](http://localhost:5173/)**
 npm run build
 ```
 Generates optimized static build assets inside the `/dist` directory.
+
+---
+
+## ⚡ Vercel Deployment Instructions
+
+To deploy this React + Vite SPA on **Vercel**, follow these configuration parameters:
+
+### 1. Build and Output Settings
+* **Framework Preset**: `Vite`
+* **Build Command**: `npm run build` or `vite build`
+* **Output Directory**: `dist`
+
+### 2. Client-Side Routing (vercel.json)
+We have included a **[vercel.json](vercel.json)** file in the root directory to handle client-side routing rewrites for Single Page Applications (SPAs):
+```json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
+This configuration redirects all request paths to `index.html`, letting React Router resolve the client-side paths (like `/post/:postId` or `/category/:label`) without triggering Vercel 404 errors.
+
