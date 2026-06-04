@@ -253,13 +253,23 @@ export default function PostDetail() {
         {/* Ad 1 — above instructions (Uses Banner unit) */}
         <AdSlot format="auto" />
 
-        {/* Compact instruction text — same style as image */}
+        {/* Pulsing Green Instruction Bars (studyaf style) */}
+        <div className="safelink-pills">
+          <div className="safelink-pill">
+            ▼ CLICK ANY IMAGE 👆 &amp; Wait 15 Seconds to GET LINK ▼ 👇
+          </div>
+          <div className="safelink-pill">
+            ▼ CLICK ANY IMAGE 👆 &amp; Wait 15 Seconds to GET LINK ▼ 👇
+          </div>
+        </div>
+
+        {/* Compact instruction text — studyaf style */}
         <div className="safelink-instructions">
-          <p className="safelink-inst-en">
-            👉 <strong>Click Image &amp; Wait, then Come Back to Get Your Link</strong>
+          <p className="safelink-inst-en text-center text-zinc-900 dark:text-zinc-100">
+            👉 Click Image &amp; Wait &amp; Come back this page to <span className="text-red-650 dark:text-red-400 font-extrabold">Get Link - Download</span>.
           </p>
-          <p className="safelink-inst-hi font-hindi">
-            ▼ LINK पाने के लिए — 👇 फोटो पर क्लिक करें, 15 सेकंड रुकें, फिर इसी PC/Mobile स्क्रीन पर वापस आएं
+          <p className="safelink-inst-hi font-hindi text-center text-zinc-800 dark:text-zinc-200">
+            ▼ <span className="text-red-650 dark:text-red-400 font-bold">LINK पाने और DOWNLOAD करने के लिए</span>, 👇 फोटो पर क्लिक करें, <span className="text-red-650 dark:text-red-400 font-extrabold">15 सेकंड रुकें</span> और फिर इसी पेज पर वापस आएं
           </p>
         </div>
 
@@ -279,21 +289,17 @@ export default function PostDetail() {
           !stepVerified ? (
             <button
               onClick={handleVerifyClick}
-              className={`${btnBase} bg-red-600 hover:bg-red-700 text-white`}
+              className={`${btnBase} bg-red-600 hover:bg-red-700 text-white font-extrabold uppercase px-12`}
             >
-              ✓ Verify
+              Verify
             </button>
           ) : (
             <div className="text-center py-2">
               <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800">
                 ✓ Verification Completed Successfully
               </span>
-              <p className="safelink-scroll-hint mt-3">
-                Scroll down to the bottom &amp; click on{' '}
-                <span className="text-indigo-600 dark:text-indigo-400 font-bold">
-                  {currentStep === 3 ? 'Get Your Link' : currentStep === 2 ? 'Continue to Final Step' : 'Continue to Step 2'}
-                </span>{' '}
-                button.
+              <p className="safelink-scroll-hint mt-3 text-center font-semibold text-zinc-600 dark:text-zinc-400">
+                Scroll down &amp; click on <span className="text-indigo-600 dark:text-indigo-400 font-bold">Continue</span> button for your destination link
               </p>
             </div>
           )
