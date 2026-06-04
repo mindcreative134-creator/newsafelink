@@ -71,6 +71,9 @@ function AdSlot({ format = 'auto', slot = '7317709042' }) {
     } catch (_) {}
   }, []);
 
+  const isFeed = slot === '1909584638';
+  const adFormat = isFeed ? 'fluid' : format;
+
   return (
     <div className="adsense-container w-full overflow-hidden">
       <ins
@@ -79,8 +82,9 @@ function AdSlot({ format = 'auto', slot = '7317709042' }) {
         style={{ display: 'block', width: '100%' }}
         data-ad-client="ca-pub-9543073887536718"
         data-ad-slot={slot}
-        data-ad-format={format}
-        data-full-width-responsive="true"
+        data-ad-format={adFormat}
+        data-full-width-responsive={adFormat === 'auto' ? "true" : "false"}
+        {...(isFeed ? { 'data-ad-layout-key': '-6t+ed+2i-1n-4w' } : {})}
       />
     </div>
   );

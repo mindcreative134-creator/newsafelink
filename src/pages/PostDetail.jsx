@@ -7,7 +7,7 @@ import StepHeader from '../components/StepHeader';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
 // ─── Ad Slot — Multi-format, zero placeholder ─────────────────────────────────
-// format: 'auto' | 'fluid' (in-article) | 'autorelaxed' (multiplex/native) | 'display-second'
+// format: 'auto' | 'fluid' (in-article) | 'autorelaxed' (multiplex/native) | 'in-feed' | 'display-second'
 function AdSlot({ format = 'auto', layout = '' }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -29,13 +29,18 @@ function AdSlot({ format = 'auto', layout = '' }) {
   } else if (format === 'autorelaxed') {
     // "multi" Multiplex unit
     adSlotId = "8617081290";
+  } else if (format === 'in-feed') {
+    // "Ad's" In-feed unit
+    adSlotId = "1909584638";
+    adFormat = "fluid";
   } else if (format === 'display-second') {
     // "Display ads" unit
     adSlotId = "5754054742";
     adFormat = "auto";
   }
 
-  const isInArticle = adFormat === 'fluid';
+  const isInArticle = adFormat === 'fluid' && format === 'fluid';
+  const isInFeed = adFormat === 'fluid' && format === 'in-feed';
 
   return (
     <div className="adsense-container">
@@ -46,8 +51,9 @@ function AdSlot({ format = 'auto', layout = '' }) {
         data-ad-client="ca-pub-9543073887536718"
         data-ad-slot={adSlotId}
         data-ad-format={adFormat}
-        data-full-width-responsive="true"
+        data-full-width-responsive={adFormat === 'auto' ? "true" : "false"}
         {...(isInArticle ? { 'data-ad-layout': 'in-article' } : {})}
+        {...(isInFeed ? { 'data-ad-layout-key': '-6t+ed+2i-1n-4w' } : {})}
         {...(adLayout ? { 'data-ad-layout': adLayout } : {})}
       />
     </div>
@@ -105,9 +111,13 @@ export default function PostDetail() {
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
   const [timerActive, setTimerActive] = useState(false);
   const [timerDone, setTimerDone] = useState(false);
+  const [stepVerified, setStepVerified] = useState(false);
   const timerRef = useRef(null);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [postId]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    setStepVerified(false);
+  }, [currentStep, postId]);
 
   // Fetch post
   useEffect(() => {
@@ -186,6 +196,14 @@ export default function PostDetail() {
     if (targetUrl) { clearSafelink(); window.location.href = targetUrl; }
   };
 
+  const handleVerifyClick = () => {
+    setStepVerified(true);
+    setTimeout(() => {
+      const el = document.getElementById('safelink-bottom');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   if (loading) return <PostDetailSkeleton />;
 
   if (error || !post) {
@@ -245,8 +263,8 @@ export default function PostDetail() {
           </p>
         </div>
 
-        {/* Ad 2 — between instructions and button (Uses Display ads unit) */}
-        <AdSlot format="display-second" />
+        {/* Ad 2 — between instructions and button (Uses In-feed unit 1909584638) */}
+        <AdSlot format="in-feed" />
 
         {/* Timer (visible only while countdown running) */}
         {timerActive && (
@@ -258,38 +276,31 @@ export default function PostDetail() {
 
         {/* Action button — shown only when timer is done */}
         {timerDone && (
-          currentStep === 3 ? (
-            <button onClick={handleFinalRedirect} className={`${btnBase} bg-green-600 hover:bg-green-700 text-white`}>
-              🔓 Get Your Link
-            </button>
-          ) : currentStep === 2 ? (
-            <button onClick={handleStepTransition} className={`${btnBase} bg-indigo-600 hover:bg-indigo-700 text-white`}>
-              Continue to Final Step <ArrowRight className="w-4 h-4" />
-            </button>
-          ) : (
+          !stepVerified ? (
             <button
-              onClick={() => {
-                const el = document.getElementById('safelink-bottom');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
+              onClick={handleVerifyClick}
               className={`${btnBase} bg-red-600 hover:bg-red-700 text-white`}
             >
               ✓ Verify
             </button>
+          ) : (
+            <div className="text-center py-2">
+              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800">
+                ✓ Verification Completed Successfully
+              </span>
+              <p className="safelink-scroll-hint mt-3">
+                Scroll down to the bottom &amp; click on{' '}
+                <span className="text-indigo-600 dark:text-indigo-400 font-bold">
+                  {currentStep === 3 ? 'Get Your Link' : currentStep === 2 ? 'Continue to Final Step' : 'Continue to Step 2'}
+                </span>{' '}
+                button.
+              </p>
+            </div>
           )
         )}
 
         {/* Ad 3 — below button (Uses Banner unit) */}
         <AdSlot format="auto" />
-
-        {/* Scroll hint — only on step 1 after verify */}
-        {timerDone && currentStep === 1 && (
-          <p className="safelink-scroll-hint">
-            Scroll down &amp; click on{' '}
-            <span className="text-indigo-600 dark:text-indigo-400 font-bold">Continue</span>{' '}
-            button for your destination link
-          </p>
-        )}
 
         {/* Ad 4 — bottom of block (Uses Multiplex grid recommendations) */}
         <AdSlot format="autorelaxed" />
@@ -297,27 +308,57 @@ export default function PostDetail() {
     );
   };
 
-  // Bottom continue trigger (only step 1, after verify)
+  // Bottom continue trigger (for steps 1, 2, 3 after verify)
   const BottomTrigger = () => {
     if (!currentStep) return null;
-    if (currentStep !== 1) return null; // Steps 2 & 3 handled in SafelinkBlock
+
+    // Determine the button label and action based on step
+    let actionBtn = null;
+    if (currentStep === 1) {
+      actionBtn = (
+        <button
+          onClick={handleStepTransition}
+          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 text-sm"
+        >
+          Continue to Step 2 <ArrowRight className="w-4 h-4" />
+        </button>
+      );
+    } else if (currentStep === 2) {
+      actionBtn = (
+        <button
+          onClick={handleStepTransition}
+          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 text-sm"
+        >
+          Continue to Final Step <ArrowRight className="w-4 h-4" />
+        </button>
+      );
+    } else if (currentStep === 3) {
+      actionBtn = (
+        <button
+          onClick={handleFinalRedirect}
+          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-10 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 text-sm"
+        >
+          🔓 Get Your Link
+        </button>
+      );
+    }
+
     return (
       <div id="safelink-bottom" className="safelink-bottom-trigger">
         {!timerDone ? (
           <span className="safelink-wait-label">
-            ⏳ Please complete verification above first
+            ⏳ Please wait for the timer above to complete
+          </span>
+        ) : !stepVerified ? (
+          <span className="safelink-wait-label">
+            ⏳ Please click "Verify" above first
           </span>
         ) : (
           <>
-            {/* Uses Display ads unit */}
-            <AdSlot format="display-second" />
-            <button
-              onClick={handleStepTransition}
-              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 text-sm"
-            >
-              Continue to Step 2 <ArrowRight className="w-4 h-4" />
-            </button>
-            {/* Uses Multiplex grid unit */}
+            {/* Uses In-feed ad unit (1909584638) */}
+            <AdSlot format="in-feed" />
+            {actionBtn}
+            {/* Uses Multiplex grid unit (8617081290) */}
             <AdSlot format="autorelaxed" />
           </>
         )}
