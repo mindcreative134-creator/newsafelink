@@ -225,7 +225,7 @@ export default function PostDetail() {
   };
 
   // ── Safelink Block ─────────────────────────────────────────────────────────
-  const SafelinkBlock = () => {
+  const renderSafelinkBlock = () => {
     if (!currentStep) return null;
 
     return (
@@ -326,7 +326,7 @@ export default function PostDetail() {
   };
 
   // ── Bottom Continue Trigger ────────────────────────────────────────────────
-  const BottomTrigger = () => {
+  const renderBottomTrigger = () => {
     if (!currentStep) return null;
 
     let actionBtn = null;
@@ -447,7 +447,7 @@ export default function PostDetail() {
 
               {/* Safelink Block */}
               <div className="px-5 sm:px-7">
-                <SafelinkBlock />
+                {renderSafelinkBlock()}
               </div>
 
               {/* Post Content */}
@@ -455,7 +455,7 @@ export default function PostDetail() {
 
               {/* Bottom Step Trigger */}
               <div className="px-5 sm:px-7 pb-7">
-                <BottomTrigger />
+                {renderBottomTrigger()}
               </div>
 
             </article>
