@@ -42,11 +42,11 @@ function AdSlot({ format = 'auto', layout = '' }) {
   const isInFeed = adFormat === 'fluid' && format === 'in-feed';
 
   return (
-    <div className="adsense-container">
+    <div className="adsense-container" style={{ width: '100%', display: 'block', alignSelf: 'stretch' }}>
       <ins
         ref={ref}
         className="adsbygoogle"
-        style={{ display: 'block', width: '100%' }}
+        style={{ display: 'block', width: '100%', minWidth: 0 }}
         data-ad-client="ca-pub-9543073887536718"
         data-ad-slot={adSlotId}
         data-ad-format={adFormat}

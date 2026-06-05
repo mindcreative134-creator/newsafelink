@@ -24,18 +24,29 @@ body {
 /* =========================================================
    AdSense Container — Zero-placeholder, natural flow
    ========================================================= */
+/* =========================================================
+   AdSense Container — Zero-placeholder, natural flow
+   Critical: NEVER use align-items:center on flex containers
+   that wrap .adsense-container or <ins> — it collapses width
+   to 0 on mobile (no content = 0 width in a flex column).
+   ========================================================= */
 .adsense-container {
   display: block !important;
   width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
   overflow: hidden;
-  margin: 4px 0;
+  margin: 0;
   line-height: 0;
   font-size: 0;
+  flex-shrink: 0;
+  align-self: stretch !important;
 }
 .adsense-container ins {
   display: block !important;
-  margin: 0 auto;
   width: 100% !important;
+  min-width: 0;
+  margin: 0;
 }
 
 /* =========================================================
@@ -190,10 +201,21 @@ html {
 .safelink-flow {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* DO NOT use align-items:center — it collapses ad containers to 0 width on mobile */
+  align-items: stretch;
   gap: 0;
   width: 100%;
   margin: 12px 0;
+}
+/* Center only buttons/pills/text, NOT the ad containers */
+.safelink-flow .safelink-pill,
+.safelink-flow .safelink-timer,
+.safelink-flow button,
+.safelink-flow .safelink-verified-label,
+.safelink-flow .safelink-instructions,
+.safelink-flow .safelink-scroll-hint,
+.safelink-flow > div.text-center {
+  align-self: center;
 }
 
 /* Green Instruction Bars (studyaf style) */
@@ -305,12 +327,17 @@ html {
 .safelink-bottom-trigger {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* DO NOT use align-items:center — it collapses ad containers to 0 width on mobile */
+  align-items: stretch;
   gap: 0;
   width: 100%;
   border-top: 1px solid #e4e4e7;
   padding-top: 12px;
   margin-top: 12px;
+}
+.safelink-bottom-trigger button,
+.safelink-bottom-trigger .safelink-wait-label {
+  align-self: center;
 }
 .dark .safelink-bottom-trigger { border-top-color: #3f3f46; }
 
@@ -348,13 +375,19 @@ html {
   margin-bottom: 0 !important;
 }
 
-/* Remove extra gap inside Safelink Verification Widget */
+/* Safelink Verification Widget — align-items:stretch for ads, center for rest */
 .safelink-verification-widget {
-  gap: 4px !important;
+  gap: 0 !important;
+  align-items: stretch !important;
 }
-.safelink-verification-widget > * {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
+.safelink-verification-widget > .adsense-container {
+  align-self: stretch !important;
+  width: 100% !important;
+}
+.safelink-verification-widget > *:not(.adsense-container) {
+  align-self: center;
+  margin-top: 4px !important;
+  margin-bottom: 4px !important;
 }
 
 @media (max-width: 640px) {

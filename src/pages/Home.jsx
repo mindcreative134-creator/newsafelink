@@ -75,11 +75,11 @@ function AdSlot({ format = 'auto', slot = '7317709042' }) {
   const adFormat = isFeed ? 'fluid' : format;
 
   return (
-    <div className="adsense-container w-full overflow-hidden">
+    <div className="adsense-container w-full overflow-hidden" style={{ display: 'block', alignSelf: 'stretch' }}>
       <ins
         ref={ref}
         className="adsbygoogle"
-        style={{ display: 'block', width: '100%' }}
+        style={{ display: 'block', width: '100%', minWidth: 0 }}
         data-ad-client="ca-pub-9543073887536718"
         data-ad-slot={slot}
         data-ad-format={adFormat}

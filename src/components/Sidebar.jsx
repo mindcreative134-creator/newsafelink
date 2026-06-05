@@ -12,10 +12,10 @@ function SidebarAdSlot() {
   }, []);
 
   return (
-    <div className="adsense-container w-full overflow-hidden">
+    <div className="adsense-container w-full overflow-hidden" style={{ display: 'block' }}>
       <ins
         className="adsbygoogle"
-        style={{ display: 'block', width: '100%' }}
+        style={{ display: 'block', width: '100%', minWidth: 0 }}
         data-ad-client="ca-pub-9543073887536718"
         data-ad-slot="7317709042"
         data-ad-format="auto"
