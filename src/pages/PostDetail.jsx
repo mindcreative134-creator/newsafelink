@@ -3,63 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getPostById, getPosts } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
+import AdUnit from '../components/AdUnit';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
-// ─── Ad Slot — Multi-format, zero placeholder ─────────────────────────────────
-// format: 'auto' | 'fluid' (in-article) | 'autorelaxed' (multiplex/native) | 'in-feed' | 'display-second'
-function AdSlot({ format = 'auto', layout = '' }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    const ins = ref.current;
-    if (!ins || ins.getAttribute('data-ad-status')) return;
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (_) {}
-  }, []);
-
-  // Map format/type to the user's specific AdSense Ad Unit IDs
-  let adSlotId = "7317709042"; // Default: "Banner" (Display format)
-  let adFormat = format;
-  let adLayout = layout;
-
-  if (format === 'fluid') {
-    // "Article" In-article unit
-    adSlotId = "1641433819";
-  } else if (format === 'autorelaxed') {
-    // "multi" Multiplex unit
-    adSlotId = "8617081290";
-  } else if (format === 'in-feed') {
-    // "Ad's" In-feed unit
-    adSlotId = "1909584638";
-    adFormat = "fluid";
-  } else if (format === 'display-second') {
-    // "Display ads" unit
-    adSlotId = "5754054742";
-    adFormat = "auto";
-  }
-
-  const isInArticle = adFormat === 'fluid' && format === 'fluid';
-  const isInFeed = adFormat === 'fluid' && format === 'in-feed';
-
-  return (
-    <div className="adsense-container" style={{ width: '100%', display: 'block', alignSelf: 'stretch' }}>
-      <ins
-        ref={ref}
-        className="adsbygoogle"
-        style={{ display: 'block', width: '100%', minWidth: 0 }}
-        data-ad-client="ca-pub-9543073887536718"
-        data-ad-slot={adSlotId}
-        data-ad-format={adFormat}
-        data-full-width-responsive={adFormat === 'auto' ? "true" : "false"}
-        {...(isInArticle ? { 'data-ad-layout': 'in-article' } : {})}
-        {...(isInFeed ? { 'data-ad-layout-key': '-6t+ed+2i-1n-4w' } : {})}
-        {...(adLayout ? { 'data-ad-layout': adLayout } : {})}
-      />
-    </div>
-  );
-}
-
-// ─── Shimmer Skeleton ─────────────────────────────────────────────────────────
+// ─── Shimmer Skeleton ──────────────────────────────────────────────────────────
 function PostDetailSkeleton() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-pulse">
@@ -95,7 +42,7 @@ function PostDetailSkeleton() {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Main Component ────────────────────────────────────────────────────────────
 const TIMER_DURATION = 15;
 
 export default function PostDetail() {
@@ -106,7 +53,6 @@ export default function PostDetail() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
   const [timerActive, setTimerActive] = useState(false);
   const [timerDone, setTimerDone] = useState(false);
@@ -175,7 +121,6 @@ export default function PostDetail() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [currentStep, post, postId]);
 
-  // Step transition
   const handleStepTransition = () => {
     setLoading(true);
     getPosts({ maxResults: 20 })
@@ -217,13 +162,12 @@ export default function PostDetail() {
     );
   }
 
-  // Inject ads into blogger content using the In-article ad unit
+  // Inject in-article ads into blogger HTML content
   const injectAds = (html) => {
     if (!html) return '';
     const paras = html.split('</p>');
     if (paras.length <= 3) return html;
-    // In-article ad unit slot is 1641433819
-    const adUnit = `<div class="adsense-container"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-9543073887536718" data-ad-slot="1641433819"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>`;
+    const adUnit = `<div style="display:block;width:100%;overflow:hidden;margin:8px 0;"><ins class="adsbygoogle" style="display:block;width:100%;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-9543073887536718" data-ad-slot="1641433819"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>`;
     let out = '';
     for (let i = 0; i < paras.length; i++) {
       out += paras[i];
@@ -239,84 +183,100 @@ export default function PostDetail() {
     return m ? m[1] : `https://picsum.photos/seed/${p.id}/1200/600`;
   };
 
-  // ── The safelink mid-article block ────────────────────────────────────────
+  // ── Safelink Block ─────────────────────────────────────────────────────────
   const SafelinkBlock = () => {
     if (!currentStep) return null;
 
-    const btnBase =
-      'inline-flex items-center justify-center gap-2 font-bold text-sm py-3 px-8 rounded-full shadow transition-all active:scale-95';
-
     return (
-      <div className="safelink-flow">
+      <div style={{ width: '100%', display: 'block', margin: '12px 0' }}>
 
-        {/* Ad 1 — above instructions (Uses Banner unit) */}
-        <AdSlot format="auto" />
+        {/* Ad 1 — Banner display */}
+        <div style={{ width: '100%', display: 'block', marginBottom: 8 }}>
+          <AdUnit slot="7317709042" format="auto" />
+        </div>
 
-        {/* Pulsing Green Instruction Bars (studyaf style) */}
+        {/* Pulsing Green Instruction Pills */}
         <div className="safelink-pills">
-          <div className="safelink-pill">
-            ▼ CLICK ANY IMAGE 👆 &amp; Wait 15 Seconds to GET LINK ▼ 👇
-          </div>
-          <div className="safelink-pill">
-            ▼ CLICK ANY IMAGE 👆 &amp; Wait 15 Seconds to GET LINK ▼ 👇
-          </div>
+          <div className="safelink-pill">▼ CLICK ANY IMAGE 👆 &amp; Wait 15 Seconds to GET LINK ▼ 👇</div>
+          <div className="safelink-pill">▼ CLICK ANY IMAGE 👆 &amp; Wait 15 Seconds to GET LINK ▼ 👇</div>
         </div>
 
-        {/* Compact instruction text — studyaf style */}
+        {/* Instruction banner */}
         <div className="safelink-instructions">
-          <p className="safelink-inst-en text-center text-zinc-900 dark:text-zinc-100">
-            👉 Click Image &amp; Wait &amp; Come back this page to <span className="text-red-650 dark:text-red-400 font-extrabold">Get Link - Download</span>.
+          <p className="safelink-inst-en" style={{ textAlign: 'center', color: 'inherit' }}>
+            👉 Click Image &amp; Wait &amp; Come back this page to <span style={{ color: '#dc2626', fontWeight: 800 }}>Get Link - Download</span>.
           </p>
-          <p className="safelink-inst-hi font-hindi text-center text-zinc-800 dark:text-zinc-200">
-            ▼ <span className="text-red-650 dark:text-red-400 font-bold">LINK पाने और DOWNLOAD करने के लिए</span>, 👇 फोटो पर क्लिक करें, <span className="text-red-650 dark:text-red-400 font-extrabold">15 सेकंड रुकें</span> और फिर इसी पेज पर वापस आएं
+          <p className="safelink-inst-hi font-hindi" style={{ textAlign: 'center', color: 'inherit' }}>
+            ▼ <span style={{ color: '#dc2626', fontWeight: 700 }}>LINK पाने और DOWNLOAD करने के लिए</span>, 👇 फोटो पर क्लिक करें, <span style={{ color: '#dc2626', fontWeight: 800 }}>15 सेकंड रुकें</span> और फिर इसी पेज पर वापस आएं
           </p>
         </div>
 
-        {/* Ad 2 — between instructions and button (Uses In-feed unit 1909584638) */}
-        <AdSlot format="in-feed" />
+        {/* Ad 2 — In-feed */}
+        <div style={{ width: '100%', display: 'block', marginBottom: 8 }}>
+          <AdUnit slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" />
+        </div>
 
-        {/* Timer (visible only while countdown running) */}
+        {/* Timer */}
         {timerActive && (
           <div className="safelink-timer">
             <span>Please wait {timeLeft} Seconds...</span>
           </div>
         )}
 
-        {/* Action button — shown only when timer is done */}
+        {/* Verify button / verified label */}
         {timerDone && (
           !stepVerified ? (
-            <button
-              onClick={handleVerifyClick}
-              className={`${btnBase} bg-red-600 hover:bg-red-700 text-white font-extrabold uppercase px-12`}
-            >
-              Verify
-            </button>
+            <div style={{ textAlign: 'center', margin: '8px 0' }}>
+              <button
+                onClick={handleVerifyClick}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  gap: 8, fontWeight: 800, fontSize: '0.875rem',
+                  padding: '12px 48px', borderRadius: '9999px',
+                  background: '#dc2626', color: '#fff',
+                  border: 'none', cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(220,38,38,0.25)',
+                  textTransform: 'uppercase', letterSpacing: '0.05em',
+                }}
+              >
+                Verify
+              </button>
+            </div>
           ) : (
-            <div className="text-center py-2">
-              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800">
+            <div style={{ textAlign: 'center', margin: '8px 0' }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '6px 16px', borderRadius: '9999px', fontSize: '0.75rem',
+                fontWeight: 700, background: '#f0fdf4', color: '#16a34a',
+                border: '1px solid #bbf7d0',
+              }}>
                 ✓ Verification Completed Successfully
               </span>
-              <p className="safelink-scroll-hint mt-3 text-center font-semibold text-zinc-600 dark:text-zinc-400">
-                Scroll down &amp; click on <span className="text-indigo-600 dark:text-indigo-400 font-bold">Continue</span> button for your destination link
+              <p style={{ fontSize: '0.75rem', color: '#71717a', textAlign: 'center', margin: '8px 0 0', padding: '0 6px' }}>
+                Scroll down &amp; click on <span style={{ color: '#4f46e5', fontWeight: 700 }}>Continue</span> button for your destination link
               </p>
             </div>
           )
         )}
 
-        {/* Ad 3 — below button (Uses Display ads unit) */}
-        <AdSlot format="display-second" />
+        {/* Ad 3 — Display second */}
+        <div style={{ width: '100%', display: 'block', marginTop: 8 }}>
+          <AdUnit slot="5754054742" format="auto" />
+        </div>
 
-        {/* Ad 4 — bottom of block (Uses Multiplex grid recommendations) */}
-        <AdSlot format="autorelaxed" />
+        {/* Ad 4 — Multiplex */}
+        <div style={{ width: '100%', display: 'block' }}>
+          <AdUnit slot="8617081290" format="autorelaxed" />
+        </div>
+
       </div>
     );
   };
 
-  // Bottom continue trigger (for steps 1, 2, 3 after verify)
+  // ── Bottom Continue Trigger ────────────────────────────────────────────────
   const BottomTrigger = () => {
     if (!currentStep) return null;
 
-    // Determine the button label and action based on step
     let actionBtn = null;
     if (currentStep === 1) {
       actionBtn = (
@@ -348,22 +308,30 @@ export default function PostDetail() {
     }
 
     return (
-      <div id="safelink-bottom" className="safelink-bottom-trigger">
+      <div id="safelink-bottom" style={{
+        width: '100%', display: 'block',
+        borderTop: '1px solid #e4e4e7',
+        paddingTop: 16, marginTop: 16,
+      }}>
         {!timerDone ? (
-          <span className="safelink-wait-label">
+          <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#a1a1aa', fontWeight: 600, padding: '8px 16px', background: '#f4f4f5', borderRadius: 8, border: '1px solid #e4e4e7', display: 'inline-block', margin: '0 auto' }}>
             ⏳ Please wait for the timer above to complete
-          </span>
+          </p>
         ) : !stepVerified ? (
-          <span className="safelink-wait-label">
+          <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#a1a1aa', fontWeight: 600, padding: '8px 16px', background: '#f4f4f5', borderRadius: 8, border: '1px solid #e4e4e7', display: 'inline-block', margin: '0 auto' }}>
             ⏳ Please click "Verify" above first
-          </span>
+          </p>
         ) : (
           <>
-            {/* Uses In-feed ad unit (1909584638) */}
-            <AdSlot format="in-feed" />
-            {actionBtn}
-            {/* Uses Multiplex grid unit (8617081290) */}
-            <AdSlot format="autorelaxed" />
+            <div style={{ width: '100%', display: 'block', marginBottom: 12 }}>
+              <AdUnit slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" />
+            </div>
+            <div style={{ textAlign: 'center', marginBottom: 12 }}>
+              {actionBtn}
+            </div>
+            <div style={{ width: '100%', display: 'block' }}>
+              <AdUnit slot="8617081290" format="autorelaxed" />
+            </div>
           </>
         )}
       </div>
@@ -409,9 +377,7 @@ export default function PostDetail() {
                 </span>
               </div>
 
-
-
-              {/* ── Safelink Block (natural flow, compact) ─── */}
+              {/* Safelink Block */}
               <div className="px-5 sm:px-7">
                 <SafelinkBlock />
               </div>

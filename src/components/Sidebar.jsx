@@ -2,28 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPosts } from '../services/bloggerApi';
 import { Tag, Clock } from 'lucide-react';
-
-// Sidebar Ad Slot
-function SidebarAdSlot() {
-  useEffect(() => {
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (e) {}
-  }, []);
-
-  return (
-    <div className="adsense-container w-full overflow-hidden" style={{ display: 'block' }}>
-      <ins
-        className="adsbygoogle"
-        style={{ display: 'block', width: '100%', minWidth: 0 }}
-        data-ad-client="ca-pub-9543073887536718"
-        data-ad-slot="7317709042"
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      />
-    </div>
-  );
-}
+import AdUnit from './AdUnit';
 
 export default function Sidebar() {
   const [recentPosts, setRecentPosts] = useState([]);
@@ -101,7 +80,7 @@ export default function Sidebar() {
       )}
 
       {/* Ad Slot */}
-      <SidebarAdSlot />
+      <AdUnit slot="7317709042" format="auto" />
 
       {/* Recent Posts Widget */}
       {recentPosts.length > 0 && (

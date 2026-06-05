@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getPosts } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
+import AdUnit from '../components/AdUnit';
 import { Calendar, User, ArrowRight, TrendingUp } from 'lucide-react';
 
 // ── Skeleton Components ───────────────────────────────────────────────────────
@@ -27,16 +28,10 @@ function PostCardSkeleton() {
   );
 }
 
-function FeaturedPostSkeleton() {
-  return (
-    <div className="w-full h-80 sm:h-96 lg:h-[26rem] bg-zinc-200 dark:bg-zinc-800 rounded-3xl animate-pulse mb-10" />
-  );
-}
-
 function HomeSkeleton() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <FeaturedPostSkeleton />
+      <div className="w-full h-80 sm:h-96 bg-zinc-200 dark:bg-zinc-800 rounded-3xl animate-pulse mb-10" />
       <div className="flex flex-col lg:flex-row gap-12">
         <div className="flex-1 flex flex-col gap-8">
           <div className="h-8 w-44 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse" />
@@ -56,36 +51,6 @@ function HomeSkeleton() {
           ))}
         </div>
       </div>
-    </div>
-  );
-}
-
-// ── Ad Slot Component ────────────────────────────────────────────────────────
-function AdSlot({ format = 'auto', slot = '7317709042' }) {
-  const ref = React.useRef(null);
-  React.useEffect(() => {
-    const ins = ref.current;
-    if (!ins || ins.getAttribute('data-ad-status')) return;
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (_) {}
-  }, []);
-
-  const isFeed = slot === '1909584638';
-  const adFormat = isFeed ? 'fluid' : format;
-
-  return (
-    <div className="adsense-container w-full overflow-hidden" style={{ display: 'block', alignSelf: 'stretch' }}>
-      <ins
-        ref={ref}
-        className="adsbygoogle"
-        style={{ display: 'block', width: '100%', minWidth: 0 }}
-        data-ad-client="ca-pub-9543073887536718"
-        data-ad-slot={slot}
-        data-ad-format={adFormat}
-        data-full-width-responsive={adFormat === 'auto' ? "true" : "false"}
-        {...(isFeed ? { 'data-ad-layout-key': '-6t+ed+2i-1n-4w' } : {})}
-      />
     </div>
   );
 }
@@ -148,15 +113,6 @@ export default function Home() {
       document.head.appendChild(metaDesc);
     }
 
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) canonical.setAttribute('href', window.location.href);
-    else {
-      canonical = document.createElement('link');
-      canonical.rel = 'canonical';
-      canonical.href = window.location.href;
-      document.head.appendChild(canonical);
-    }
-
     getPosts({ maxResults: 10 })
       .then((data) => {
         if (data.items && data.items.length > 0) {
@@ -199,55 +155,101 @@ export default function Home() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
 
-      {/* ── Safelink Verification Widget ─────────────────── */}
+      {/* ── Safelink Verification Widget ─────────────────────────────────── */}
       {showVerification && (
-        <div className="safelink-verification-widget w-full bg-gradient-to-br from-indigo-50 via-purple-50/50 to-white dark:from-indigo-950/20 dark:via-purple-950/10 dark:to-zinc-900 border border-indigo-100 dark:border-indigo-900/30 rounded-3xl p-4 sm:p-5 flex flex-col gap-0 mb-10 shadow-sm">
-          
-          <div className="text-center self-center">
-            <p className="text-sm sm:text-base font-extrabold text-zinc-800 dark:text-zinc-200 uppercase tracking-wide">
-              Please confirm you are not a robot to continue
-            </p>
+        <div style={{
+          width: '100%',
+          background: 'linear-gradient(135deg, #eef2ff 0%, #f5f3ff 50%, #ffffff 100%)',
+          border: '1px solid #c7d2fe',
+          borderRadius: '1.5rem',
+          padding: '1rem',
+          marginBottom: '2.5rem',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        }}>
+          {/* Heading */}
+          <p style={{
+            textAlign: 'center',
+            fontWeight: 800,
+            fontSize: '0.9rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            color: '#1e293b',
+            marginBottom: '8px',
+          }}>
+            Please confirm you are not a robot to continue
+          </p>
+
+          {/* Ad above checkbox — pure block, no flex parent */}
+          <div style={{ width: '100%', display: 'block' }}>
+            <AdUnit slot="7317709042" format="auto" />
           </div>
 
-          {/* Ad directly above the verification box */}
-          <AdSlot slot="7317709042" />
-
-          {/* Checkbox box */}
-          <div className="self-center flex items-center gap-4 bg-white dark:bg-zinc-950 px-6 py-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm min-w-[280px] sm:min-w-[320px] justify-between m-0 my-2">
-            <div className="flex items-center gap-3">
+          {/* Checkbox */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '1rem',
+            padding: '0.75rem 1.25rem',
+            margin: '8px auto',
+            maxWidth: '340px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               {verifying ? (
-                <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                <div style={{
+                  width: 24, height: 24,
+                  border: '2px solid #4f46e5',
+                  borderTopColor: 'transparent',
+                  borderRadius: '50%',
+                  animation: 'spin 0.8s linear infinite',
+                }} />
               ) : verified ? (
-                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</div>
+                <div style={{
+                  width: 24, height: 24,
+                  background: '#22c55e',
+                  borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', fontSize: 12, fontWeight: 700,
+                }}>✓</div>
               ) : (
                 <input
                   type="checkbox"
                   id="not-robot"
-                  className="w-5 h-5 rounded cursor-pointer accent-indigo-600"
+                  style={{ width: 20, height: 20, cursor: 'pointer', accentColor: '#4f46e5' }}
                   onChange={handleRobotCheck}
                 />
               )}
-              <label htmlFor="not-robot" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
+              <label htmlFor="not-robot" style={{
+                fontSize: '0.875rem', fontWeight: 600,
+                color: '#334155', cursor: 'pointer', userSelect: 'none',
+              }}>
                 {verifying ? 'Verifying...' : verified ? 'Verification Complete!' : "I'm not a robot"}
               </label>
             </div>
-            <div className="flex flex-col items-center gap-0.5 text-indigo-600 dark:text-indigo-400">
-              <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, color: '#4f46e5' }}>
+              <svg style={{ width: 28, height: 28 }} viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
               </svg>
-              <span className="text-[8px] font-bold uppercase tracking-wider text-zinc-400">Shield</span>
+              <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.05em', color: '#94a3b8', textTransform: 'uppercase' }}>Shield</span>
             </div>
           </div>
 
-          {/* Ad directly below the verification box */}
-          <AdSlot slot="1909584638" />
+          {/* Ad below checkbox */}
+          <div style={{ width: '100%', display: 'block' }}>
+            <AdUnit slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" />
+          </div>
         </div>
       )}
 
       {/* ── Featured / Hero Post ──────────────────────────── */}
       {featuredPost && !showVerification && (
-        <div className="relative bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl mb-10 group cursor-pointer" onClick={() => navigate(`/post/${featuredPost.id}`)}>
-          {/* Background image with parallax-style zoom */}
+        <div
+          className="relative bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl mb-10 group cursor-pointer"
+          onClick={() => navigate(`/post/${featuredPost.id}`)}
+        >
           <div className="absolute inset-0">
             <img
               src={getPostImage(featuredPost)}
@@ -306,7 +308,6 @@ export default function Home() {
                   onClick={() => navigate(`/post/${post.id}`)}
                   className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col group cursor-pointer"
                 >
-                  {/* Image */}
                   <div className="aspect-video w-full overflow-hidden relative">
                     <img
                       src={getPostImage(post)}
@@ -321,7 +322,6 @@ export default function Home() {
                     )}
                   </div>
 
-                  {/* Content */}
                   <div className="p-5 flex-1 flex flex-col gap-3">
                     <div className="flex items-center text-xs text-zinc-400 dark:text-zinc-500 gap-3">
                       <span className="flex items-center gap-1">
@@ -345,10 +345,10 @@ export default function Home() {
                   </div>
                 </article>
 
-                {/* Render In-feed Ad card after the 3rd post */}
+                {/* In-feed Ad after the 3rd post */}
                 {index === 2 && (
-                  <div className="col-span-1 sm:col-span-2 lg:col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
-                    <AdSlot slot="1909584638" format="auto" />
+                  <div className="col-span-1 sm:col-span-2 lg:col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm">
+                    <AdUnit slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" />
                   </div>
                 )}
               </React.Fragment>

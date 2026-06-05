@@ -195,38 +195,26 @@ html {
 }
 
 /* =========================================================
-   Safelink Flow — Compact Natural Layout
+   AdSense — simple block reset
+   All ad wrappers now use inline styles in JSX.
+   This CSS is just a safety net.
+   ========================================================= */
+.adsbygoogle {
+  display: block !important;
+}
+
+/* =========================================================
+   Safelink UI Elements
    ========================================================= */
 
-.safelink-flow {
-  display: flex;
-  flex-direction: column;
-  /* DO NOT use align-items:center — it collapses ad containers to 0 width on mobile */
-  align-items: stretch;
-  gap: 0;
-  width: 100%;
-  margin: 12px 0;
-}
-/* Center only buttons/pills/text, NOT the ad containers */
-.safelink-flow .safelink-pill,
-.safelink-flow .safelink-timer,
-.safelink-flow button,
-.safelink-flow .safelink-verified-label,
-.safelink-flow .safelink-instructions,
-.safelink-flow .safelink-scroll-hint,
-.safelink-flow > div.text-center {
-  align-self: center;
-}
-
-/* Green Instruction Bars (studyaf style) */
+/* Green pulsing instruction pills */
 .safelink-pills {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: block;
   margin: 10px 0;
 }
 .safelink-pill {
+  display: block;
   width: 100%;
   background: linear-gradient(135deg, #22c55e, #16a34a);
   color: #ffffff;
@@ -240,27 +228,22 @@ html {
   border-radius: 9999px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
   animation: pill-pulse 2s infinite ease-in-out;
+  margin-bottom: 8px;
 }
 .dark .safelink-pill {
   background: linear-gradient(135deg, #15803d, #166534);
   border-color: #14532d;
   color: #f0fdf4;
 }
-
 @keyframes pill-pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-  }
-  50% {
-    transform: scale(0.985);
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
-  }
+  0%, 100% { transform: scale(1); box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+  50%       { transform: scale(0.985); box-shadow: 0 4px 12px rgba(34,197,94,0.2); }
 }
 
 /* Instruction banner */
 .safelink-instructions {
   width: 100%;
+  display: block;
   padding: 9px 13px;
   background: #fefce8;
   border-left: 3px solid #f59e0b;
@@ -272,27 +255,27 @@ html {
   border-left-color: #d97706;
 }
 .safelink-inst-en {
+  display: block;
   font-size: 13px;
   font-weight: 700;
-  color: #1c1917;
   margin: 0 0 3px;
   line-height: 1.4;
 }
-.dark .safelink-inst-en { color: #fafaf9; }
 .safelink-inst-hi {
+  display: block;
   font-size: 12px;
-  color: #57534e;
   margin: 0;
   line-height: 1.7;
 }
+.dark .safelink-inst-en { color: #fafaf9; }
 .dark .safelink-inst-hi { color: #a8a29e; }
 
 /* Timer pill */
 .safelink-timer {
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
   font-size: 13px;
   font-weight: 700;
   color: #0f172a;
@@ -300,7 +283,7 @@ html {
   border: 1.5px solid #000000;
   border-radius: 9999px;
   padding: 8px 16px;
-  margin: 4px 0 !important;
+  margin: 8px 0;
   text-align: center;
 }
 .dark .safelink-timer {
@@ -308,86 +291,16 @@ html {
   border-color: #475569;
   color: #f1f5f9;
 }
-@keyframes pulse-dot {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.4; transform: scale(0.7); }
+
+/* Hindi font */
+.font-hindi {
+  font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', sans-serif;
+  line-height: 1.8;
 }
 
-/* Scroll hint */
-.safelink-scroll-hint {
-  font-size: 12px;
-  color: #71717a;
-  text-align: center;
-  margin: 6px 0;
-  padding: 0 6px;
-}
-.dark .safelink-scroll-hint { color: #a1a1aa; }
-
-/* Bottom continue section */
-.safelink-bottom-trigger {
-  display: flex;
-  flex-direction: column;
-  /* DO NOT use align-items:center — it collapses ad containers to 0 width on mobile */
-  align-items: stretch;
-  gap: 0;
-  width: 100%;
-  border-top: 1px solid #e4e4e7;
-  padding-top: 12px;
-  margin-top: 12px;
-}
-.safelink-bottom-trigger button,
-.safelink-bottom-trigger .safelink-wait-label {
-  align-self: center;
-}
-.dark .safelink-bottom-trigger { border-top-color: #3f3f46; }
-
-/* Wait label */
-.safelink-wait-label {
-  font-size: 12px;
-  color: #a1a1aa;
-  font-weight: 600;
-  padding: 9px 16px;
-  border-radius: 8px;
-  background: #f4f4f5;
-  border: 1px solid #e4e4e7;
-}
-.dark .safelink-wait-label {
-  background: #27272a;
-  border-color: #3f3f46;
-  color: #71717a;
-}
-
-/* Remove all margins on AdSense containers inside the Safelink flow and verification widgets */
-.safelink-flow .adsense-container,
-.safelink-bottom-trigger .adsense-container,
-.safelink-verification-widget .adsense-container {
-  margin: 0 !important;
-}
-
-/* Minimize vertical gaps for internal elements */
-.safelink-flow .safelink-timer,
-.safelink-flow button,
-.safelink-flow .safelink-verified-label,
-.safelink-flow > div:not(.safelink-pills):not(.safelink-instructions),
-.safelink-bottom-trigger button,
-.safelink-bottom-trigger .safelink-wait-label {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-
-/* Safelink Verification Widget — align-items:stretch for ads, center for rest */
-.safelink-verification-widget {
-  gap: 0 !important;
-  align-items: stretch !important;
-}
-.safelink-verification-widget > .adsense-container {
-  align-self: stretch !important;
-  width: 100% !important;
-}
-.safelink-verification-widget > *:not(.adsense-container) {
-  align-self: center;
-  margin-top: 4px !important;
-  margin-bottom: 4px !important;
+/* Spin animation for verification spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 640px) {

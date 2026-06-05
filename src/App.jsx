@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useSafelink } from './context/SafelinkContext';
 import Header from './components/Header';
@@ -8,50 +8,29 @@ import PostDetail from './pages/PostDetail';
 import Category from './pages/Category';
 import StaticPages from './pages/StaticPages';
 import StepHeader from './components/StepHeader';
-
-// ── Top Header Ad Slot ───────────────────────────────────────────────────────
-function HeaderAdSlot() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const ins = ref.current;
-    if (!ins || ins.getAttribute('data-ad-status')) return;
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (_) {}
-  }, []);
-
-  return (
-    <div className="w-full bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 py-1 flex justify-center items-center overflow-hidden">
-      <div className="max-w-7xl w-full px-4 adsense-container">
-        <ins
-          ref={ref}
-          className="adsbygoogle"
-          style={{ display: 'block', width: '100%' }}
-          data-ad-client="ca-pub-9543073887536718"
-          data-ad-slot="7317709042"
-          data-ad-format="horizontal"
-          data-full-width-responsive="true"
-        />
-      </div>
-    </div>
-  );
-}
+import AdUnit from './components/AdUnit';
 
 export default function App() {
   const { currentStep } = useSafelink();
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
-      {/* Step Header at the absolute top of screen */}
+      {/* Step indicator bar — sticky at absolute top when active */}
       <StepHeader />
 
-      {/* Top Banner Ad above navigation header - only visible during active safelink redirection */}
-      {currentStep > 0 && <HeaderAdSlot />}
+      {/* Top Banner Ad — visible during safelink flow only */}
+      {currentStep > 0 && (
+        <div style={{ width: '100%', display: 'block', background: '#fff', borderBottom: '1px solid #e4e4e7', padding: '4px 0' }}>
+          <div style={{ maxWidth: 1280, width: '100%', margin: '0 auto', padding: '0 16px', display: 'block' }}>
+            <AdUnit slot="7317709042" format="auto" />
+          </div>
+        </div>
+      )}
 
-      {/* Dynamic Navigation Header */}
+      {/* Navigation Header */}
       <Header />
 
-      {/* Main Page Area */}
+      {/* Page Content */}
       <div className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -65,7 +44,7 @@ export default function App() {
         </Routes>
       </div>
 
-      {/* Policy compliant Footer */}
+      {/* Footer */}
       <Footer />
     </div>
   );
