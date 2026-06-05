@@ -24,16 +24,23 @@ export default function AdUnit({
   const pushed = useRef(false);
 
   useEffect(() => {
-    // Only push once per mount; on mobile AdSense reads offsetWidth at push time
+    let active = true;
     if (pushed.current) return;
     pushed.current = true;
 
     // Use rAF to ensure the DOM has painted and the element has real dimensions
     requestAnimationFrame(() => {
+      if (!active) return;
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (_) {}
+      } catch (err) {
+        console.error('AdSense push error:', err);
+      }
     });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const insProps = {

@@ -162,20 +162,49 @@ export default function PostDetail() {
     );
   }
 
-  // Inject in-article ads into blogger HTML content
-  const injectAds = (html) => {
-    if (!html) return '';
-    const paras = html.split('</p>');
-    if (paras.length <= 3) return html;
-    const adUnit = `<div style="display:block;width:100%;overflow:hidden;margin:8px 0;"><ins class="adsbygoogle" style="display:block;width:100%;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-9543073887536718" data-ad-slot="1641433819"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>`;
-    let out = '';
-    for (let i = 0; i < paras.length; i++) {
-      out += paras[i];
-      if (i < paras.length - 1) out += '</p>';
-      if (i === 1) out += adUnit;
-      if (paras.length > 5 && i === paras.length - 3) out += adUnit;
+  // Helper to render content with active React AdUnits instead of non-executing raw script tags
+  const renderPostContent = (content) => {
+    if (!content) return null;
+    const paras = content.split('</p>');
+    if (paras.length <= 3) {
+      return (
+        <div 
+          className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base break-words px-5 sm:px-7 pt-4 pb-6"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      );
     }
-    return out;
+
+    return (
+      <div className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base break-words px-5 sm:px-7 pt-4 pb-6">
+        {paras.map((para, index) => {
+          if (!para.trim()) return null;
+          
+          // Re-add the closing </p> tag
+          const paraHtml = para + '</p>';
+          
+          return (
+            <React.Fragment key={index}>
+              <div dangerouslySetInnerHTML={{ __html: paraHtml }} />
+              
+              {/* In-article ad after paragraph 2 (index 1) */}
+              {index === 1 && (
+                <div style={{ display: 'block', width: '100%', overflow: 'hidden', margin: '16px 0' }}>
+                  <AdUnit slot="1641433819" format="fluid" layout="in-article" />
+                </div>
+              )}
+              
+              {/* In-article ad before the last few paragraphs */}
+              {paras.length > 5 && index === paras.length - 3 && (
+                <div style={{ display: 'block', width: '100%', overflow: 'hidden', margin: '16px 0' }}>
+                  <AdUnit slot="1641433819" format="fluid" layout="in-article" />
+                </div>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    );
   };
 
   const getPostImage = (p) => {
@@ -383,10 +412,7 @@ export default function PostDetail() {
               </div>
 
               {/* Post Content */}
-              <div
-                className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base break-words px-5 sm:px-7 pt-4 pb-6"
-                dangerouslySetInnerHTML={{ __html: injectAds(post.content) }}
-              />
+              {renderPostContent(post.content)}
 
               {/* Bottom Step Trigger */}
               <div className="px-5 sm:px-7 pb-7">
