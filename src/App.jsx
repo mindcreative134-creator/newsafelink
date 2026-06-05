@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import PostDetail from './pages/PostDetail';
 import Category from './pages/Category';
 import StaticPages from './pages/StaticPages';
+import StepHeader from './components/StepHeader';
 
 // ── Top Header Ad Slot ───────────────────────────────────────────────────────
 function HeaderAdSlot() {
@@ -41,6 +42,9 @@ export default function App() {
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
+      {/* Step Header at the absolute top of screen */}
+      <StepHeader />
+
       {/* Top Banner Ad above navigation header - only visible during active safelink redirection */}
       {currentStep > 0 && <HeaderAdSlot />}
 

@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Sun, Moon, ChevronDown } from 'lucide-react';
 import { getPosts } from '../services/bloggerApi';
+import { useSafelink } from '../context/SafelinkContext';
 
 export default function Header() {
+  const { currentStep } = useSafelink();
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark');
@@ -72,8 +74,10 @@ export default function Header() {
     { to: '/contact', label: 'Contact' },
   ];
 
+  const stickyTopClass = currentStep > 0 ? 'top-8' : 'top-0';
+
   return (
-    <header className={`sticky top-0 z-40 w-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-lg border-b border-zinc-200 dark:border-zinc-800 transition-all duration-200 ${scrolled ? 'shadow-sm' : ''}`}>
+    <header className={`sticky ${stickyTopClass} z-40 w-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-lg border-b border-zinc-200 dark:border-zinc-800 transition-all duration-200 ${scrolled ? 'shadow-sm' : ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 

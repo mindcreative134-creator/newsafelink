@@ -201,7 +201,7 @@ export default function Home() {
 
       {/* ── Safelink Verification Widget ─────────────────── */}
       {showVerification && (
-        <div className="safelink-verification-widget bg-gradient-to-br from-indigo-50 via-purple-50/50 to-white dark:from-indigo-950/20 dark:via-purple-950/10 dark:to-zinc-900 border border-indigo-100 dark:border-indigo-900/30 rounded-3xl p-4 sm:p-5 flex flex-col items-center gap-1.5 mb-10 shadow-sm">
+        <div className="safelink-verification-widget w-full bg-gradient-to-br from-indigo-50 via-purple-50/50 to-white dark:from-indigo-950/20 dark:via-purple-950/10 dark:to-zinc-900 border border-indigo-100 dark:border-indigo-900/30 rounded-3xl p-4 sm:p-5 flex flex-col items-center gap-1.5 mb-10 shadow-sm">
           
           <div className="text-center">
             <p className="text-sm sm:text-base font-extrabold text-zinc-800 dark:text-zinc-200 uppercase tracking-wide">

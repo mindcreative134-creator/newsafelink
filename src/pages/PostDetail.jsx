@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getPostById, getPosts } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
-import StepHeader from '../components/StepHeader';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
 // ─── Ad Slot — Multi-format, zero placeholder ─────────────────────────────────
@@ -373,8 +372,6 @@ export default function PostDetail() {
 
   return (
     <>
-      <StepHeader />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col lg:flex-row gap-8">
 

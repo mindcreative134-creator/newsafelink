@@ -25,7 +25,8 @@ body {
    AdSense Container — Zero-placeholder, natural flow
    ========================================================= */
 .adsense-container {
-  /* No min-height, no background, no border — takes space only when ad renders */
+  display: block !important;
+  width: 100% !important;
   overflow: hidden;
   margin: 4px 0;
   line-height: 0;
@@ -34,6 +35,7 @@ body {
 .adsense-container ins {
   display: block !important;
   margin: 0 auto;
+  width: 100% !important;
 }
 
 /* =========================================================
@@ -339,10 +341,11 @@ html {
 .safelink-flow .safelink-timer,
 .safelink-flow button,
 .safelink-flow .safelink-verified-label,
+.safelink-flow > div:not(.safelink-pills):not(.safelink-instructions),
 .safelink-bottom-trigger button,
 .safelink-bottom-trigger .safelink-wait-label {
-  margin-top: 4px !important;
-  margin-bottom: 4px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 /* Remove extra gap inside Safelink Verification Widget */
