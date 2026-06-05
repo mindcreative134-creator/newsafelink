@@ -219,7 +219,7 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
 .safelink-pills {
   width: 100%;
   display: block;
-  margin: 10px 0;
+  margin: 0 0 4px 0;
 }
 .safelink-pill {
   display: block;
@@ -236,7 +236,7 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   border-radius: 9999px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
   animation: pill-pulse 2s infinite ease-in-out;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 .dark .safelink-pill {
   background: linear-gradient(135deg, #15803d, #166534);
@@ -256,7 +256,7 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   background: #fefce8;
   border-left: 3px solid #f59e0b;
   border-radius: 6px;
-  margin: 8px 0;
+  margin: 0 0 4px 0;
 }
 .dark .safelink-instructions {
   background: rgba(120, 53, 15, 0.12);
@@ -291,7 +291,7 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   border: 1.5px solid #000000;
   border-radius: 9999px;
   padding: 8px 16px;
-  margin: 8px 0;
+  margin: 0 auto !important;
   text-align: center;
 }
 .dark .safelink-timer {

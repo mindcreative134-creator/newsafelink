@@ -193,7 +193,7 @@ export default function Home() {
             border: '1px solid #e2e8f0',
             borderRadius: '1rem',
             padding: '0.75rem 1.25rem',
-            margin: '8px auto',
+            margin: '0 auto',
             maxWidth: '340px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
           }}>
