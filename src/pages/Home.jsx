@@ -181,7 +181,7 @@ export default function Home() {
 
           {/* Ad above checkbox — pure block, no flex parent */}
           <div style={{ width: '100%', display: 'block' }}>
-            <AdUnit slot="7317709042" format="auto" />
+            <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" minHeight="250px" />
           </div>
 
           {/* Checkbox */}
@@ -239,7 +239,7 @@ export default function Home() {
 
           {/* Ad below checkbox */}
           <div style={{ width: '100%', display: 'block' }}>
-            <AdUnit slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" />
+            <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
           </div>
         </div>
       )}
@@ -348,7 +348,7 @@ export default function Home() {
                 {/* In-feed Ad after the 3rd post */}
                 {index === 2 && (
                   <div className="col-span-1 sm:col-span-2 lg:col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm">
-                    <AdUnit slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" />
+                    <AdUnit key={`home-list-ad-${index}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
                   </div>
                 )}
               </React.Fragment>

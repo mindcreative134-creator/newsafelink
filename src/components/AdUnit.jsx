@@ -19,6 +19,7 @@ export default function AdUnit({
   layout = '',
   layoutKey = '',
   style = {},
+  minHeight = '120px',
 }) {
   const insRef = useRef(null);
   const pushed = useRef(false);
@@ -57,10 +58,12 @@ export default function AdUnit({
 
   return (
     <div
+      className="ad-unit-wrapper"
       style={{
         display: 'block',
         width: '100%',
         minWidth: 0,
+        minHeight: minHeight,
         overflow: 'hidden',
         lineHeight: 0,
         fontSize: 0,

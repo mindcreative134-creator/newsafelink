@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getPosts } from '../services/bloggerApi';
 import { Tag, Clock } from 'lucide-react';
 import AdUnit from './AdUnit';
 
 export default function Sidebar() {
+  const location = useLocation();
   const [recentPosts, setRecentPosts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -80,7 +81,7 @@ export default function Sidebar() {
       )}
 
       {/* Ad Slot */}
-      <AdUnit slot="7317709042" format="auto" />
+      <AdUnit key={`sidebar-ad-${location.pathname}`} slot="7317709042" format="auto" minHeight="250px" />
 
       {/* Recent Posts Widget */}
       {recentPosts.length > 0 && (

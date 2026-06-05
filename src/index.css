@@ -197,10 +197,18 @@ html {
 /* =========================================================
    AdSense — simple block reset
    All ad wrappers now use inline styles in JSX.
-   This CSS is just a safety net.
+   This CSS handles display resets and collapses unfilled containers.
    ========================================================= */
 .adsbygoogle {
   display: block !important;
+}
+
+/* Hide unfilled ads and collapse their wrappers to prevent blank spaces */
+ins.adsbygoogle[data-ad-status="unfilled"] {
+  display: none !important;
+}
+.ad-unit-wrapper:has(ins.adsbygoogle[data-ad-status="unfilled"]) {
+  display: none !important;
 }
 
 /* =========================================================

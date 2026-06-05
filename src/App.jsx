@@ -22,7 +22,7 @@ export default function App() {
       {currentStep > 0 && (
         <div style={{ width: '100%', display: 'block', background: '#fff', borderBottom: '1px solid #e4e4e7', padding: '4px 0' }}>
           <div style={{ maxWidth: 1280, width: '100%', margin: '0 auto', padding: '0 16px', display: 'block' }}>
-            <AdUnit slot="7317709042" format="auto" />
+            <AdUnit key={`global-top-ad-${currentStep}`} slot="7317709042" format="auto" minHeight="90px" />
           </div>
         </div>
       )}

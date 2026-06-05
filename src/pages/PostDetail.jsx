@@ -189,15 +189,27 @@ export default function PostDetail() {
               
               {/* In-article ad after paragraph 2 (index 1) */}
               {index === 1 && (
-                <div style={{ display: 'block', width: '100%', overflow: 'hidden', margin: '16px 0' }}>
-                  <AdUnit slot="1641433819" format="fluid" layout="in-article" />
+                <div style={{ display: 'block', width: '100%', overflow: 'hidden', margin: '12px 0' }}>
+                  <AdUnit 
+                    key={`${postId}-article-ad-1`} 
+                    slot="1641433819" 
+                    format="fluid" 
+                    layout="in-article" 
+                    minHeight="120px" 
+                  />
                 </div>
               )}
               
               {/* In-article ad before the last few paragraphs */}
               {paras.length > 5 && index === paras.length - 3 && (
-                <div style={{ display: 'block', width: '100%', overflow: 'hidden', margin: '16px 0' }}>
-                  <AdUnit slot="1641433819" format="fluid" layout="in-article" />
+                <div style={{ display: 'block', width: '100%', overflow: 'hidden', margin: '12px 0' }}>
+                  <AdUnit 
+                    key={`${postId}-article-ad-2`} 
+                    slot="1641433819" 
+                    format="fluid" 
+                    layout="in-article" 
+                    minHeight="120px" 
+                  />
                 </div>
               )}
             </React.Fragment>
@@ -221,7 +233,12 @@ export default function PostDetail() {
 
         {/* Ad 1 — Banner display */}
         <div style={{ width: '100%', display: 'block', marginBottom: 8 }}>
-          <AdUnit slot="7317709042" format="auto" />
+          <AdUnit 
+            key={`${postId}-${currentStep}-safelink-ad1`} 
+            slot="7317709042" 
+            format="auto" 
+            minHeight="250px" 
+          />
         </div>
 
         {/* Pulsing Green Instruction Pills */}
@@ -240,22 +257,28 @@ export default function PostDetail() {
           </p>
         </div>
 
-        {/* Ad 2 — In-feed */}
-        <div style={{ width: '100%', display: 'block', marginBottom: 8 }}>
-          <AdUnit slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" />
+        {/* Ad 2 — In-feed (immediately above button/timer with no gap) */}
+        <div style={{ width: '100%', display: 'block', margin: 0 }}>
+          <AdUnit 
+            key={`${postId}-${currentStep}-safelink-ad2`} 
+            slot="1909584638" 
+            format="fluid" 
+            layoutKey="-6t+ed+2i-1n-4w" 
+            minHeight="120px" 
+          />
         </div>
 
-        {/* Timer */}
+        {/* Timer (no vertical margin to keep it flush) */}
         {timerActive && (
-          <div className="safelink-timer">
+          <div className="safelink-timer" style={{ margin: '0 auto', borderRadius: '9999px' }}>
             <span>Please wait {timeLeft} Seconds...</span>
           </div>
         )}
 
-        {/* Verify button / verified label */}
+        {/* Verify button / verified label (no vertical margin) */}
         {timerDone && (
           !stepVerified ? (
-            <div style={{ textAlign: 'center', margin: '8px 0' }}>
+            <div style={{ textAlign: 'center', margin: 0, padding: '4px 0' }}>
               <button
                 onClick={handleVerifyClick}
                 style={{
@@ -272,7 +295,7 @@ export default function PostDetail() {
               </button>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', margin: '8px 0' }}>
+            <div style={{ textAlign: 'center', margin: 0, padding: '4px 0' }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '6px 16px', borderRadius: '9999px', fontSize: '0.75rem',
@@ -281,21 +304,21 @@ export default function PostDetail() {
               }}>
                 ✓ Verification Completed Successfully
               </span>
-              <p style={{ fontSize: '0.75rem', color: '#71717a', textAlign: 'center', margin: '8px 0 0', padding: '0 6px' }}>
+              <p style={{ fontSize: '0.75rem', color: '#71717a', textAlign: 'center', margin: '4px 0 0', padding: '0 6px' }}>
                 Scroll down &amp; click on <span style={{ color: '#4f46e5', fontWeight: 700 }}>Continue</span> button for your destination link
               </p>
             </div>
           )
         )}
 
-        {/* Ad 3 — Display second */}
-        <div style={{ width: '100%', display: 'block', marginTop: 8 }}>
-          <AdUnit slot="5754054742" format="auto" />
-        </div>
-
-        {/* Ad 4 — Multiplex */}
-        <div style={{ width: '100%', display: 'block' }}>
-          <AdUnit slot="8617081290" format="autorelaxed" />
+        {/* Ad 3 — Display second (immediately below button/timer with no gap) */}
+        <div style={{ width: '100%', display: 'block', margin: 0 }}>
+          <AdUnit 
+            key={`${postId}-${currentStep}-safelink-ad3`} 
+            slot="5754054742" 
+            format="auto" 
+            minHeight="250px" 
+          />
         </div>
 
       </div>
@@ -352,14 +375,30 @@ export default function PostDetail() {
           </p>
         ) : (
           <>
-            <div style={{ width: '100%', display: 'block', marginBottom: 12 }}>
-              <AdUnit slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" />
+            {/* Ad above bottom continue button — no gap */}
+            <div style={{ width: '100%', display: 'block', margin: 0 }}>
+              <AdUnit 
+                key={`${postId}-${currentStep}-bottom-ad1`} 
+                slot="1909584638" 
+                format="fluid" 
+                layoutKey="-6t+ed+2i-1n-4w" 
+                minHeight="120px" 
+              />
             </div>
-            <div style={{ textAlign: 'center', marginBottom: 12 }}>
+            
+            {/* Continue button — flush with ads */}
+            <div style={{ textAlign: 'center', margin: 0, padding: '8px 0' }}>
               {actionBtn}
             </div>
-            <div style={{ width: '100%', display: 'block' }}>
-              <AdUnit slot="8617081290" format="autorelaxed" />
+            
+            {/* Ad below bottom continue button — no gap */}
+            <div style={{ width: '100%', display: 'block', margin: 0 }}>
+              <AdUnit 
+                key={`${postId}-${currentStep}-bottom-ad2`} 
+                slot="8617081290" 
+                format="autorelaxed" 
+                minHeight="280px" 
+              />
             </div>
           </>
         )}
