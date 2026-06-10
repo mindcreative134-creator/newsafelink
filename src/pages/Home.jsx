@@ -90,12 +90,25 @@ export default function Home() {
       setVerifying(false);
       setVerified(true);
       startSafelink(safelinkTarget);
-      getPosts({ maxResults: 15 }).then((data) => {
-        if (data.items && data.items.length > 0) {
-          const randomPost = data.items[Math.floor(Math.random() * data.items.length)];
-          navigate(`/post/${randomPost.id}`);
-        }
-      });
+      
+      const availablePosts = [...posts];
+      if (featuredPost) availablePosts.push(featuredPost);
+      
+      if (availablePosts.length > 0) {
+        const randomPost = availablePosts[Math.floor(Math.random() * availablePosts.length)];
+        navigate(`/post/${randomPost.id}`);
+      } else {
+        // Fallback API call if state is somehow empty
+        getPosts({ maxResults: 15 }).then((data) => {
+          if (data.items && data.items.length > 0) {
+            const randomPost = data.items[Math.floor(Math.random() * data.items.length)];
+            navigate(`/post/${randomPost.id}`);
+          }
+        }).catch(() => {
+          // Absolute fallback if everything fails
+          console.error("Failed to fetch posts for safelink routing");
+        });
+      }
     }, 1500);
   };
 

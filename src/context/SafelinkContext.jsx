@@ -11,8 +11,9 @@ export function SafelinkProvider({ children }) {
     let decodedUrl = url;
     try {
       // Check if it's base64 (standard URL search)
-      if (url.match(/^[A-Za-z0-9+/=]+$/)) {
-        decodedUrl = atob(url);
+      const sanitizedUrl = url.replace(/ /g, '+');
+      if (sanitizedUrl.match(/^[A-Za-z0-9+/=]+$/)) {
+        decodedUrl = atob(sanitizedUrl);
       }
     } catch (e) {
       // Not base64
