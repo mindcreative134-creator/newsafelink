@@ -311,7 +311,31 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   to { transform: rotate(360deg); }
 }
 
+/* Verify / CTA button pulse animation */
+@keyframes verify-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(220,38,38,0.4); }
+  50%       { transform: scale(1.025); box-shadow: 0 8px 24px rgba(220,38,38,0.55); }
+}
+
+/* Mobile: force ads to be block and full width inside safelink */
 @media (max-width: 640px) {
   .safelink-inst-en { font-size: 12px; }
   .safelink-inst-hi { font-size: 11px; }
+
+  /* Force ad blocks to stretch full width on mobile */
+  .ad-unit-wrapper {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: block !important;
+  }
+  .ad-unit-wrapper ins {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Fix inline-block centering on mobile for status messages */
+  .safelink-timer {
+    max-width: 100%;
+    width: calc(100% - 0px);
+  }
 }

@@ -231,8 +231,8 @@ export default function PostDetail() {
     return (
       <div style={{ width: '100%', display: 'block', margin: '12px 0' }}>
 
-        {/* Ad 1 — Banner display */}
-        <div style={{ width: '100%', display: 'block', marginBottom: 8 }}>
+        {/* Ad 1 — Top Banner */}
+        <div style={{ width: '100%', display: 'block', marginBottom: 0 }}>
           <AdUnit 
             key={`${postId}-${currentStep}-safelink-ad1`} 
             slot="7317709042" 
@@ -242,13 +242,13 @@ export default function PostDetail() {
         </div>
 
         {/* Pulsing Green Instruction Pills */}
-        <div className="safelink-pills">
+        <div className="safelink-pills" style={{ margin: '6px 0' }}>
           <div className="safelink-pill">▼ CLICK ANY IMAGE 👆 &amp; Wait 15 Seconds to GET LINK ▼ 👇</div>
-          <div className="safelink-pill">▼ CLICK ANY IMAGE 👆 &amp; Wait 15 Seconds to GET LINK ▼ 👇</div>
+          <div className="safelink-pill" style={{ marginTop: 4 }}>▼ CLICK ANY IMAGE 👆 &amp; Wait 15 Seconds to GET LINK ▼ 👇</div>
         </div>
 
         {/* Instruction banner */}
-        <div className="safelink-instructions">
+        <div className="safelink-instructions" style={{ marginBottom: 0 }}>
           <p className="safelink-inst-en" style={{ textAlign: 'center', color: 'inherit' }}>
             👉 Click Image &amp; Wait &amp; Come back this page to <span style={{ color: '#dc2626', fontWeight: 800 }}>Get Link - Download</span>.
           </p>
@@ -257,7 +257,7 @@ export default function PostDetail() {
           </p>
         </div>
 
-        {/* Ad 2 — In-feed (immediately above button/timer with no gap) */}
+        {/* Ad 2 — Above Verify */}
         <div style={{ width: '100%', display: 'block', margin: 0 }}>
           <AdUnit 
             key={`${postId}-${currentStep}-safelink-ad2`} 
@@ -268,50 +268,72 @@ export default function PostDetail() {
           />
         </div>
 
-        {/* Timer (no vertical margin to keep it flush) */}
+        {/* Timer */}
         {timerActive && (
-          <div className="safelink-timer" style={{ margin: '0 auto', borderRadius: '9999px' }}>
+          <div className="safelink-timer" style={{ margin: '6px auto', borderRadius: '9999px' }}>
             <span>Please wait {timeLeft} Seconds...</span>
           </div>
         )}
 
-        {/* Verify button / verified label (no vertical margin) */}
+        {/* Verify button / verified label */}
         {timerDone && (
           !stepVerified ? (
-            <div style={{ textAlign: 'center', margin: 0, padding: '4px 0' }}>
+            <div style={{ textAlign: 'center', margin: '6px 0', padding: '4px 0' }}>
               <button
                 onClick={handleVerifyClick}
                 style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  gap: 8, fontWeight: 800, fontSize: '0.875rem',
-                  padding: '12px 48px', borderRadius: '9999px',
-                  background: '#dc2626', color: '#fff',
+                  gap: 8, fontWeight: 800, fontSize: '1rem',
+                  padding: '14px 0', borderRadius: '9999px',
+                  background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
+                  color: '#fff',
                   border: 'none', cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(220,38,38,0.25)',
-                  textTransform: 'uppercase', letterSpacing: '0.05em',
+                  boxShadow: '0 4px 16px rgba(220,38,38,0.4)',
+                  textTransform: 'uppercase', letterSpacing: '0.08em',
+                  width: '100%', maxWidth: 380,
+                  animation: 'verify-pulse 1.8s infinite ease-in-out',
                 }}
               >
-                Verify
+                ✅ Verify &amp; Continue
               </button>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', margin: 0, padding: '4px 0' }}>
+            <div style={{ textAlign: 'center', margin: '6px 0', padding: '4px 0' }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '6px 16px', borderRadius: '9999px', fontSize: '0.75rem',
+                padding: '8px 20px', borderRadius: '9999px', fontSize: '0.8rem',
                 fontWeight: 700, background: '#f0fdf4', color: '#16a34a',
-                border: '1px solid #bbf7d0',
+                border: '1.5px solid #bbf7d0',
               }}>
-                ✓ Verification Completed Successfully
+                ✓ Verification Completed
               </span>
-              <p style={{ fontSize: '0.75rem', color: '#71717a', textAlign: 'center', margin: '4px 0 0', padding: '0 6px' }}>
-                Scroll down &amp; click on <span style={{ color: '#4f46e5', fontWeight: 700 }}>Continue</span> button for your destination link
-              </p>
             </div>
           )
         )}
 
-        {/* Ad 3 — Display second (immediately below button/timer with no gap) */}
+        {/* Scroll Down CTA — shown after verify */}
+        {timerDone && stepVerified && (
+          <div style={{
+            margin: '8px 0 0',
+            background: 'linear-gradient(135deg, #eff6ff, #eef2ff)',
+            border: '1.5px solid #c7d2fe',
+            borderRadius: 12,
+            padding: '10px 16px',
+            textAlign: 'center',
+          }}>
+            <p style={{
+              margin: 0, fontSize: '0.85rem', fontWeight: 700, color: '#3730a3',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, flexWrap: 'wrap',
+            }}>
+              👇 Scroll Down &amp; Click <span style={{
+                background: '#4f46e5', color: '#fff',
+                padding: '2px 12px', borderRadius: 99, fontWeight: 800, fontSize: '0.8rem',
+              }}>Continue</span> to Get Your Link
+            </p>
+          </div>
+        )}
+
+        {/* Ad 3 — Below Verify */}
         <div style={{ width: '100%', display: 'block', margin: 0 }}>
           <AdUnit 
             key={`${postId}-${currentStep}-safelink-ad3`} 
@@ -334,25 +356,50 @@ export default function PostDetail() {
       actionBtn = (
         <button
           onClick={handleStepTransition}
-          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 text-sm"
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            gap: 8, fontWeight: 800, fontSize: '1rem',
+            padding: '14px 0', borderRadius: '9999px',
+            background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+            color: '#fff', border: 'none', cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(79,70,229,0.4)',
+            width: '100%', maxWidth: 380, letterSpacing: '0.04em',
+          }}
         >
-          Continue to Step 2 <ArrowRight className="w-4 h-4" />
+          Continue to Step 2 →
         </button>
       );
     } else if (currentStep === 2) {
       actionBtn = (
         <button
           onClick={handleStepTransition}
-          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 text-sm"
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            gap: 8, fontWeight: 800, fontSize: '1rem',
+            padding: '14px 0', borderRadius: '9999px',
+            background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+            color: '#fff', border: 'none', cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(79,70,229,0.4)',
+            width: '100%', maxWidth: 380, letterSpacing: '0.04em',
+          }}
         >
-          Continue to Final Step <ArrowRight className="w-4 h-4" />
+          Continue to Final Step →
         </button>
       );
     } else if (currentStep === 3) {
       actionBtn = (
         <button
           onClick={handleFinalRedirect}
-          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-10 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 text-sm"
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            gap: 8, fontWeight: 800, fontSize: '1rem',
+            padding: '14px 0', borderRadius: '9999px',
+            background: 'linear-gradient(135deg, #16a34a, #15803d)',
+            color: '#fff', border: 'none', cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(22,163,74,0.4)',
+            width: '100%', maxWidth: 380, letterSpacing: '0.04em',
+            animation: 'verify-pulse 1.8s infinite ease-in-out',
+          }}
         >
           🔓 Get Your Link
         </button>
@@ -362,20 +409,34 @@ export default function PostDetail() {
     return (
       <div id="safelink-bottom" style={{
         width: '100%', display: 'block',
-        borderTop: '1px solid #e4e4e7',
-        paddingTop: 16, marginTop: 16,
+        borderTop: '2px solid #e4e4e7',
+        paddingTop: 12, marginTop: 12,
       }}>
         {!timerDone ? (
-          <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#a1a1aa', fontWeight: 600, padding: '8px 16px', background: '#f4f4f5', borderRadius: 8, border: '1px solid #e4e4e7', display: 'inline-block', margin: '0 auto' }}>
-            ⏳ Please wait for the timer above to complete
-          </p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{
+              textAlign: 'center', fontSize: '0.8rem', color: '#64748b',
+              fontWeight: 600, padding: '10px 20px', background: '#f8fafc',
+              borderRadius: 10, border: '1.5px dashed #cbd5e1',
+              display: 'inline-block', margin: '0 auto',
+            }}>
+              ⏳ Please wait for the timer above to complete
+            </p>
+          </div>
         ) : !stepVerified ? (
-          <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#a1a1aa', fontWeight: 600, padding: '8px 16px', background: '#f4f4f5', borderRadius: 8, border: '1px solid #e4e4e7', display: 'inline-block', margin: '0 auto' }}>
-            ⏳ Please click "Verify" above first
-          </p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{
+              textAlign: 'center', fontSize: '0.8rem', color: '#64748b',
+              fontWeight: 600, padding: '10px 20px', background: '#f8fafc',
+              borderRadius: 10, border: '1.5px dashed #cbd5e1',
+              display: 'inline-block', margin: '0 auto',
+            }}>
+              ⚠️ Please click &quot;Verify &amp; Continue&quot; above first
+            </p>
+          </div>
         ) : (
           <>
-            {/* Ad above bottom continue button — no gap */}
+            {/* Ad above continue button */}
             <div style={{ width: '100%', display: 'block', margin: 0 }}>
               <AdUnit 
                 key={`${postId}-${currentStep}-bottom-ad1`} 
@@ -385,12 +446,11 @@ export default function PostDetail() {
                 minHeight="120px" 
               />
             </div>
-            
-            {/* Continue button — flush with ads */}
-            <div style={{ textAlign: 'center', margin: 0, padding: '8px 0' }}>
+
+            {/* Continue button — full width, centered */}
+            <div style={{ textAlign: 'center', margin: '8px 0', display: 'flex', justifyContent: 'center' }}>
               {actionBtn}
             </div>
-            
             {/* Ad below bottom continue button — no gap */}
             <div style={{ width: '100%', display: 'block', margin: 0 }}>
               <AdUnit 

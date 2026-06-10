@@ -189,11 +189,11 @@ export default function Home() {
             color: '#1e293b',
             marginBottom: '8px',
           }}>
-            Please confirm you are not a robot to continue
+            🔒 Please Confirm You Are Not a Robot to Continue
           </p>
 
-          {/* Ad above checkbox — pure block, no flex parent */}
-          <div style={{ width: '100%', display: 'block' }}>
+          {/* Ad ABOVE checkbox — pure block, no flex parent */}
+          <div style={{ width: '100%', display: 'block', marginBottom: 8 }}>
             <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" minHeight="250px" />
           </div>
 
@@ -203,43 +203,43 @@ export default function Home() {
             alignItems: 'center',
             justifyContent: 'space-between',
             background: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1.5px solid #c7d2fe',
             borderRadius: '1rem',
-            padding: '0.75rem 1.25rem',
+            padding: '1rem 1.25rem',
             margin: '0 auto',
-            maxWidth: '340px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+            maxWidth: '380px',
+            boxShadow: '0 2px 8px rgba(79,70,229,0.08)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               {verifying ? (
                 <div style={{
-                  width: 24, height: 24,
-                  border: '2px solid #4f46e5',
+                  width: 26, height: 26,
+                  border: '2.5px solid #4f46e5',
                   borderTopColor: 'transparent',
                   borderRadius: '50%',
                   animation: 'spin 0.8s linear infinite',
                 }} />
               ) : verified ? (
                 <div style={{
-                  width: 24, height: 24,
+                  width: 26, height: 26,
                   background: '#22c55e',
                   borderRadius: '50%',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#fff', fontSize: 12, fontWeight: 700,
+                  color: '#fff', fontSize: 14, fontWeight: 700,
                 }}>✓</div>
               ) : (
                 <input
                   type="checkbox"
                   id="not-robot"
-                  style={{ width: 20, height: 20, cursor: 'pointer', accentColor: '#4f46e5' }}
+                  style={{ width: 22, height: 22, cursor: 'pointer', accentColor: '#4f46e5' }}
                   onChange={handleRobotCheck}
                 />
               )}
               <label htmlFor="not-robot" style={{
-                fontSize: '0.875rem', fontWeight: 600,
+                fontSize: '0.95rem', fontWeight: 700,
                 color: '#334155', cursor: 'pointer', userSelect: 'none',
               }}>
-                {verifying ? 'Verifying...' : verified ? 'Verification Complete!' : "I'm not a robot"}
+                {verifying ? 'Verifying...' : verified ? '✅ Verification Complete!' : "I'm not a robot"}
               </label>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, color: '#4f46e5' }}>
@@ -250,9 +250,14 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Ad below checkbox */}
-          <div style={{ width: '100%', display: 'block' }}>
+          {/* Ad BELOW checkbox */}
+          <div style={{ width: '100%', display: 'block', marginTop: 8 }}>
             <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
+          </div>
+
+          {/* Second Ad below for better coverage */}
+          <div style={{ width: '100%', display: 'block', marginTop: 4 }}>
+            <AdUnit key={`home-robot-ad3-${safelinkTarget}`} slot="5754054742" format="auto" minHeight="250px" />
           </div>
         </div>
       )}
