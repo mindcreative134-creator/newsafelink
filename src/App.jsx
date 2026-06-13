@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useSafelink } from './context/SafelinkContext';
 import Header from './components/Header';
@@ -6,11 +6,11 @@ import Footer from './components/Footer';
 import StepHeader from './components/StepHeader';
 import AdUnit from './components/AdUnit';
 
-// Dynamic page imports for code-splitting
-const Home = lazy(() => import('./pages/Home'));
-const PostDetail = lazy(() => import('./pages/PostDetail'));
-const Category = lazy(() => import('./pages/Category'));
-const StaticPages = lazy(() => import('./pages/StaticPages'));
+// Eager page imports to eliminate dynamic route loading roundtrips
+import Home from './pages/Home';
+import PostDetail from './pages/PostDetail';
+import Category from './pages/Category';
+import StaticPages from './pages/StaticPages';
 
 // Pulse loading indicator fallback
 const PageLoader = () => (
