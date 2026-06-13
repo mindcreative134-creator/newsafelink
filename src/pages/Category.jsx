@@ -106,7 +106,9 @@ export default function Category() {
 
   const getExcerpt = (content, limit = 120) => {
     if (!content) return '';
-    const plainText = content.replace(/<\/?[^>]+(>|$)/g, "");
+    let clean = content.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, '');
+    clean = clean.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
+    const plainText = clean.replace(/<\/?[^>]+(>|$)/g, "");
     return plainText.length > limit ? plainText.substring(0, limit) + '...' : plainText;
   };
 

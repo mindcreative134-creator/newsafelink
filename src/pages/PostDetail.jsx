@@ -165,12 +165,13 @@ export default function PostDetail() {
   // Helper to render content with active React AdUnits instead of non-executing raw script tags
   const renderPostContent = (content) => {
     if (!content) return null;
-    const paras = content.split('</p>');
+    const optimizedContent = content.replace(/<img /g, '<img loading="lazy" decoding="async" ');
+    const paras = optimizedContent.split('</p>');
     if (paras.length <= 3) {
       return (
         <div 
           className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base break-words px-5 sm:px-7 pt-4 pb-6"
-          dangerouslySetInnerHTML={{ __html: content }}
+          dangerouslySetInnerHTML={{ __html: optimizedContent }}
         />
       );
     }

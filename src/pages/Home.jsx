@@ -90,25 +90,12 @@ export default function Home() {
       setVerifying(false);
       setVerified(true);
       startSafelink(safelinkTarget);
-      
-      const availablePosts = [...posts];
-      if (featuredPost) availablePosts.push(featuredPost);
-      
-      if (availablePosts.length > 0) {
-        const randomPost = availablePosts[Math.floor(Math.random() * availablePosts.length)];
-        navigate(`/post/${randomPost.id}`);
-      } else {
-        // Fallback API call if state is somehow empty
-        getPosts({ maxResults: 15 }).then((data) => {
-          if (data.items && data.items.length > 0) {
-            const randomPost = data.items[Math.floor(Math.random() * data.items.length)];
-            navigate(`/post/${randomPost.id}`);
-          }
-        }).catch(() => {
-          // Absolute fallback if everything fails
-          console.error("Failed to fetch posts for safelink routing");
-        });
-      }
+      getPosts({ maxResults: 15 }).then((data) => {
+        if (data.items && data.items.length > 0) {
+          const randomPost = data.items[Math.floor(Math.random() * data.items.length)];
+          navigate(`/post/${randomPost.id}`);
+        }
+      });
     }, 1500);
   };
 
@@ -161,7 +148,9 @@ export default function Home() {
 
   const getExcerpt = (content, limit = 150) => {
     if (!content) return '';
-    const text = content.replace(/<\/?[^>]+(>|$)/g, '');
+    let clean = content.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, '');
+    clean = clean.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
+    const text = clean.replace(/<\/?[^>]+(>|$)/g, '');
     return text.length > limit ? text.substring(0, limit) + '...' : text;
   };
 
@@ -189,11 +178,11 @@ export default function Home() {
             color: '#1e293b',
             marginBottom: '8px',
           }}>
-            🔒 Please Confirm You Are Not a Robot to Continue
+            Please confirm you are not a robot to continue
           </p>
 
-          {/* Ad ABOVE checkbox — pure block, no flex parent */}
-          <div style={{ width: '100%', display: 'block', marginBottom: 8 }}>
+          {/* Ad above checkbox — pure block, no flex parent */}
+          <div style={{ width: '100%', display: 'block' }}>
             <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" minHeight="250px" />
           </div>
 
@@ -203,61 +192,56 @@ export default function Home() {
             alignItems: 'center',
             justifyContent: 'space-between',
             background: '#ffffff',
-            border: '1.5px solid #c7d2fe',
+            border: '1px solid #e2e8f0',
             borderRadius: '1rem',
-            padding: '1rem 1.25rem',
+            padding: '0.75rem 1.25rem',
             margin: '0 auto',
-            maxWidth: '380px',
-            boxShadow: '0 2px 8px rgba(79,70,229,0.08)',
+            maxWidth: '340px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               {verifying ? (
                 <div style={{
-                  width: 26, height: 26,
-                  border: '2.5px solid #4f46e5',
+                  width: 24, height: 24,
+                  border: '2px solid #4f46e5',
                   borderTopColor: 'transparent',
                   borderRadius: '50%',
                   animation: 'spin 0.8s linear infinite',
                 }} />
               ) : verified ? (
                 <div style={{
-                  width: 26, height: 26,
+                  width: 24, height: 24,
                   background: '#22c55e',
                   borderRadius: '50%',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#fff', fontSize: 14, fontWeight: 700,
+                  color: '#fff', fontSize: 12, fontWeight: 700,
                 }}>✓</div>
               ) : (
                 <input
                   type="checkbox"
                   id="not-robot"
-                  style={{ width: 22, height: 22, cursor: 'pointer', accentColor: '#4f46e5' }}
+                  style={{ width: 20, height: 20, cursor: 'pointer', accentColor: '#4f46e5' }}
                   onChange={handleRobotCheck}
                 />
               )}
               <label htmlFor="not-robot" style={{
-                fontSize: '0.95rem', fontWeight: 700,
+                fontSize: '0.875rem', fontWeight: 600,
                 color: '#334155', cursor: 'pointer', userSelect: 'none',
               }}>
-                {verifying ? 'Verifying...' : verified ? '✅ Verification Complete!' : "I'm not a robot"}
+                {verifying ? 'Verifying...' : verified ? 'Verification Complete!' : "I'm not a robot"}
               </label>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, color: '#4f46e5' }}>
               <svg style={{ width: 28, height: 28 }} viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z" />
               </svg>
               <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.05em', color: '#94a3b8', textTransform: 'uppercase' }}>Shield</span>
             </div>
           </div>
 
-          {/* Ad BELOW checkbox */}
-          <div style={{ width: '100%', display: 'block', marginTop: 8 }}>
+          {/* Ad below checkbox */}
+          <div style={{ width: '100%', display: 'block' }}>
             <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
-          </div>
-
-          {/* Second Ad below for better coverage */}
-          <div style={{ width: '100%', display: 'block', marginTop: 4 }}>
-            <AdUnit key={`home-robot-ad3-${safelinkTarget}`} slot="5754054742" format="auto" minHeight="250px" />
           </div>
         </div>
       )}
@@ -273,6 +257,7 @@ export default function Home() {
               src={getPostImage(featuredPost)}
               alt={featuredPost.title}
               className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700 ease-out"
+              fetchPriority="high"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-zinc-900/20" />
           </div>

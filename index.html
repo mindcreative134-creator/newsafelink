@@ -1,15 +1,6 @@
 <!doctype html>
 <html lang="en" class="light">
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q7JQNNB4ZY"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-Q7JQNNB4ZY');
-    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -41,33 +32,52 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Performance Loader for Analytics & Ads -->
     <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
-              heading: ['Outfit', 'system-ui', 'sans-serif'],
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.3s ease-out',
-              'slide-up': 'slideUp 0.4s ease-out',
-            },
-            keyframes: {
-              fadeIn: { from: { opacity: '0' }, to: { opacity: '1' } },
-              slideUp: { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
-            }
-          }
-        }
-      }
-    </script>
+      (function() {
+        var analyticsId = 'G-Q7JQNNB4ZY';
+        var adsenseId = 'ca-pub-9543073887536718';
+        var loaded = false;
 
-    <!-- Google AdSense — Auto Ads enabled -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9543073887536718"
-         crossorigin="anonymous"></script>
+        function loadThirdParty() {
+          if (loaded) return;
+          loaded = true;
+
+          // Remove listeners
+          var events = ['mouseover', 'keydown', 'touchmove', 'touchstart', 'scroll'];
+          events.forEach(function(event) {
+            window.removeEventListener(event, loadThirdParty);
+          });
+
+          // Load Google Tag Manager
+          var gtmScript = document.createElement('script');
+          gtmScript.async = true;
+          gtmScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + analyticsId;
+          document.head.appendChild(gtmScript);
+
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function() { dataLayer.push(arguments); };
+          gtag('js', new Date());
+          gtag('config', analyticsId);
+
+          // Load Google AdSense
+          var adsScript = document.createElement('script');
+          adsScript.async = true;
+          adsScript.crossOrigin = 'anonymous';
+          adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + adsenseId;
+          document.head.appendChild(adsScript);
+        }
+
+        // Add listeners
+        var events = ['mouseover', 'keydown', 'touchmove', 'touchstart', 'scroll'];
+        events.forEach(function(event) {
+          window.addEventListener(event, loadThirdParty, { passive: true, once: true });
+        });
+
+        // Fallback timeout of 3.5 seconds
+        setTimeout(loadThirdParty, 3500);
+      })();
+    </script>
   </head>
   <body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen transition-colors duration-200">
     <div id="root"></div>
