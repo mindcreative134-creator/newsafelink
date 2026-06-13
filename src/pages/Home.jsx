@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { getPosts, getPostImage } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
@@ -59,6 +59,8 @@ function HomeSkeleton() {
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [featuredPost, setFeaturedPost] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(5);
   const [nextPageToken, setNextPageToken] = useState('');
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -113,12 +115,29 @@ export default function Home() {
       document.head.appendChild(metaDesc);
     }
 
-    getPosts({ maxResults: 10 })
+    // Load categories from session storage first
+    const cached = sessionStorage.getItem('ST_CATS');
+    if (cached) {
+      try {
+        setCategories(JSON.parse(cached));
+      } catch (e) {}
+    }
+
+    getPosts({ maxResults: 15 })
       .then((data) => {
         if (data.items && data.items.length > 0) {
           setFeaturedPost(data.items[0]);
           setPosts(data.items.slice(1));
           setNextPageToken(data.nextPageToken || '');
+
+          // Extract categories dynamically to merge/update cache
+          const labelsSet = new Set(JSON.parse(sessionStorage.getItem('ST_CATS') || '[]'));
+          data.items.forEach((post) => {
+            if (post.labels) post.labels.forEach((l) => labelsSet.add(l));
+          });
+          const cats = Array.from(labelsSet).slice(0, 15);
+          setCategories(cats);
+          try { sessionStorage.setItem('ST_CATS', JSON.stringify(cats)); } catch (e) {}
         }
         setLoading(false);
       })
@@ -126,17 +145,21 @@ export default function Home() {
   }, []);
 
   const loadMore = () => {
-    if (!nextPageToken) return;
-    setLoadingMore(true);
-    getPosts({ pageToken: nextPageToken, maxResults: 9 })
-      .then((data) => {
-        if (data.items) {
-          setPosts((prev) => [...prev, ...data.items]);
-          setNextPageToken(data.nextPageToken || '');
-        }
-        setLoadingMore(false);
-      })
-      .catch(() => setLoadingMore(false));
+    if (visibleCount < posts.length) {
+      setVisibleCount(posts.length);
+    } else if (nextPageToken) {
+      setLoadingMore(true);
+      getPosts({ pageToken: nextPageToken, maxResults: 9 })
+        .then((data) => {
+          if (data.items) {
+            setPosts((prev) => [...prev, ...data.items]);
+            setVisibleCount((prev) => prev + data.items.length);
+            setNextPageToken(data.nextPageToken || '');
+          }
+          setLoadingMore(false);
+        })
+        .catch(() => setLoadingMore(false));
+    }
   };
 
   if (loading) return <HomeSkeleton />;
@@ -291,6 +314,24 @@ export default function Home() {
         </div>
       )}
 
+      {/* ── Categories Horizontal Scroll ──────────────────── */}
+      {categories.length > 0 && !showVerification && (
+        <div className="w-full overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-2 pb-4 mb-6 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-zinc-200/50 dark:border-zinc-800/50">
+          <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mr-2 flex items-center gap-1 select-none flex-shrink-0">
+            <TrendingUp className="w-3.5 h-3.5 text-indigo-500" /> Topics:
+          </span>
+          {categories.map((cat) => (
+            <Link
+              key={cat}
+              to={`/category/${encodeURIComponent(cat)}`}
+              className="inline-block px-4 py-2 text-xs sm:text-sm font-semibold rounded-full bg-zinc-100 hover:bg-indigo-50 hover:text-indigo-600 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 dark:text-zinc-300 dark:hover:text-indigo-400 transition-colors shadow-xs border border-zinc-200/50 dark:border-zinc-700/50"
+            >
+              {cat}
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* ── Main Grid + Sidebar ───────────────────────────── */}
       <div className="flex flex-col lg:flex-row gap-12">
         <main className="flex-1 flex flex-col gap-8">
@@ -302,7 +343,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post, index) => (
+            {posts.slice(0, visibleCount).map((post, index) => (
               <React.Fragment key={post.id}>
                 <article
                   onClick={() => navigate(`/post/${post.id}`)}
@@ -359,7 +400,7 @@ export default function Home() {
           </div>
 
           {/* Load More */}
-          {nextPageToken && (
+          {(visibleCount < posts.length || nextPageToken) && (
             <div className="flex justify-center">
               <button
                 onClick={loadMore}

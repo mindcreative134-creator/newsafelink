@@ -130,7 +130,7 @@ export default function Header() {
               </button>
 
               {catOpen && (
-                <div className="absolute left-0 mt-2 w-52 rounded-2xl shadow-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 py-1.5 z-50 overflow-hidden">
+                <div className="absolute left-0 mt-2 w-52 rounded-2xl shadow-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 py-1.5 z-50 max-h-80 overflow-y-auto scrollbar-none">
                   {categories.length > 0 ? (
                     categories.map((cat) => (
                       <Link
@@ -182,7 +182,7 @@ export default function Header() {
 
       {/* Mobile Menu Panel */}
       {isOpen && (
-        <div className="md:hidden bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 py-3 px-4 flex flex-col gap-1">
+        <div className="md:hidden bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 py-3 px-4 flex flex-col gap-1 max-h-[calc(100vh-4.5rem)] overflow-y-auto scrollbar-none shadow-inner">
           {navLinks.map(({ to, label }) => (
             <Link
               key={to}
