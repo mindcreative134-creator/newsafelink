@@ -94,3 +94,20 @@ export async function getPages() {
 export async function getPageById(pageId) {
   return fetchJson(`${BASE_URL}/pages/${pageId}?key=${API_KEY}`);
 }
+
+export function getPostImage(post, width = 640) {
+  if (!post || !post.content) {
+    return `https://picsum.photos/seed/${post?.id || 'default'}/600/400`;
+  }
+  const match = post.content.match(/<img[^>]+src="([^">]+)"/);
+  const rawUrl = match ? match[1] : `https://picsum.photos/seed/${post.id}/600/400`;
+  
+  // Apply Google CDN image resizing for WebP-compressed, responsive load speeds
+  if (rawUrl.includes('googleusercontent.com') || rawUrl.includes('blogspot.com')) {
+    const sizeRegex = /\/(s|w)\d{2,5}(-[a-z0-9-]+)*\//i;
+    if (sizeRegex.test(rawUrl)) {
+      return rawUrl.replace(sizeRegex, `/w${width}-rw/`);
+    }
+  }
+  return rawUrl;
+}

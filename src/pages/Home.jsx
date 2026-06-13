@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPosts } from '../services/bloggerApi';
+import { getPosts, getPostImage } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import AdUnit from '../components/AdUnit';
@@ -141,10 +141,7 @@ export default function Home() {
 
   if (loading) return <HomeSkeleton />;
 
-  const getPostImage = (post) => {
-    const match = post.content?.match(/<img[^>]+src="([^">]+)"/);
-    return match ? match[1] : `https://picsum.photos/seed/${post.id}/600/400`;
-  };
+
 
   const getExcerpt = (content, limit = 150) => {
     if (!content) return '';
@@ -254,7 +251,7 @@ export default function Home() {
         >
           <div className="absolute inset-0">
             <img
-              src={getPostImage(featuredPost)}
+              src={getPostImage(featuredPost, 1000)}
               alt={featuredPost.title}
               className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700 ease-out"
               fetchPriority="high"
@@ -313,7 +310,7 @@ export default function Home() {
                 >
                   <div className="aspect-video w-full overflow-hidden relative">
                     <img
-                      src={getPostImage(post)}
+                      src={getPostImage(post, 500)}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"

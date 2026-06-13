@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getPosts } from '../services/bloggerApi';
+import { getPosts, getPostImage } from '../services/bloggerApi';
 import Sidebar from '../components/Sidebar';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
@@ -98,11 +98,7 @@ export default function Category() {
       });
   };
 
-  const getPostImage = (post) => {
-    if (!post.content) return 'https://picsum.photos/600/400';
-    const match = post.content.match(/<img[^>]+src="([^">]+)"/);
-    return match ? match[1] : 'https://picsum.photos/600/400';
-  };
+
 
   const getExcerpt = (content, limit = 120) => {
     if (!content) return '';
@@ -163,7 +159,7 @@ export default function Category() {
                       className="aspect-video w-full overflow-hidden cursor-pointer relative"
                     >
                       <img
-                        src={getPostImage(post)}
+                        src={getPostImage(post, 500)}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />

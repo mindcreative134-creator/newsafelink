@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { getPosts } from '../services/bloggerApi';
+import { getPosts, getPostImage } from '../services/bloggerApi';
 import { Tag, Clock } from 'lucide-react';
 import AdUnit from './AdUnit';
 
@@ -26,10 +26,7 @@ export default function Sidebar() {
       .catch(() => setLoading(false));
   }, []);
 
-  const getPostImage = (post) => {
-    const match = post.content?.match(/<img[^>]+src="([^">]+)"/);
-    return match ? match[1] : `https://picsum.photos/seed/${post.id}/80/80`;
-  };
+
 
   if (loading) {
     return (
@@ -97,7 +94,7 @@ export default function Sidebar() {
                   className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-zinc-100 dark:bg-zinc-800"
                 >
                   <img
-                    src={getPostImage(post)}
+                    src={getPostImage(post, 150)}
                     alt={post.title}
                     className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                     loading="lazy"

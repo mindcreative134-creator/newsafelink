@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getPostById, getPosts } from '../services/bloggerApi';
+import { getPostById, getPosts, getPostImage } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import AdUnit from '../components/AdUnit';
@@ -165,7 +165,16 @@ export default function PostDetail() {
   // Helper to render content with active React AdUnits instead of non-executing raw script tags
   const renderPostContent = (content) => {
     if (!content) return null;
-    const optimizedContent = content.replace(/<img /g, '<img loading="lazy" decoding="async" ');
+    const optimizedContent = content.replace(/<img[^>]+src="([^">]+)"/g, (imgTag, srcUrl) => {
+      let newSrc = srcUrl;
+      if (srcUrl.includes('googleusercontent.com') || srcUrl.includes('blogspot.com')) {
+        const sizeRegex = /\/(s|w)\d{2,5}(-[a-z0-9-]+)*\//i;
+        if (sizeRegex.test(srcUrl)) {
+          newSrc = srcUrl.replace(sizeRegex, '/w1000-rw/');
+        }
+      }
+      return imgTag.replace(srcUrl, newSrc);
+    }).replace(/<img /g, '<img loading="lazy" decoding="async" ');
     const paras = optimizedContent.split('</p>');
     if (paras.length <= 3) {
       return (
@@ -220,10 +229,7 @@ export default function PostDetail() {
     );
   };
 
-  const getPostImage = (p) => {
-    const m = p.content?.match(/<img[^>]+src="([^">]+)"/);
-    return m ? m[1] : `https://picsum.photos/seed/${p.id}/1200/600`;
-  };
+
 
   // ── Safelink Block ─────────────────────────────────────────────────────────
   const renderSafelinkBlock = () => {
