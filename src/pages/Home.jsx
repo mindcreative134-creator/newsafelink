@@ -251,7 +251,7 @@ export default function Home() {
         >
           <div className="absolute inset-0">
             <img
-              src={getPostImage(featuredPost, 1000)}
+              src={getPostImage(featuredPost, typeof window !== 'undefined' && window.innerWidth < 640 ? 640 : 1000)}
               alt={featuredPost.title}
               className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700 ease-out"
               fetchPriority="high"
@@ -310,7 +310,7 @@ export default function Home() {
                 >
                   <div className="aspect-video w-full overflow-hidden relative">
                     <img
-                      src={getPostImage(post, 500)}
+                      src={getPostImage(post, 480)}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"

@@ -29,12 +29,6 @@
     <meta property="twitter:title" content="SarkariTrend — Career Guidance & Job Notifications" />
     <meta property="twitter:description" content="Premium career guidance, sarkari job notifications, exam updates, and educational resources." />
 
-    <!-- Google Fonts — non-blocking preload -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet"></noscript>
-    
     <!-- Preconnect to Blogger CDNs for instant LCP image discovery -->
     <link rel="preconnect" href="https://blogger.googleusercontent.com" crossorigin />
     <link rel="dns-prefetch" href="https://blogger.googleusercontent.com" />
@@ -68,7 +62,8 @@
               if (rawUrl.indexOf('googleusercontent.com') !== -1 || rawUrl.indexOf('blogspot.com') !== -1) {
                 var sizeRegex = /\/(s|w)\d{2,5}(-[a-z0-9-]+)*\//i;
                 if (sizeRegex.test(rawUrl)) {
-                  return rawUrl.replace(sizeRegex, '/w1000-rw/');
+                  var heroWidth = (window.innerWidth || screen.width || 640) < 640 ? 640 : 1000;
+                  return rawUrl.replace(sizeRegex, '/w' + heroWidth + '-rw/');
                 }
               }
               return rawUrl;
