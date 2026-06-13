@@ -249,7 +249,7 @@ export default function Home() {
       {/* ── Featured / Hero Post ──────────────────────────── */}
       {featuredPost && !showVerification && (
         <div
-          className="relative bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl mb-10 group cursor-pointer"
+          className="relative w-full h-80 sm:h-96 bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl mb-10 group cursor-pointer"
           onClick={() => navigate(`/post/${featuredPost.id}`)}
         >
           <div className="absolute inset-0">
@@ -262,7 +262,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-zinc-900/20" />
           </div>
 
-          <div className="relative px-6 py-16 sm:px-12 sm:py-24 lg:px-16 lg:py-28 flex flex-col items-start gap-4 max-w-3xl">
+          <div className="absolute inset-0 p-6 sm:p-12 lg:p-16 flex flex-col justify-end items-start gap-3 sm:gap-4 max-w-3xl z-10">
             {featuredPost.labels && (
               <span className="px-3 py-1.5 text-xs font-bold uppercase rounded-full bg-indigo-600 text-white tracking-widest">
                 {featuredPost.labels[0]}

@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useSafelink } from './context/SafelinkContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import PostDetail from './pages/PostDetail';
-import Category from './pages/Category';
-import StaticPages from './pages/StaticPages';
 import StepHeader from './components/StepHeader';
 import AdUnit from './components/AdUnit';
+
+// Dynamic page imports for code-splitting
+const Home = lazy(() => import('./pages/Home'));
+const PostDetail = lazy(() => import('./pages/PostDetail'));
+const Category = lazy(() => import('./pages/Category'));
+const StaticPages = lazy(() => import('./pages/StaticPages'));
+
+// Pulse loading indicator fallback
+const PageLoader = () => (
+  <div className="w-full flex justify-center items-center py-24">
+    <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 export default function App() {
   const { currentStep } = useSafelink();
@@ -32,16 +41,18 @@ export default function App() {
 
       {/* Page Content */}
       <div className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/post/:postId" element={<PostDetail />} />
-          <Route path="/category/:label" element={<Category />} />
-          <Route path="/about" element={<StaticPages type="about" />} />
-          <Route path="/contact" element={<StaticPages type="contact" />} />
-          <Route path="/privacy-policy" element={<StaticPages type="privacy" />} />
-          <Route path="/disclaimer" element={<StaticPages type="disclaimer" />} />
-          <Route path="/terms-conditions" element={<StaticPages type="terms" />} />
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/post/:postId" element={<PostDetail />} />
+            <Route path="/category/:label" element={<Category />} />
+            <Route path="/about" element={<StaticPages type="about" />} />
+            <Route path="/contact" element={<StaticPages type="contact" />} />
+            <Route path="/privacy-policy" element={<StaticPages type="privacy" />} />
+            <Route path="/disclaimer" element={<StaticPages type="disclaimer" />} />
+            <Route path="/terms-conditions" element={<StaticPages type="terms" />} />
+          </Routes>
+        </Suspense>
       </div>
 
       {/* Footer */}

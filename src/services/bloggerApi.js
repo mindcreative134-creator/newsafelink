@@ -2,14 +2,33 @@ const API_KEY = 'AIzaSyAB38Lkz-xiuvkFFuEDd7BsVo97DMA4g24';
 const BLOG_ID = '6924208631263306852';
 const BASE_URL = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}`;
 
-// Helper to check for API errors
+// Helper to check for API errors with local caching (10-minute expiration)
 async function fetchJson(url) {
+  const cacheKey = `blogger_cache_${url}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    try {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < 600000) {
+        return data;
+      }
+    } catch (e) {
+      localStorage.removeItem(cacheKey);
+    }
+  }
+
   const response = await fetch(url);
   if (!response.ok) {
     const err = await response.json();
     throw new Error(err.error?.message || 'Failed to fetch data from Blogger API');
   }
-  return response.json();
+  const data = await response.json();
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
+  } catch (e) {
+    // Fail silently if storage is full or throws security error in sandbox
+  }
+  return data;
 }
 
 export async function getBlogInfo() {
