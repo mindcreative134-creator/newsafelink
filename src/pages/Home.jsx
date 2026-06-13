@@ -155,7 +155,7 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
       {/* ── Safelink Verification Widget ─────────────────────────────────── */}
       {showVerification && (
@@ -317,6 +317,9 @@ export default function Home() {
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
+                      decoding="async"
+                      width="600"
+                      height="338"
                     />
                     {post.labels && post.labels[0] && (
                       <span className="absolute top-3 left-3 px-2.5 py-1 text-[10px] font-bold uppercase rounded-full bg-indigo-600 text-white">

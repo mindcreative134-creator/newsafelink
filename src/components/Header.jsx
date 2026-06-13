@@ -51,16 +51,25 @@ export default function Header() {
     document.documentElement.classList.toggle('dark', isDark);
   }, [isDark]);
 
-  // Fetch categories from API
+  // Fetch categories from API (cached in sessionStorage to avoid repeated heavy calls)
   useEffect(() => {
-    getPosts({ maxResults: 50 })
+    const cached = sessionStorage.getItem('ST_CATS');
+    if (cached) {
+      try {
+        setCategories(JSON.parse(cached));
+        return;
+      } catch (e) { /* fall through to fetch */ }
+    }
+    getPosts({ maxResults: 12 })
       .then((data) => {
         if (data.items) {
           const labelsSet = new Set();
           data.items.forEach((post) => {
             if (post.labels) post.labels.forEach((l) => labelsSet.add(l));
           });
-          setCategories(Array.from(labelsSet).slice(0, 12));
+          const cats = Array.from(labelsSet).slice(0, 12);
+          setCategories(cats);
+          try { sessionStorage.setItem('ST_CATS', JSON.stringify(cats)); } catch (e) {}
         }
       })
       .catch(() => {
