@@ -433,63 +433,54 @@ export default function PostDetail() {
                 />
               </div>
 
-              {/* Safelink Timer/Action Widget */}
               {currentStep > 0 && (
-                <div className="flex flex-col gap-6 my-4 items-center w-full">
-                  
-                  {/* Top Ad */}
-                  <AdUnit key={`post-top-banner-${currentStep}`} slot="7317709042" format="auto" minHeight="90px" />
+                <>
+                  {/* Warning Bars (studyaf.com style) */}
+                  <div className="w-full flex flex-col gap-1.5 my-2">
+                    <div className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-400 border border-green-600 text-zinc-900 dark:text-zinc-950 text-center text-xs font-black uppercase tracking-wider rounded-md shadow-sm">
+                      ▼ CLICK ANY <span className="text-red-600 font-extrabold">IMAGE</span> 👆 & Wait 15 Seconds to <span className="text-blue-700 font-extrabold">GET LINK</span> ▼ 👆
+                    </div>
+                    <div className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-400 border border-green-600 text-zinc-900 dark:text-zinc-950 text-center text-xs font-black uppercase tracking-wider rounded-md shadow-sm">
+                      ▼ CLICK ANY <span className="text-red-650 font-extrabold">IMAGE</span> 👆 & Wait 15 Seconds to <span className="text-blue-700 font-extrabold">GET LINK</span> ▼ 👆
+                    </div>
+                  </div>
 
                   {/* Verification Instructions Alert (Hinglish/Hindi compliant) */}
-                  <div className="w-full p-6 bg-amber-50/60 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/30 rounded-2xl text-center text-sm font-semibold text-amber-800 dark:text-amber-300 space-y-2.5 backdrop-blur-sm shadow-sm">
-                    <p className="flex items-center justify-center gap-2 font-extrabold text-zinc-900 dark:text-zinc-100">
-                      <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-500 flex-shrink-0" /> Click Image & Wait & Come back this page to Get Link - Download.
+                  <div className="w-full text-center space-y-1 my-3 px-4">
+                    <p className="text-xs sm:text-sm font-extrabold text-zinc-800 dark:text-zinc-200">
+                      👉 Click Image & Wait & Come back this page to <span className="text-red-600 font-extrabold">Get Link - Download.</span>
                     </p>
-                    <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 font-hindi leading-relaxed">
-                      👇 LINK पाने और DOWNLOAD करने के लिए, 👇 फोटो पर क्लिक करें, 15 सेकंड रुकें और फिर इसी पेज पर वापस आएं
+                    <p className="text-xs sm:text-xs font-bold text-zinc-750 dark:text-zinc-350 font-hindi">
+                      <span className="text-red-650 font-extrabold">▼ LINK पाने और DOWNLOAD करने के लिए,</span> 👉 फोटो पर क्लिक करें, <span className="text-blue-750 font-extrabold">15 सेकंड रुकें</span> और फिर इसी पेज पर वापस आएं
                     </p>
                   </div>
 
                   {/* Above Verify Ad */}
                   <AdUnit key={`post-above-verify-${currentStep}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
 
-                  {/* Modern Countdown Timer Widget */}
-                  <div className="bg-gradient-to-br from-red-50/40 to-rose-50/20 dark:from-zinc-900/40 dark:to-zinc-900/20 border border-red-100/70 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-6 w-full shadow-sm">
-                    <div className="flex flex-col items-center gap-1">
-                      <h3 className="text-base font-extrabold text-zinc-900 dark:text-white font-heading tracking-tight">
-                        Securing Link parameters
-                      </h3>
-                      <p className="text-xs font-medium text-zinc-450 dark:text-zinc-500">
-                        {currentStep === 3
-                          ? 'Finalizing safe transit gateway parameters'
-                          : `Step ${currentStep} of 3: Decoupling redirect headers`}
-                      </p>
-                    </div>
-
+                  {/* studyaf.com countdown / Verify widget */}
+                  <div className="w-full flex items-center justify-center my-3">
                     {timerActive ? (
-                      <div className="flex flex-col items-center gap-4 w-full max-w-sm">
-                        <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 px-4 py-2 rounded-xl">
-                          <Clock className="w-4 h-4 text-red-650 dark:text-red-400 animate-spin" />
-                          <span className="text-xs font-bold text-red-650 dark:text-red-400 font-mono">
+                      <div className="w-full max-w-sm flex flex-col items-center gap-3 py-4">
+                        <div className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest animate-pulse">
+                          Analyzing Safe Transit Tunnel...
+                        </div>
+                        <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 px-4 py-1.5 rounded-full">
+                          <Clock className="w-3.5 h-3.5 text-red-650 dark:text-red-400 animate-spin" />
+                          <span className="text-xs font-extrabold text-red-650 dark:text-red-400 font-mono">
                             Wait {timeLeft} seconds
                           </span>
                         </div>
-                        {/* Shimmer linear progress bar */}
-                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden shadow-inner">
+                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden shadow-inner">
                           <div
-                            className="bg-red-600 h-full rounded-full transition-all duration-1000 ease-linear shadow-md"
+                            className="bg-red-650 h-full rounded-full transition-all duration-1000 ease-linear shadow-md"
                             style={{ width: `${(timeLeft / 15) * 100}%` }}
                           />
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center gap-3">
-                        <span className="text-[10px] text-green-600 dark:text-green-400 font-extrabold uppercase tracking-widest flex items-center gap-1.5 bg-green-50 dark:bg-green-950/40 px-4 py-1.5 rounded-full border border-green-200 dark:border-green-800/60 shadow-sm">
-                          <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping"></span>
-                          Redirection Verified
-                        </span>
-                        
-                        {/* Verify Scroll Button */}
+                      <div className="flex flex-col items-center justify-center my-2">
+                        {/* Red Pill Verify Button */}
                         <button
                           onClick={() => {
                             const bottomEl = document.getElementById('safelink-bottom-trigger');
@@ -499,9 +490,9 @@ export default function PostDetail() {
                               window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
                             }
                           }}
-                          className="px-8 py-3.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-extrabold rounded-full shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 text-xs uppercase tracking-wider verify-pulse-glow"
+                          className="px-6 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-sm text-xs uppercase tracking-wider transition-all scale-100 active:scale-95 border-none cursor-pointer verify-pulse-glow"
                         >
-                          Verify / Scroll Down
+                          Verify
                         </button>
                       </div>
                     )}
@@ -509,7 +500,7 @@ export default function PostDetail() {
 
                   {/* Below Verify Ad */}
                   <AdUnit key={`post-below-verify-${currentStep}`} slot="5754054742" format="auto" minHeight="250px" />
-                </div>
+                </>
               )}
 
               {/* Dynamic Post Content with Ads Injected */}
@@ -522,30 +513,23 @@ export default function PostDetail() {
               {currentStep > 0 && (
                 <div id="safelink-bottom-trigger" className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center gap-4">
                   {!timerDone ? (
-                    <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-555 bg-zinc-100 dark:bg-zinc-950 px-6 py-4 rounded-xl border border-zinc-200 dark:border-zinc-850/80 cursor-not-allowed select-none">
+                    <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-555 bg-zinc-100 dark:bg-zinc-950 px-6 py-4 rounded-xl border border-zinc-200 dark:border-zinc-850/80 cursor-not-allowed select-none font-bold">
                       Complete countdown timer above
                     </div>
-                  ) : currentStep === 1 ? (
-                    <button
-                      onClick={handleStepTransition}
-                      className="inline-flex items-center gap-2 bg-red-650 hover:bg-red-700 text-white font-extrabold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider"
-                    >
-                      Continue to Step 2 <ArrowRight className="w-4 h-4" />
-                    </button>
-                  ) : currentStep === 2 ? (
-                    <button
-                      onClick={handleStepTransition}
-                      className="inline-flex items-center gap-2 bg-red-650 hover:bg-red-700 text-white font-extrabold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider"
-                    >
-                      Continue to Step 3 <ArrowRight className="w-4 h-4" />
-                    </button>
                   ) : (
-                    <button
-                      onClick={handleFinalRedirect}
-                      className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-extrabold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider verify-pulse-glow"
-                    >
-                      Go to Secured Link <ArrowRight className="w-4 h-4" />
-                    </button>
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <p className="text-xs sm:text-sm font-bold text-zinc-750 dark:text-zinc-350 tracking-tight text-center">
+                        Scroll down & click on <span className="text-red-600 dark:text-red-500 font-extrabold">Continue</span> button for your destination link
+                      </p>
+                      
+                      {/* Red Pill Continue Button */}
+                      <button
+                        onClick={currentStep === 3 ? handleFinalRedirect : handleStepTransition}
+                        className="px-6 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-sm text-xs uppercase tracking-wider transition-all scale-100 active:scale-95 border-none cursor-pointer verify-pulse-glow"
+                      >
+                        Continue
+                      </button>
+                    </div>
                   )}
 
                   {/* Bottom Ad Slots */}
