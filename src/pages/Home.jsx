@@ -260,56 +260,49 @@ export default function Home() {
       
       {/* Safelink Verification Widget */}
       {showVerification && (
-        <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] shadow-lg overflow-hidden text-zinc-900 dark:text-zinc-100 max-w-3xl mx-auto mb-12 transition-all">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-zinc-950 to-indigo-950 px-6 py-8 text-center gold-gradient-border flex flex-col items-center gap-2 rounded-t-[32px]">
-            <span className="bg-gold-badge px-3 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest">
-              Gateway Security Node
-            </span>
-            <h2 className="m-0 text-white text-xl sm:text-2xl font-black font-heading tracking-tight flex items-center gap-2 justify-center">
-              <ShieldCheck className="w-6 h-6 text-amber-500" /> Gateway Security Verification
+        <div className="bg-gradient-to-r from-indigo-50/60 to-purple-50/60 dark:from-zinc-900/40 dark:to-zinc-900/20 border border-indigo-100/80 dark:border-zinc-800 rounded-3xl p-6 sm:p-10 flex flex-col items-center justify-center text-center gap-6 mb-12 shadow-md backdrop-blur-md">
+          <div className="flex flex-col items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-heading tracking-tight flex items-center gap-2">
+              <ShieldCheck className="w-6.5 h-6.5 text-indigo-650 dark:text-indigo-400" /> Gateway Security Verification
             </h2>
-            <p className="text-xs text-zinc-450 max-w-md font-medium">
+            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 max-w-sm">
               Verify your session parameters to proceed to the secure portal destination.
             </p>
           </div>
 
-          <div className="p-6 sm:p-10 flex flex-col items-center gap-6">
-            {/* Ad ABOVE checkbox */}
-            <div className="w-full flex items-center justify-center my-2">
-              <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" minHeight="250px" />
+          {/* Ad ABOVE checkbox */}
+          <div className="w-full flex items-center justify-center my-2">
+            <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" minHeight="250px" />
+          </div>
+
+          <div className="flex items-center gap-5 bg-white dark:bg-zinc-950 px-6 py-4.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-850/80 shadow-sm min-w-[280px] sm:min-w-[340px] justify-between transition-all duration-300">
+            <div className="flex items-center gap-3.5">
+              {verifying ? (
+                <div className="w-5.5 h-5.5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+              ) : verified ? (
+                <div className="w-5.5 h-5.5 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">✓</div>
+              ) : (
+                <input
+                  type="checkbox"
+                  id="not-robot"
+                  className="w-5.5 h-5.5 rounded-lg border-zinc-350 text-indigo-650 focus:ring-indigo-500 cursor-pointer transition-all duration-150"
+                  onChange={handleRobotCheck}
+                />
+              )}
+              <label htmlFor="not-robot" className="text-xs sm:text-sm font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
+                {verifying ? 'Checking browser parameters...' : verified ? 'Verification Complete' : "I'm not a robot"}
+              </label>
             </div>
 
-            {/* Checkbox box */}
-            <div className="flex items-center gap-5 bg-zinc-50 dark:bg-zinc-950 px-6 py-4.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm min-w-[280px] sm:min-w-[340px] justify-between transition-all duration-300">
-              <div className="flex items-center gap-3.5">
-                {verifying ? (
-                  <div className="w-5.5 h-5.5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                ) : verified ? (
-                  <div className="w-5.5 h-5.5 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">✓</div>
-                ) : (
-                  <input
-                    type="checkbox"
-                    id="not-robot"
-                    className="w-5.5 h-5.5 rounded-lg border-zinc-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all duration-150"
-                    onChange={handleRobotCheck}
-                  />
-                )}
-                <label htmlFor="not-robot" className="text-xs sm:text-sm font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
-                  {verifying ? 'Checking browser parameters...' : verified ? 'Verification Complete' : "I'm not a robot"}
-                </label>
-              </div>
-
-              <div className="flex flex-col items-center gap-0.5 opacity-60">
-                <span className="text-[9px] text-zinc-450 dark:text-zinc-500 font-extrabold uppercase tracking-widest">v3-Shield</span>
-              </div>
+            <div className="flex flex-col items-center gap-0.5 opacity-60">
+              <span className="text-[9px] text-zinc-400 font-extrabold uppercase tracking-widest">v3-Shield</span>
             </div>
+          </div>
 
-            {/* Ad BELOW checkbox */}
-            <div className="w-full flex flex-col gap-4 mt-2">
-              <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
-              <AdUnit key={`home-robot-ad3-${safelinkTarget}`} slot="5754054742" format="auto" minHeight="250px" />
-            </div>
+          {/* Ad BELOW checkbox */}
+          <div className="w-full flex flex-col gap-4 mt-2">
+            <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
+            <AdUnit key={`home-robot-ad3-${safelinkTarget}`} slot="5754054742" format="auto" minHeight="250px" />
           </div>
         </div>
       )}
