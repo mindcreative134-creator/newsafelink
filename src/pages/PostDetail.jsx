@@ -4,7 +4,7 @@ import { getPostById, getPosts } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import StepHeader from '../components/StepHeader';
-import { Calendar, User, ArrowRight } from 'lucide-react';
+import { Calendar, User, ArrowRight, ShieldCheck, AlertCircle, Clock } from 'lucide-react';
 
 // Ad slot component to reuse easily and ensure standard execution (no label)
 function AdSlot() {
@@ -35,7 +35,7 @@ function PostDetailSkeleton() {
       <div className="flex flex-col lg:flex-row gap-12">
         {/* Article Column Skeleton */}
         <div className="flex-1 min-w-0">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col gap-6">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-6 sm:p-8 flex flex-col gap-6">
             <div className="flex gap-2">
               <div className="h-5 w-16 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
               <div className="h-5 w-20 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
@@ -50,8 +50,6 @@ function PostDetailSkeleton() {
               <div className="h-4 w-full bg-zinc-200 dark:bg-zinc-800 rounded" />
               <div className="h-4 w-full bg-zinc-200 dark:bg-zinc-800 rounded" />
               <div className="h-4 w-5/6 bg-zinc-200 dark:bg-zinc-800 rounded" />
-              <div className="h-4 w-full bg-zinc-200 dark:bg-zinc-800 rounded" />
-              <div className="h-4 w-4/5 bg-zinc-200 dark:bg-zinc-800 rounded" />
             </div>
           </div>
         </div>
@@ -60,18 +58,6 @@ function PostDetailSkeleton() {
         <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8">
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
             <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 rounded mb-4" />
-            <div className="space-y-2">
-              <div className="h-3 w-full bg-zinc-200 dark:bg-zinc-800 rounded" />
-              <div className="h-3 w-5/6 bg-zinc-200 dark:bg-zinc-800 rounded" />
-            </div>
-          </div>
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
-            <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-800 rounded mb-4" />
-            <div className="flex flex-wrap gap-2">
-              <div className="h-7 w-16 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
-              <div className="h-7 w-12 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
-              <div className="h-7 w-20 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
-            </div>
           </div>
         </aside>
       </div>
@@ -225,7 +211,7 @@ export default function PostDetail() {
         <p className="text-zinc-500 dark:text-zinc-400 mb-8">{error || 'Article not found.'}</p>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold shadow-md"
+          className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold uppercase tracking-wider text-xs shadow-md"
         >
           Return Home
         </button>
@@ -289,15 +275,15 @@ export default function PostDetail() {
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Article Column */}
           <main className="flex-1 min-w-0">
-            <article className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm p-6 sm:p-8 flex flex-col gap-6">
+            <article className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-[32px] overflow-hidden shadow-sm p-6 sm:p-10 flex flex-col gap-6 backdrop-blur-sm">
               
               {/* Labels / Categories */}
               {post.labels && post.labels.length > 0 && (
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {post.labels.map((label) => (
                     <span
                       key={label}
-                      className="px-3 py-1 text-xs font-bold uppercase rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400"
+                      className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-650 dark:text-indigo-400 border border-indigo-100/50 dark:border-indigo-900/40"
                     >
                       {label}
                     </span>
@@ -306,14 +292,14 @@ export default function PostDetail() {
               )}
 
               {/* Title */}
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-white leading-tight font-heading m-0">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-900 dark:text-white leading-tight font-heading m-0 tracking-tight">
                 {post.title}
               </h1>
 
               {/* Meta */}
-              <div className="flex items-center text-sm text-zinc-400 dark:text-zinc-500 gap-4 pb-6 border-b border-zinc-200 dark:border-zinc-800">
+              <div className="flex flex-wrap items-center text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 gap-4 pb-6 border-b border-zinc-200/60 dark:border-zinc-800/60">
                 <span className="flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="w-4 h-4 text-indigo-500" />
                   {new Date(post.published).toLocaleDateString(undefined, {
                     year: 'numeric',
                     month: 'long',
@@ -321,13 +307,13 @@ export default function PostDetail() {
                   })}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <User className="w-4 h-4" />
+                  <User className="w-4 h-4 text-indigo-500" />
                   Staff Writer
                 </span>
               </div>
 
               {/* Featured Image */}
-              <div className="w-full rounded-2xl overflow-hidden shadow-sm aspect-video">
+              <div className="w-full rounded-[24px] overflow-hidden shadow-sm aspect-video border border-zinc-200/10">
                 <img
                   src={getPostImage(post)}
                   alt={post.title}
@@ -337,54 +323,55 @@ export default function PostDetail() {
 
               {/* Safelink Timer/Action Widget */}
               {currentStep > 0 && (
-                <div className="flex flex-col gap-4 my-4 items-center w-full">
+                <div className="flex flex-col gap-6 my-4 items-center w-full">
                   
                   {/* Top Ad */}
                   <AdSlot />
 
                   {/* Verification Instructions Alert (Hinglish/Hindi compliant) */}
-                  <div className="w-full p-5 bg-amber-50/70 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/40 rounded-2xl text-center text-sm font-semibold text-amber-800 dark:text-amber-300 space-y-2.5 backdrop-blur-sm">
-                    <p className="flex items-center justify-center gap-1.5 font-extrabold text-zinc-900 dark:text-zinc-100">
-                      👇 Click Image & Wait & Come back this page to Get Link - Download.
+                  <div className="w-full p-6 bg-amber-50/60 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/30 rounded-2xl text-center text-sm font-semibold text-amber-800 dark:text-amber-300 space-y-2.5 backdrop-blur-sm shadow-sm">
+                    <p className="flex items-center justify-center gap-2 font-extrabold text-zinc-900 dark:text-zinc-100">
+                      <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-500 flex-shrink-0" /> Click Image & Wait & Come back this page to Get Link - Download.
                     </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-hindi">
+                    <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 font-hindi leading-relaxed">
                       👇 LINK पाने और DOWNLOAD करने के लिए, 👇 फोटो पर क्लिक करें, 15 सेकंड रुकें और फिर इसी पेज पर वापस आएं
                     </p>
                   </div>
 
-                  {/* Modern Horizontal Countdown Timer Widget */}
-                  <div className="bg-gradient-to-br from-red-50/40 to-rose-50/20 dark:from-zinc-900/50 dark:to-zinc-900/30 border border-red-100/70 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-6 w-full shadow-sm">
+                  {/* Modern Countdown Timer Widget */}
+                  <div className="bg-gradient-to-br from-red-50/40 to-rose-50/20 dark:from-zinc-900/40 dark:to-zinc-900/20 border border-red-100/70 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-6 w-full shadow-sm">
                     <div className="flex flex-col items-center gap-1">
-                      <h3 className="text-lg font-bold text-zinc-900 dark:text-white font-heading">
-                        Link Security Analysis
+                      <h3 className="text-base font-extrabold text-zinc-900 dark:text-white font-heading tracking-tight">
+                        Securing Link parameters
                       </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-xs font-medium text-zinc-450 dark:text-zinc-500">
                         {currentStep === 3
-                          ? 'Finalizing direct transit credentials'
-                          : `Step ${currentStep} of 3: Processing encryption tags`}
+                          ? 'Finalizing safe transit gateway parameters'
+                          : `Step ${currentStep} of 3: Decoupling redirect headers`}
                       </p>
                     </div>
 
                     {timerActive ? (
-                      <div className="flex flex-col items-center gap-3.5 w-full max-w-sm">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-base font-extrabold text-red-600 dark:text-red-400 font-mono animate-pulse">
-                            Please wait {timeLeft}s
+                      <div className="flex flex-col items-center gap-4 w-full max-w-sm">
+                        <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 px-4 py-2 rounded-xl">
+                          <Clock className="w-4 h-4 text-red-650 dark:text-red-400 animate-spin" />
+                          <span className="text-xs font-bold text-red-650 dark:text-red-400 font-mono">
+                            Wait {timeLeft} seconds
                           </span>
                         </div>
                         {/* Shimmer linear progress bar */}
-                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
+                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden shadow-inner">
                           <div
-                            className="bg-red-600 h-full rounded-full transition-all duration-1000 ease-linear shadow-inner"
+                            className="bg-red-600 h-full rounded-full transition-all duration-1000 ease-linear shadow-md"
                             style={{ width: `${(timeLeft / 15) * 100}%` }}
                           />
                         </div>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-3">
-                        <span className="text-xs text-green-600 dark:text-green-400 font-bold flex items-center gap-1.5 bg-green-50 dark:bg-green-950/40 px-4 py-1.5 rounded-full border border-green-200 dark:border-green-800/60 shadow-sm">
-                          <span className="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
-                          Parameters Authenticated
+                        <span className="text-[10px] text-green-600 dark:text-green-400 font-extrabold uppercase tracking-widest flex items-center gap-1.5 bg-green-50 dark:bg-green-950/40 px-4 py-1.5 rounded-full border border-green-200 dark:border-green-800/60 shadow-sm">
+                          <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping"></span>
+                          Redirection Verified
                         </span>
                         
                         {/* Verify Scroll Button */}
@@ -397,7 +384,7 @@ export default function PostDetail() {
                               window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
                             }
                           }}
-                          className="px-8 py-3 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 text-xs sm:text-sm uppercase tracking-wide"
+                          className="px-8 py-3.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-extrabold rounded-full shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 text-xs uppercase tracking-wider verify-pulse-glow"
                         >
                           Verify / Scroll Down
                         </button>
@@ -420,27 +407,27 @@ export default function PostDetail() {
               {currentStep > 0 && (
                 <div id="safelink-bottom-trigger" className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center gap-4">
                   {!timerDone ? (
-                    <div className="text-sm font-semibold text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-950 px-6 py-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800/80 cursor-not-allowed">
-                      Please complete verification above first
+                    <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-550 bg-zinc-100 dark:bg-zinc-950 px-6 py-4 rounded-xl border border-zinc-200 dark:border-zinc-850/80 cursor-not-allowed select-none">
+                      Complete countdown timer above
                     </div>
                   ) : currentStep === 1 ? (
                     <button
                       onClick={handleStepTransition}
-                      className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider"
+                      className="inline-flex items-center gap-2 bg-red-650 hover:bg-red-700 text-white font-extrabold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider"
                     >
                       Continue to Step 2 <ArrowRight className="w-4 h-4" />
                     </button>
                   ) : currentStep === 2 ? (
                     <button
                       onClick={handleStepTransition}
-                      className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider"
+                      className="inline-flex items-center gap-2 bg-red-650 hover:bg-red-700 text-white font-extrabold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider"
                     >
                       Continue to Step 3 <ArrowRight className="w-4 h-4" />
                     </button>
                   ) : (
                     <button
                       onClick={handleFinalRedirect}
-                      className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider"
+                      className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-extrabold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 uppercase text-xs tracking-wider verify-pulse-glow"
                     >
                       Go to Secured Link <ArrowRight className="w-4 h-4" />
                     </button>
