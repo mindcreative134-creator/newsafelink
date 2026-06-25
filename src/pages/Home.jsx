@@ -4,6 +4,7 @@ import { getPosts } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import { Calendar, User, ArrowRight, ShieldCheck, RefreshCw } from 'lucide-react';
+import AdUnit from '../components/AdUnit';
 
 // Card skeleton component
 function PostCardSkeleton() {
@@ -269,6 +270,11 @@ export default function Home() {
             </p>
           </div>
 
+          {/* Ad ABOVE checkbox */}
+          <div className="w-full flex items-center justify-center my-2">
+            <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" minHeight="250px" />
+          </div>
+
           <div className="flex items-center gap-5 bg-white dark:bg-zinc-950 px-6 py-4.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-850/80 shadow-sm min-w-[280px] sm:min-w-[340px] justify-between transition-all duration-300">
             <div className="flex items-center gap-3.5">
               {verifying ? (
@@ -279,7 +285,7 @@ export default function Home() {
                 <input
                   type="checkbox"
                   id="not-robot"
-                  className="w-5.5 h-5.5 rounded-lg border-zinc-350 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all duration-150"
+                  className="w-5.5 h-5.5 rounded-lg border-zinc-350 text-indigo-650 focus:ring-indigo-500 cursor-pointer transition-all duration-150"
                   onChange={handleRobotCheck}
                 />
               )}
@@ -291,6 +297,12 @@ export default function Home() {
             <div className="flex flex-col items-center gap-0.5 opacity-60">
               <span className="text-[9px] text-zinc-400 font-extrabold uppercase tracking-widest">v3-Shield</span>
             </div>
+          </div>
+
+          {/* Ad BELOW checkbox */}
+          <div className="w-full flex flex-col gap-4 mt-2">
+            <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
+            <AdUnit key={`home-robot-ad3-${safelinkTarget}`} slot="5754054742" format="auto" minHeight="250px" />
           </div>
         </div>
       )}
@@ -338,60 +350,68 @@ export default function Home() {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post) => (
-              <article
-                key={post.id}
-                className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group"
-              >
-                {/* Image */}
-                <div
-                  onClick={() => navigate(`/post/${post.id}`)}
-                  className="aspect-video w-full overflow-hidden cursor-pointer relative"
+            {posts.map((post, index) => (
+              <React.Fragment key={post.id}>
+                <article
+                  className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group"
                 >
-                  <img
-                    src={getPostImage(post)}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {post.labels && (
-                    <span className="absolute top-3 left-3 px-2.5 py-1 text-[10px] font-bold uppercase rounded-full bg-indigo-600 text-white shadow-sm">
-                      {post.labels[0]}
-                    </span>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="p-5 flex-1 flex flex-col justify-between gap-5">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center text-[10px] font-bold text-zinc-400 dark:text-zinc-500 gap-3 uppercase tracking-wider">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {new Date(post.published).toLocaleDateString()}
+                  {/* Image */}
+                  <div
+                    onClick={() => navigate(`/post/${post.id}`)}
+                    className="aspect-video w-full overflow-hidden cursor-pointer relative"
+                  >
+                    <img
+                      src={getPostImage(post)}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {post.labels && (
+                      <span className="absolute top-3 left-3 px-2.5 py-1 text-[10px] font-bold uppercase rounded-full bg-indigo-600 text-white shadow-sm">
+                        {post.labels[0]}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <User className="w-3.5 h-3.5" />
-                        Staff
-                      </span>
-                    </div>
-                    <h3
-                      onClick={() => navigate(`/post/${post.id}`)}
-                      className="text-base font-extrabold text-zinc-900 dark:text-white hover:text-indigo-650 dark:hover:text-indigo-400 line-clamp-2 leading-snug cursor-pointer font-heading transition-colors"
-                    >
-                      {post.title}
-                    </h3>
-                    <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm line-clamp-3 leading-relaxed font-medium">
-                      {getExcerpt(post.content, 120)}
-                    </p>
+                    )}
                   </div>
 
-                  <button
-                    onClick={() => navigate(`/post/${post.id}`)}
-                    className="inline-flex items-center text-indigo-650 dark:text-indigo-400 font-bold text-xs gap-1.5 self-start group-hover:translate-x-1.5 transition-transform"
-                  >
-                    Read Excerpt <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </article>
+                  {/* Content */}
+                  <div className="p-5 flex-1 flex flex-col justify-between gap-5">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center text-[10px] font-bold text-zinc-400 dark:text-zinc-500 gap-3 uppercase tracking-wider">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {new Date(post.published).toLocaleDateString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <User className="w-3.5 h-3.5" />
+                          Staff
+                        </span>
+                      </div>
+                      <h3
+                        onClick={() => navigate(`/post/${post.id}`)}
+                        className="text-base font-extrabold text-zinc-900 dark:text-white hover:text-indigo-650 dark:hover:text-indigo-400 line-clamp-2 leading-snug cursor-pointer font-heading transition-colors"
+                      >
+                        {post.title}
+                      </h3>
+                      <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm line-clamp-3 leading-relaxed font-medium">
+                        {getExcerpt(post.content, 120)}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => navigate(`/post/${post.id}`)}
+                      className="inline-flex items-center text-indigo-650 dark:text-indigo-400 font-bold text-xs gap-1.5 self-start group-hover:translate-x-1.5 transition-transform"
+                    >
+                      Read Excerpt <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </article>
+
+                {/* In-feed Ad after the 3rd post */}
+                {index === 2 && (
+                  <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] p-4 flex items-center justify-center min-h-[120px]">
+                    <AdUnit key={`home-list-ad-${index}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
+                  </div>
+                )}
+              </React.Fragment>
             ))}
           </div>
 

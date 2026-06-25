@@ -5,6 +5,7 @@ import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import StepHeader from '../components/StepHeader';
 import { Calendar, User, ArrowRight, ShieldCheck, AlertCircle, Clock } from 'lucide-react';
+import AdUnit from '../components/AdUnit';
 
 // Ad slot component to reuse easily and ensure standard execution (no label)
 function AdSlot() {
@@ -340,13 +341,13 @@ export default function PostDetail() {
     }
 
     const adUnit = `
-      <div class="adsense-container w-full overflow-hidden flex items-center justify-center">
+      <div class="adsense-container w-full overflow-hidden flex items-center justify-center py-2">
         <ins class="adsbygoogle"
-             style="display:block"
+             style="display:block; text-align:center;"
+             data-ad-layout="in-article"
+             data-ad-format="fluid"
              data-ad-client="ca-pub-9543073887536718"
-             data-ad-slot="7317709042"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+             data-ad-slot="1641433819"></ins>
       </div>
     `;
 
@@ -437,7 +438,7 @@ export default function PostDetail() {
                 <div className="flex flex-col gap-6 my-4 items-center w-full">
                   
                   {/* Top Ad */}
-                  <AdSlot />
+                  <AdUnit key={`post-top-banner-${currentStep}`} slot="7317709042" format="auto" minHeight="90px" />
 
                   {/* Verification Instructions Alert (Hinglish/Hindi compliant) */}
                   <div className="w-full p-6 bg-amber-50/60 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/30 rounded-2xl text-center text-sm font-semibold text-amber-800 dark:text-amber-300 space-y-2.5 backdrop-blur-sm shadow-sm">
@@ -448,6 +449,9 @@ export default function PostDetail() {
                       👇 LINK पाने और DOWNLOAD करने के लिए, 👇 फोटो पर क्लिक करें, 15 सेकंड रुकें और फिर इसी पेज पर वापस आएं
                     </p>
                   </div>
+
+                  {/* Above Verify Ad */}
+                  <AdUnit key={`post-above-verify-${currentStep}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
 
                   {/* Modern Countdown Timer Widget */}
                   <div className="bg-gradient-to-br from-red-50/40 to-rose-50/20 dark:from-zinc-900/40 dark:to-zinc-900/20 border border-red-100/70 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-6 w-full shadow-sm">
@@ -503,8 +507,8 @@ export default function PostDetail() {
                     )}
                   </div>
 
-                  {/* Bottom Ad */}
-                  <AdSlot />
+                  {/* Below Verify Ad */}
+                  <AdUnit key={`post-below-verify-${currentStep}`} slot="5754054742" format="auto" minHeight="250px" />
                 </div>
               )}
 
@@ -518,7 +522,7 @@ export default function PostDetail() {
               {currentStep > 0 && (
                 <div id="safelink-bottom-trigger" className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center gap-4">
                   {!timerDone ? (
-                    <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-550 bg-zinc-100 dark:bg-zinc-950 px-6 py-4 rounded-xl border border-zinc-200 dark:border-zinc-850/80 cursor-not-allowed select-none">
+                    <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-555 bg-zinc-100 dark:bg-zinc-950 px-6 py-4 rounded-xl border border-zinc-200 dark:border-zinc-850/80 cursor-not-allowed select-none">
                       Complete countdown timer above
                     </div>
                   ) : currentStep === 1 ? (
@@ -543,6 +547,12 @@ export default function PostDetail() {
                       Go to Secured Link <ArrowRight className="w-4 h-4" />
                     </button>
                   )}
+
+                  {/* Bottom Ad Slots */}
+                  <div className="w-full flex flex-col gap-6 mt-6">
+                    <AdUnit key={`post-bottom-ad1-${currentStep}`} slot="1909584638" format="auto" minHeight="250px" />
+                    <AdUnit key={`post-bottom-ad2-${currentStep}`} slot="8617081290" format="autorelaxed" minHeight="280px" />
+                  </div>
                 </div>
               )}
 

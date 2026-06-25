@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPosts } from '../services/bloggerApi';
 import { Rss, Folder, Image, Star } from 'lucide-react';
+import AdUnit from './AdUnit';
 
 export default function Sidebar() {
   const [recentPosts, setRecentPosts] = useState([]);
@@ -68,17 +69,8 @@ export default function Sidebar() {
       </div>
 
       {/* Ad Placement */}
-      <div className="adsense-container w-full overflow-hidden">
-        <div className="w-full flex items-center justify-center p-2">
-          {/* AdSense Unit */}
-          <ins
-            className="adsbygoogle"
-            style={{ display: 'block', width: '100%' }}
-            data-ad-client="ca-pub-9543073887536718"
-            data-ad-slot="7317709042"
-            data-ad-format="auto"
-          />
-        </div>
+      <div className="adsense-container w-full overflow-hidden flex items-center justify-center p-2">
+        <AdUnit slot="7317709042" format="auto" minHeight="250px" />
       </div>
 
       {/* Recent Posts Widget */}
