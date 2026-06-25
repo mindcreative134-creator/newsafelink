@@ -79,6 +79,7 @@ export default function PostDetail() {
   const [timeLeft, setTimeLeft] = useState(15);
   const [timerActive, setTimerActive] = useState(false);
   const [timerDone, setTimerDone] = useState(false);
+  const [gatewayStarted, setGatewayStarted] = useState(false);
   const timerRef = useRef(null);
 
   // Scroll to top when post changes
@@ -238,9 +239,14 @@ export default function PostDetail() {
     };
   }, [postId]);
 
+  // Reset gateway status when post ID changes
+  useEffect(() => {
+    setGatewayStarted(false);
+  }, [postId]);
+
   // Handle safelink timer initialization
   useEffect(() => {
-    if (currentStep > 0 && post) {
+    if (currentStep > 0 && post && gatewayStarted) {
       setTimeLeft(15);
       setTimerActive(true);
       setTimerDone(false);
@@ -258,12 +264,15 @@ export default function PostDetail() {
           return prev - 1;
         });
       }, 1000);
+    } else {
+      setTimerActive(false);
+      setTimerDone(false);
     }
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [currentStep, post, postId]);
+  }, [currentStep, post, postId, gatewayStarted]);
 
   // Load AdSense ads dynamically once content is rendered
   useEffect(() => {
@@ -451,45 +460,93 @@ export default function PostDetail() {
                   </div>
 
                   {/* Above Verify Ad */}
-                  <AdUnit key={`post-above-verify-${currentStep}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
-
-                  {/* Modern Countdown Timer Widget */}
-                  <div className="bg-gradient-to-br from-red-50/40 to-rose-50/20 dark:from-zinc-900/40 dark:to-zinc-900/20 border border-red-100/70 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-6 w-full shadow-sm">
-                    <div className="flex flex-col items-center gap-1">
-                      <h3 className="text-base font-extrabold text-zinc-900 dark:text-white font-heading tracking-tight">
-                        Securing Link parameters
+                          {/* Link Parameter Verification Gateway Widget */}
+                  <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[24px] shadow-sm overflow-hidden text-zinc-900 dark:text-zinc-100 max-w-2xl mx-auto my-4 transition-all">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-zinc-950 to-indigo-950 px-6 py-6 text-center gold-gradient-border flex flex-col items-center gap-2 rounded-t-[24px]">
+                      <span className="bg-gold-badge px-3 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest">
+                        Secure Transit Node
+                      </span>
+                      <h3 className="m-0 text-white text-base sm:text-lg font-black font-heading tracking-tight">
+                        Link Parameter Verification Gateway
                       </h3>
-                      <p className="text-xs font-medium text-zinc-450 dark:text-zinc-500">
-                        {currentStep === 3
-                          ? 'Finalizing safe transit gateway parameters'
-                          : `Step ${currentStep} of 3: Decoupling redirect headers`}
-                      </p>
                     </div>
 
-                    {timerActive ? (
-                      <div className="flex flex-col items-center gap-4 w-full max-w-sm">
-                        <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 px-4 py-2 rounded-xl">
-                          <Clock className="w-4 h-4 text-red-650 dark:text-red-400 animate-spin" />
-                          <span className="text-xs font-bold text-red-650 dark:text-red-400 font-mono">
+                    {/* State 1: Input dropdown and start button */}
+                    {!gatewayStarted && (
+                      <div className="p-6 sm:p-8 flex flex-col gap-5">
+                        <div className="flex flex-col gap-2">
+                          <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider text-left">
+                            Select Secure Transit Pipeline:
+                          </label>
+                          <select className="w-full p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-bold bg-zinc-50 dark:bg-zinc-950 text-zinc-850 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                            <option>Direct Institutional Transit Gateway (Ultra Fast Node)</option>
+                            <option>Sovereign Academic Encryption Pipeline (SSL-v3 Secured)</option>
+                            <option>Encrypted Cross-Border Payload Router</option>
+                          </select>
+                        </div>
+                        
+                        <p className="text-xs text-zinc-450 dark:text-zinc-500 leading-relaxed font-medium text-left">
+                          Initialize the secure transit gateway to decouple, decrypt, and authorize the requested redirection parameters safely.
+                        </p>
+
+                        <button
+                          onClick={() => setGatewayStarted(true)}
+                          className="w-full py-4 bg-indigo-650 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all scale-100 active:scale-[0.98]"
+                        >
+                          Verify Safe Transit Gateway
+                        </button>
+                      </div>
+                    )}
+
+                    {/* State 2: Progress Scanner */}
+                    {gatewayStarted && timerActive && (
+                      <div className="p-8 text-center flex flex-col items-center justify-center gap-6">
+                        <div className="w-10 h-10 border-4 border-zinc-200 dark:border-zinc-800 border-t-amber-500 rounded-full animate-spin-gold" />
+                        
+                        <div className="flex flex-col gap-1.5">
+                          <h4 className="text-sm font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                            {timeLeft > 11 ? "Initializing Secure Transit Nodes..." :
+                             timeLeft > 7 ? "Decoupling Encrypted Payload Parameters..." :
+                             timeLeft > 3 ? "Authorizing Transit Port Headers..." :
+                             "Establishing Secure Redirection Bridge..."}
+                          </h4>
+                          <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-600 dark:text-amber-500 font-mono">
                             Wait {timeLeft} seconds
                           </span>
                         </div>
-                        {/* Shimmer linear progress bar */}
-                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden shadow-inner">
+
+                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-1.5 mt-2 overflow-hidden shadow-inner">
                           <div
-                            className="bg-red-600 h-full rounded-full transition-all duration-1000 ease-linear shadow-md"
-                            style={{ width: `${(timeLeft / 15) * 100}%` }}
+                            className="bg-gradient-to-r from-indigo-600 to-amber-500 h-full rounded-full transition-all duration-1000 ease-linear shadow-md"
+                            style={{ width: `${((15 - timeLeft) / 15) * 100}%` }}
                           />
                         </div>
                       </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-3">
-                        <span className="text-[10px] text-green-600 dark:text-green-400 font-extrabold uppercase tracking-widest flex items-center gap-1.5 bg-green-50 dark:bg-green-950/40 px-4 py-1.5 rounded-full border border-green-200 dark:border-green-800/60 shadow-sm">
-                          <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping"></span>
-                          Redirection Verified
-                        </span>
+                    )}
+
+                    {/* State 3: Result screen */}
+                    {gatewayStarted && timerDone && (
+                      <div className="p-8 text-center flex flex-col items-center justify-center gap-6">
+                        <div className="w-10 h-10 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/30 rounded-full flex items-center justify-center text-green-600 dark:text-green-400 text-sm font-bold shadow-sm">
+                          ✓
+                        </div>
                         
-                        {/* Verify Scroll Button */}
+                        <div className="flex flex-col gap-1">
+                          <h3 className="text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                            Safe Transit Bridge Established
+                          </h3>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold leading-relaxed">
+                            Your session credentials clear strict secure transit underwriting parameters. Click the button below to verify.
+                          </p>
+                        </div>
+
+                        <div className="w-full p-4 border border-zinc-200 dark:border-zinc-800/80 border-l-4 border-l-indigo-600 dark:border-l-indigo-500 bg-zinc-50 dark:bg-zinc-950/30 rounded-xl text-left">
+                          <h2 className="m-0 text-xs font-extrabold text-zinc-900 dark:text-white uppercase tracking-tight">
+                            Redirection Gateway Parameters Decoupled Successfully
+                          </h2>
+                        </div>
+
                         <button
                           onClick={() => {
                             const bottomEl = document.getElementById('safelink-bottom-trigger');
@@ -499,7 +556,7 @@ export default function PostDetail() {
                               window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
                             }
                           }}
-                          className="px-8 py-3.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-extrabold rounded-full shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 text-xs uppercase tracking-wider verify-pulse-glow"
+                          className="px-8 py-3.5 bg-red-650 hover:bg-red-700 active:bg-red-800 text-white font-extrabold rounded-full shadow-lg hover:shadow-xl transition-all scale-105 active:scale-95 text-xs uppercase tracking-wider verify-pulse-glow"
                         >
                           Verify / Scroll Down
                         </button>

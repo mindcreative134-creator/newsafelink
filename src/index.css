@@ -178,3 +178,40 @@ body {
 .prose [style*="color"] { color: inherit !important; }
 .prose font[color] { color: inherit !important; }
 .prose span { color: inherit !important; }
+
+/* Redirection Gateway custom styles matching hittracks.in.net */
+@keyframes v93Spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-spin-gold {
+  animation: v93Spin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Gold/Blue badges and elements */
+.bg-gold-badge {
+  background: rgba(202, 138, 4, 0.1);
+  color: #ca8a04;
+  border: 1px solid rgba(202, 138, 4, 0.25);
+}
+.dark .bg-gold-badge {
+  background: rgba(251, 191, 36, 0.08);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.gold-gradient-border {
+  border-bottom: 4px solid #ca8a04;
+}
+
+.gateway-result-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 5px solid #1e40af;
+}
+.dark .gateway-result-box {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(30, 41, 59, 0.8);
+  border-left: 5px solid #4f46e5;
+}
+
