@@ -171,12 +171,55 @@ export default function Home() {
           setFeaturedPost(data.items[0]);
           setPosts(data.items.slice(1));
           setNextPageToken(data.nextPageToken || '');
+
+          // ── JSON-LD ItemList Schema for AI SEO ──
+          const existingHomeSchema = document.querySelector('script[data-home-schema]');
+          if (existingHomeSchema) existingHomeSchema.remove();
+
+          const itemListSchema = {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            'name': 'Latest Sarkari Job & Education Articles',
+            'description': 'Most recent government job notifications, exam updates, and career guidance articles from SarkariTrend.',
+            'url': 'https://sarkaritrend.news/',
+            'numberOfItems': data.items.length,
+            'itemListElement': data.items.map((item, index) => {
+              const plain = item.content ? item.content.replace(/<\/?[^>]+(>|$)/g, '') : '';
+              const desc = plain.length > 120 ? plain.substring(0, 120) + '...' : plain;
+              return {
+                '@type': 'ListItem',
+                'position': index + 1,
+                'url': `https://sarkaritrend.news/post/${item.id}`,
+                'name': item.title,
+                'item': {
+                  '@type': 'Article',
+                  'headline': item.title,
+                  'description': desc,
+                  'datePublished': item.published,
+                  'url': `https://sarkaritrend.news/post/${item.id}`,
+                  'keywords': item.labels ? item.labels.join(', ') : 'sarkari job',
+                  'publisher': { '@id': 'https://sarkaritrend.news/#organization' },
+                },
+              };
+            }),
+          };
+
+          const schemaScript = document.createElement('script');
+          schemaScript.type = 'application/ld+json';
+          schemaScript.setAttribute('data-home-schema', 'true');
+          schemaScript.textContent = JSON.stringify(itemListSchema);
+          document.head.appendChild(schemaScript);
         }
         setLoading(false);
       })
       .catch(() => {
         setLoading(false);
       });
+
+    return () => {
+      const s = document.querySelector('script[data-home-schema]');
+      if (s) s.remove();
+    };
   }, []);
 
   const loadMore = () => {

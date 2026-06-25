@@ -118,12 +118,123 @@ export default function PostDetail() {
           document.head.appendChild(canonical);
         }
 
+        // ── Open Graph per-post ──
+        const postImage = (data.content?.match(/<img[^>]+src="([^">]+)"/) || [])[1]
+          || `https://picsum.photos/seed/${data.id}/1200/630`;
+        const ogTags = {
+          'og:type': 'article',
+          'og:title': `${data.title} - SarkariTrend`,
+          'og:description': excerpt,
+          'og:url': window.location.href,
+          'og:image': postImage,
+          'article:published_time': data.published,
+          'article:modified_time': data.updated || data.published,
+          'article:section': (data.labels && data.labels[0]) || 'General',
+        };
+        Object.entries(ogTags).forEach(([prop, content]) => {
+          let tag = document.querySelector(`meta[property="${prop}"]`);
+          if (tag) tag.setAttribute('content', content);
+          else {
+            tag = document.createElement('meta');
+            tag.setAttribute('property', prop);
+            tag.setAttribute('content', content);
+            document.head.appendChild(tag);
+          }
+        });
+        if (data.labels) {
+          data.labels.forEach((label) => {
+            const tag = document.createElement('meta');
+            tag.setAttribute('property', 'article:tag');
+            tag.setAttribute('content', label);
+            tag.setAttribute('data-dynamic-og-tag', 'true');
+            document.head.appendChild(tag);
+          });
+        }
+
+        // ── JSON-LD Article Schema (AI SEO) ──
+        const existingSchemas = document.querySelectorAll('script[data-post-schema]');
+        existingSchemas.forEach((s) => s.remove());
+
+        const articleSchema = {
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'Article',
+              '@id': `${window.location.href}#article`,
+              'headline': data.title,
+              'description': excerpt,
+              'image': {
+                '@type': 'ImageObject',
+                'url': postImage,
+                'width': 1200,
+                'height': 630,
+              },
+              'datePublished': data.published,
+              'dateModified': data.updated || data.published,
+              'author': {
+                '@type': 'Person',
+                'name': 'SarkariTrend Editorial Team',
+                'url': 'https://sarkaritrend.news/about',
+              },
+              'publisher': {
+                '@id': 'https://sarkaritrend.news/#organization',
+              },
+              'isPartOf': { '@id': 'https://sarkaritrend.news/#website' },
+              'url': window.location.href,
+              'mainEntityOfPage': window.location.href,
+              'keywords': data.labels ? data.labels.join(', ') : 'sarkari job, government job, India',
+              'articleSection': (data.labels && data.labels[0]) || 'Career',
+              'inLanguage': 'en-IN',
+              'about': [
+                { '@type': 'Thing', 'name': 'Government Jobs India' },
+                { '@type': 'Thing', 'name': 'Sarkari Naukri' },
+              ],
+            },
+            {
+              '@type': 'BreadcrumbList',
+              '@id': `${window.location.href}#breadcrumb`,
+              'itemListElement': [
+                {
+                  '@type': 'ListItem',
+                  'position': 1,
+                  'name': 'Home',
+                  'item': 'https://sarkaritrend.news/',
+                },
+                ...(data.labels && data.labels[0] ? [{
+                  '@type': 'ListItem',
+                  'position': 2,
+                  'name': data.labels[0],
+                  'item': `https://sarkaritrend.news/category/${encodeURIComponent(data.labels[0])}`,
+                }] : []),
+                {
+                  '@type': 'ListItem',
+                  'position': data.labels && data.labels[0] ? 3 : 2,
+                  'name': data.title,
+                  'item': window.location.href,
+                },
+              ],
+            },
+          ],
+        };
+
+        const schemaScript = document.createElement('script');
+        schemaScript.type = 'application/ld+json';
+        schemaScript.setAttribute('data-post-schema', 'true');
+        schemaScript.textContent = JSON.stringify(articleSchema);
+        document.head.appendChild(schemaScript);
+
         setLoading(false);
       })
       .catch((err) => {
         setError(err.message || 'Failed to fetch article details.');
         setLoading(false);
       });
+
+    // Cleanup schemas and tags on unmount
+    return () => {
+      document.querySelectorAll('script[data-post-schema]').forEach((s) => s.remove());
+      document.querySelectorAll('meta[data-dynamic-og-tag]').forEach((t) => t.remove());
+    };
   }, [postId]);
 
   // Handle safelink timer initialization
