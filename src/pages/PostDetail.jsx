@@ -458,48 +458,64 @@ export default function PostDetail() {
                   {/* Above Verify Ad */}
                   <AdUnit key={`post-above-verify-${currentStep}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
 
-                  {/* studyaf.com countdown / Verify widget */}
-                  <div className="w-full flex items-center justify-center my-3">
+                  {/* Countdown Timer */}
+                  <div className="w-full flex items-center justify-center my-4">
                     {timerActive ? (
                       <div className="w-full max-w-sm flex flex-col items-center gap-3 py-4">
                         <div className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest animate-pulse">
-                          Analyzing Safe Transit Tunnel...
+                          Verifying Secure Link...
                         </div>
-                        <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 px-4 py-1.5 rounded-full">
-                          <Clock className="w-3.5 h-3.5 text-red-650 dark:text-red-400 animate-spin" />
-                          <span className="text-xs font-extrabold text-red-650 dark:text-red-400 font-mono">
-                            Wait {timeLeft} seconds
+                        <div className="flex items-center gap-2 bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40 px-5 py-2 rounded-full">
+                          <Clock className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 animate-spin" />
+                          <span className="text-sm font-extrabold text-purple-700 dark:text-purple-300 font-mono">
+                            {timeLeft}s remaining
                           </span>
                         </div>
-                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden shadow-inner">
+                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden shadow-inner">
                           <div
-                            className="bg-red-650 h-full rounded-full transition-all duration-1000 ease-linear shadow-md"
-                            style={{ width: `${(timeLeft / 15) * 100}%` }}
+                            className="h-full rounded-full transition-all duration-1000 ease-linear"
+                            style={{
+                              width: `${((15 - timeLeft) / 15) * 100}%`,
+                              background: 'linear-gradient(90deg, #8b5cf6, #a855f7, #ec4899)'
+                            }}
                           />
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center my-2">
-                        {/* Red Pill Verify Button */}
-                        <button
-                          onClick={() => {
-                            const bottomEl = document.getElementById('safelink-bottom-trigger');
-                            if (bottomEl) {
-                              bottomEl.scrollIntoView({ behavior: 'smooth' });
-                            } else {
-                              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                            }
-                          }}
-                          className="px-6 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-sm text-xs uppercase tracking-wider transition-all scale-100 active:scale-95 border-none cursor-pointer verify-pulse-glow"
-                        >
-                          Verify
-                        </button>
+                      <div className="flex flex-col items-center justify-center gap-3 my-2">
+                        {/* Neon Purple - Verify Now Button */}
+                        <div className="neon-btn-wrap">
+                          <button
+                            onClick={() => {
+                              const bottomEl = document.getElementById('safelink-bottom-trigger');
+                              if (bottomEl) {
+                                bottomEl.scrollIntoView({ behavior: 'smooth' });
+                              } else {
+                                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                              }
+                            }}
+                            className="btn-neon-purple px-10 py-3 text-sm"
+                          >
+                            ✅ Verify Now
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Below Verify Ad */}
-                  <AdUnit key={`post-below-verify-${currentStep}`} slot="5754054742" format="auto" minHeight="250px" />
+                  {/* Click Ads Instruction Box + Ad - Maximize Earnings */}
+                  <div className="click-ads-box w-full my-4">
+                    <p className="text-sm font-extrabold text-white mb-1">🙏 Thank You For Visiting Our Site</p>
+                    <div className="inner-white-box">
+                      Please Click on any <strong>Ads</strong> 👆 Above Or Below 👇 and then <strong>Back</strong> to Continue
+                    </div>
+                  </div>
+
+                  {/* Below Instruction Ad #1 */}
+                  <AdUnit key={`post-verify-mid1-${currentStep}`} slot="5754054742" format="auto" minHeight="250px" />
+
+                  {/* Below Instruction Ad #2 - in-article */}
+                  <AdUnit key={`post-verify-mid2-${currentStep}`} slot="1641433819" format="fluid" layout="in-article" minHeight="120px" />
                 </>
               )}
 
@@ -511,32 +527,46 @@ export default function PostDetail() {
 
               {/* Bottom Safelink Action Trigger */}
               {currentStep > 0 && (
-                <div id="safelink-bottom-trigger" className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center gap-4">
+                <div id="safelink-bottom-trigger" className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center gap-5">
+
+                  {/* Top Bottom Ad - Always visible to maximize impressions */}
+                  <AdUnit key={`post-bottom-top-ad-${currentStep}`} slot="1909584638" format="auto" minHeight="250px" />
+
                   {!timerDone ? (
-                    <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-555 bg-zinc-100 dark:bg-zinc-950 px-6 py-4 rounded-xl border border-zinc-200 dark:border-zinc-850/80 cursor-not-allowed select-none font-bold">
-                      Complete countdown timer above
+                    <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-8 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 cursor-not-allowed select-none text-center">
+                      ⏳ Complete the countdown timer above to unlock the button
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center gap-3">
-                      <p className="text-xs sm:text-sm font-bold text-zinc-750 dark:text-zinc-350 tracking-tight text-center">
-                        Scroll down & click on <span className="text-red-600 dark:text-red-500 font-extrabold">Continue</span> button for your destination link
+                    <div className="flex flex-col items-center justify-center gap-4 w-full">
+                      {/* Click Ads Box (bottom) */}
+                      <div className="click-ads-box w-full">
+                        <p className="text-sm font-extrabold text-white mb-1">🙏 Thank You For Visiting Our Site</p>
+                        <div className="inner-white-box">
+                          Please Click on any <strong>Ads</strong> 👆 Above Or Below 👇 and then <strong>Back</strong> to Continue
+                        </div>
+                      </div>
+
+                      {/* Mid Ad before Continue */}
+                      <AdUnit key={`post-bottom-mid-${currentStep}`} slot="5754054742" format="auto" minHeight="250px" />
+
+                      <p className="text-xs sm:text-sm font-extrabold text-zinc-800 dark:text-zinc-200 text-center">
+                        👇 Click <span className="text-orange-500 font-black">CONTINUE</span> to get your download link
                       </p>
-                      
-                      {/* Red Pill Continue Button */}
-                      <button
-                        onClick={currentStep === 3 ? handleFinalRedirect : handleStepTransition}
-                        className="px-6 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-sm text-xs uppercase tracking-wider transition-all scale-100 active:scale-95 border-none cursor-pointer verify-pulse-glow"
-                      >
-                        Continue
-                      </button>
+
+                      {/* Neon Orange - Continue Button */}
+                      <div className="neon-btn-wrap">
+                        <button
+                          onClick={currentStep === 3 ? handleFinalRedirect : handleStepTransition}
+                          className="btn-neon-orange px-12 py-3.5 text-base"
+                        >
+                          🔥 Continue
+                        </button>
+                      </div>
                     </div>
                   )}
 
-                  {/* Bottom Ad Slots */}
-                  <div className="w-full flex flex-col gap-6 mt-6">
-                    <AdUnit key={`post-bottom-ad1-${currentStep}`} slot="1909584638" format="auto" minHeight="250px" />
-                    <AdUnit key={`post-bottom-ad2-${currentStep}`} slot="8617081290" format="autorelaxed" minHeight="280px" />
-                  </div>
+                  {/* Bottom relaxed Ad - always visible */}
+                  <AdUnit key={`post-bottom-relax-${currentStep}`} slot="8617081290" format="autorelaxed" minHeight="280px" />
                 </div>
               )}
 

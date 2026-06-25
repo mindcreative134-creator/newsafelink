@@ -102,6 +102,127 @@ body {
   animation: verifyPulse 2s infinite ease-in-out;
 }
 
+/* ── Neon Glow Buttons (premium safelink style) ── */
+
+/* Purple Neon - Verify Now */
+@keyframes neonPurplePulse {
+  0%, 100% {
+    box-shadow: 0 0 8px 2px rgba(168, 85, 247, 0.7),
+                0 0 20px 6px rgba(168, 85, 247, 0.4),
+                0 0 40px 10px rgba(139, 92, 246, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px 4px rgba(192, 132, 252, 0.9),
+                0 0 35px 12px rgba(168, 85, 247, 0.6),
+                0 0 60px 20px rgba(139, 92, 246, 0.3);
+  }
+}
+
+.btn-neon-purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+  color: #fff;
+  font-weight: 800;
+  border-radius: 999px;
+  border: 1.5px solid rgba(192, 132, 252, 0.6);
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  animation: neonPurplePulse 2s infinite ease-in-out;
+  position: relative;
+}
+.btn-neon-purple:hover  { transform: scale(1.05); filter: brightness(1.15); }
+.btn-neon-purple:active { transform: scale(0.97); }
+
+/* Blue-Purple Neon - Generate Link */
+@keyframes neonBluePulse {
+  0%, 100% {
+    box-shadow: 0 0 8px 2px rgba(59, 130, 246, 0.7),
+                0 0 20px 6px rgba(99, 102, 241, 0.5),
+                0 0 40px 10px rgba(139, 92, 246, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 15px 4px rgba(96, 165, 250, 0.9),
+                0 0 35px 12px rgba(99, 102, 241, 0.7),
+                0 0 60px 20px rgba(168, 85, 247, 0.35);
+  }
+}
+
+.btn-neon-blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+  color: #fff;
+  font-weight: 800;
+  border-radius: 999px;
+  border: 1.5px solid rgba(99, 102, 241, 0.5);
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  animation: neonBluePulse 2s infinite ease-in-out;
+}
+.btn-neon-blue:hover  { transform: scale(1.05); filter: brightness(1.15); }
+.btn-neon-blue:active { transform: scale(0.97); }
+
+/* Orange-Red Neon - Continue */
+@keyframes neonOrangePulse {
+  0%, 100% {
+    box-shadow: 0 0 8px 2px rgba(249, 115, 22, 0.7),
+                0 0 20px 6px rgba(239, 68, 68, 0.5),
+                0 0 40px 10px rgba(220, 38, 38, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 15px 4px rgba(251, 146, 60, 0.9),
+                0 0 35px 12px rgba(249, 115, 22, 0.7),
+                0 0 60px 20px rgba(239, 68, 68, 0.35);
+  }
+}
+
+.btn-neon-orange {
+  background: linear-gradient(135deg, #f97316 0%, #ef4444 60%, #dc2626 100%);
+  color: #fff;
+  font-weight: 800;
+  border-radius: 999px;
+  border: 1.5px solid rgba(251, 146, 60, 0.5);
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  animation: neonOrangePulse 2s infinite ease-in-out;
+}
+.btn-neon-orange:hover  { transform: scale(1.05); filter: brightness(1.1); }
+.btn-neon-orange:active { transform: scale(0.97); }
+
+/* ── Click Ads Instruction Box ── */
+.click-ads-box {
+  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border: 2px solid #f97316;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.25), inset 0 1px 0 rgba(255,255,255,0.05);
+  color: #fff;
+}
+
+.click-ads-box .inner-white-box {
+  background: #fff;
+  color: #111;
+  border-radius: 0.625rem;
+  padding: 0.875rem 1rem;
+  margin-top: 0.75rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Sparkling/shimmer particles effect wrapper */
+.neon-btn-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Sponsored ad slot layout */
 .adsense-container {
   margin: 1.5rem 0;
