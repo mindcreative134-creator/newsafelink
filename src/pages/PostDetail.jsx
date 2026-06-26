@@ -235,10 +235,17 @@ export default function PostDetail() {
     };
   }, [showPopup]);
 
-  // Scroll to top when post changes
+  // Scroll to top when post changes or loading finishes to override browser scroll restoration
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [postId]);
+    if (!loading) {
+      window.scrollTo(0, 0);
+      const timer = setTimeout(() => {
+        window.scrollTo(0, 0);
+        document.body.style.overflow = ''; // Ensure body scroll is unlocked
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [postId, loading]);
 
   // Fetch post details
   useEffect(() => {
@@ -580,7 +587,8 @@ export default function PostDetail() {
           >
             <PopupDirectLinkBanner 
               onClick={() => {
-                sessionStorage.setItem('SAFELINK_AD_CLICKED', 'true');
+                sessionStorage.setItem('SAFELINK_POPUP_SHOWN', 'true');
+                setShowPopup(false);
               }}
             />
           </div>
