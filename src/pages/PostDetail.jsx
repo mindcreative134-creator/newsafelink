@@ -554,7 +554,7 @@ export default function PostDetail() {
 
               {/* Bottom Safelink Action Trigger */}
               {currentStep > 0 && (
-                <div id="safelink-bottom-trigger" className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center" style={{ gap: 0 }}>
+                <div id="safelink-bottom-trigger" className="mt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center" style={{ gap: 0, paddingTop: 0 }}>
 
                   {/* Top Bottom Ad (Ad 1) */}
                   <AdUnit

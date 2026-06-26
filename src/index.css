@@ -275,3 +275,13 @@ body {
   border-color: #27272a;
   box-shadow: none;
 }
+
+/* ── Collapse unfilled Google AdSense blocks ── */
+ins.adsbygoogle[data-ad-status="unfilled"],
+.ad-unit-wrapper:has(ins[data-ad-status="unfilled"]) {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
