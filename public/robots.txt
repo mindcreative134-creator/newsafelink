@@ -1,4 +1,4 @@
-# robots.txt for sarkaritrend.news
+# robots.txt for sarkaritrend.vercel.app
 # Last updated: 2025
 
 # ── Standard Search Engines ────────────────────────────────────
