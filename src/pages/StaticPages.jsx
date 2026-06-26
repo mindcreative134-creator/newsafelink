@@ -47,7 +47,7 @@ export default function StaticPages({ type }) {
               <h1 className="text-3xl font-extrabold font-heading m-0">Contact Us</h1>
             </div>
             <p className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              Have questions, feedback, or inquiries? We would love to hear from you. Please fill out the form below or email us directly at <a href="mailto:support@sarkaritrend.news" className="text-indigo-600 hover:underline">support@sarkaritrend.news</a>.
+              Have questions, feedback, or inquiries? We would love to hear from you. Please fill out the form below or email us directly at <a href="mailto:support@iwantgovjob.vercel.app" className="text-indigo-600 hover:underline">support@iwantgovjob.vercel.app</a>.
             </p>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
