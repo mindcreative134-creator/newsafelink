@@ -539,5 +539,21 @@ ins.adsbygoogle[data-ad-status="unfilled"],
   50% { transform: rotate(-8deg); }
 }
 
+/* Ensure the popup ad unit and AdSense inside it is completely transparent, borderless, outline-free and has no card box shadows */
+.ad-unit-wrapper,
+.ad-unit-wrapper *,
+ins.adsbygoogle,
+ins.adsbygoogle *,
+ins.adsbygoogle iframe,
+ins.adsbygoogle iframe *,
+iframe {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
 
 

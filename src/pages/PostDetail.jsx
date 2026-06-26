@@ -453,6 +453,7 @@ export default function PostDetail() {
   // Parse and inject Ads into the blogger content (no Advertisement label text)
   const injectAds = (html) => {
     if (!html) return '';
+    if (showPopup) return html;
     const paras = html.split('</p>');
     
     if (paras.length <= 3) {
@@ -500,11 +501,11 @@ export default function PostDetail() {
     <>
       {/* Force Click AdSense Redirect Popup Modal */}
       {showPopup && (
-        <div className="fixed inset-0 z-50 bg-zinc-950 flex flex-col items-center justify-center p-6 text-center select-none overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/45 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center select-none overflow-y-auto">
           {/* Animated Mascot Header */}
-          <div className="mb-8 flex flex-col items-center text-center max-w-sm">
+          <div className="mb-8 flex flex-col items-center text-center max-w-sm pointer-events-none drop-shadow-md">
             <div className="relative w-20 h-20 mb-4 animate-bounce">
-              <svg viewBox="0 0 100 100" className="w-full h-full text-indigo-500 fill-current">
+              <svg viewBox="0 0 100 100" className="w-full h-full text-indigo-400 fill-current">
                 <circle cx="50" cy="50" r="40" className="text-indigo-900/60" />
                 <circle cx="38" cy="45" r="6" fill="#fff" />
                 <circle cx="38" cy="45" r="2.5" fill="#000" />
@@ -517,53 +518,50 @@ export default function PostDetail() {
             <h3 className="text-2xl font-black text-white mb-3 font-heading tracking-wide uppercase">
               🔓 Unlock Download Link
             </h3>
-            <p className="text-sm font-extrabold text-zinc-200 font-hindi leading-relaxed px-2">
+            <p className="text-sm font-extrabold text-zinc-100 font-hindi leading-relaxed px-2">
               आगे बढ़ने के लिए कृपया नीचे दिए गए <span className="text-yellow-400 font-black">विज्ञापन (Ad)</span> पर क्लिक करें। <br/>
               <span className="text-green-400 font-bold text-xs sm:text-sm mt-1 block">(क्लिक करने के बाद वापस आएं, लिंक अनलॉक हो जाएगा)</span>
             </p>
-            <p className="text-xs font-semibold text-zinc-400 mt-2 px-4 leading-normal">
+            <p className="text-xs font-semibold text-zinc-300 mt-2 px-4 leading-normal">
               Please click the advertisement below to verify and unlock your destination link.
             </p>
           </div>
 
-          {/* The Popup Ad Unit Wrapper with Hover detection */}
+          {/* The Popup Ad Unit Wrapper with Hover detection - Completely transparent, no box container, borders, or lines */}
           <div 
-            className="w-full max-w-sm bg-white dark:bg-zinc-900 border-2 border-dashed border-zinc-700 dark:border-zinc-800 rounded-[24px] p-4 shadow-2xl relative overflow-hidden"
+            className="w-full max-w-md flex items-center justify-center relative my-4 p-0 bg-transparent border-0 outline-none"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            <div className="absolute top-1.5 right-3 text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pointer-events-none">
-              Sponsored Advertisement
-            </div>
-            <div className="py-2.5">
+            <div className="w-full flex items-center justify-center bg-transparent border-0 outline-none">
               <AdUnit 
                 key="popup-ad-unit"
                 slot="5754054742"
                 format="auto"
+                style={{ margin: 0, padding: 0 }}
                 minHeight="250px"
               />
             </div>
           </div>
 
           {/* Footer indicator */}
-          <div className="mt-8 flex flex-col items-center">
+          <div className="mt-8 flex flex-col items-center pointer-events-none drop-shadow-md">
             <div className="text-xs font-black text-yellow-400 uppercase tracking-widest animate-pulse flex items-center gap-1.5">
               ⏳ Waiting for Ad click to unlock...
             </div>
-            <div className="text-[10px] font-bold text-zinc-500 mt-1 max-w-xs">
+            <div className="text-[10px] font-bold text-zinc-350 mt-1 max-w-xs leading-normal">
               Popup cannot be closed manually. It will auto-close when you return from the ad link.
             </div>
           </div>
         </div>
       )}
 
-      {currentStep > 0 && !showPopup && (
+      {currentStep > 0 && (
         <div className="sticky top-[64px] z-30 w-full border-b border-blue-200 dark:border-blue-900/50 bg-blue-50/90 dark:bg-blue-950/90 text-blue-900 dark:text-blue-100 text-center font-bold text-xs sm:text-sm py-2.5 px-4 shadow-sm font-sans backdrop-blur-md">
           You are Currently On Step ({currentStep}/3) From Destination.
         </div>
       )}
 
-      {!showPopup && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
           <div className="flex flex-col lg:flex-row gap-12">
             {/* Article Column */}
@@ -666,13 +664,15 @@ export default function PostDetail() {
                     {/* Wrap Middle Verification Ad & Action group in zero-gap flexbox */}
                     <div className="w-full flex flex-col items-center" style={{ gap: 0, margin: 0, padding: 0 }}>
                       {/* Above Verify Ad (Ad 1) */}
-                      <AdUnit
-                        key={`post-above-verify-${currentStep}`}
-                        slot="1909584638"
-                        format="fluid"
-                        layoutKey="-6t+ed+2i-1n-4w"
-                        style={{ margin: 0, padding: 0 }}
-                      />
+                      {!showPopup && (
+                        <AdUnit
+                          key={`post-above-verify-${currentStep}`}
+                          slot="1909584638"
+                          format="fluid"
+                          layoutKey="-6t+ed+2i-1n-4w"
+                          style={{ margin: 0, padding: 0 }}
+                        />
+                      )}
 
                       {timerActive ? (
                         /* Click Ads Instruction Box (Text Box) */
@@ -701,12 +701,14 @@ export default function PostDetail() {
                       )}
 
                       {/* Below Instruction Ad #1 (Ad 2) */}
-                      <AdUnit
-                        key={`post-verify-mid1-${currentStep}`}
-                        slot="5754054742"
-                        format="auto"
-                        style={{ margin: 0, padding: 0 }}
-                      />
+                      {!showPopup && (
+                        <AdUnit
+                          key={`post-verify-mid1-${currentStep}`}
+                          slot="5754054742"
+                          format="auto"
+                          style={{ margin: 0, padding: 0 }}
+                        />
+                      )}
                     </div>
 
                     {!timerActive && (
@@ -732,12 +734,14 @@ export default function PostDetail() {
                     {/* Wrap Bottom Verification Ad & Action group in zero-gap flexbox and use unique slots to prevent collisions */}
                     <div className="w-full flex flex-col items-center" style={{ gap: 0, margin: 0, padding: 0 }}>
                       {/* Top Bottom Ad (Ad 1) */}
-                      <AdUnit
-                        key={`post-bottom-top-ad-${currentStep}`}
-                        slot="7317709042"
-                        format="auto"
-                        style={{ margin: 0, padding: 0 }}
-                      />
+                      {!showPopup && (
+                        <AdUnit
+                          key={`post-bottom-top-ad-${currentStep}`}
+                          slot="7317709042"
+                          format="auto"
+                          style={{ margin: 0, padding: 0 }}
+                        />
+                      )}
 
                       {!timerDone ? (
                         <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-8 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 cursor-not-allowed select-none text-center">
@@ -767,16 +771,20 @@ export default function PostDetail() {
                       )}
 
                       {/* Bottom Ad (Ad 2) */}
-                      <AdUnit
-                        key={`post-bottom-mid-${currentStep}`}
-                        slot="1641433819"
-                        format="auto"
-                        style={{ margin: 0, padding: 0 }}
-                      />
+                      {!showPopup && (
+                        <AdUnit
+                          key={`post-bottom-mid-${currentStep}`}
+                          slot="1641433819"
+                          format="auto"
+                          style={{ margin: 0, padding: 0 }}
+                        />
+                      )}
                     </div>
 
                     {/* Bottom relaxed Ad - always visible */}
-                    <AdUnit key={`post-bottom-relax-${currentStep}`} slot="8617081290" format="autorelaxed" />
+                    {!showPopup && (
+                      <AdUnit key={`post-bottom-relax-${currentStep}`} slot="8617081290" format="autorelaxed" />
+                    )}
                   </div>
                 )}
 
@@ -784,10 +792,9 @@ export default function PostDetail() {
             </main>
 
             {/* Sidebar */}
-            <Sidebar />
+            <Sidebar hideAds={showPopup} />
           </div>
         </div>
-      )}
     </>
   );
 }
