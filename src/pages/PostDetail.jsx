@@ -239,7 +239,7 @@ export default function PostDetail() {
 
   // Handle safelink timer initialization
   useEffect(() => {
-    if (currentStep === 1 && post) {
+    if (currentStep > 0 && post) {
       setTimeLeft(15);
       setTimerActive(true);
       setTimerDone(false);
