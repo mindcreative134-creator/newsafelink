@@ -115,6 +115,51 @@ function LivingBanner() {
   );
 }
 
+// Direct Link Banner component for popup modal
+const POPUP_DIRECT_LINK = "https://www.effectivecpmnetwork.com/wm9u7q6i7?key=2322f579e7bdafc50bc0259df918895f";
+
+function PopupDirectLinkBanner({ onClick }) {
+  return (
+    <a
+      href={POPUP_DIRECT_LINK}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={onClick}
+      className="w-full max-w-sm block no-underline overflow-hidden rounded-[24px] border border-indigo-500/30 bg-gradient-to-br from-indigo-900/40 to-slate-900/60 backdrop-blur-xl shadow-[0_0_40px_rgba(99,102,241,0.15)] hover:shadow-[0_0_50px_rgba(99,102,241,0.3)] transition-all duration-300 transform hover:-translate-y-1 animate-fadeIn"
+    >
+      <div className="p-6 flex flex-col items-center gap-4 relative">
+        {/* Glow effect */}
+        <div className="absolute -top-10 -left-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
+        
+        {/* Animated Icon */}
+        <div className="relative w-16 h-16 flex items-center justify-center bg-indigo-500/10 border border-indigo-500/20 rounded-2xl animate-pulse">
+          <ShieldCheck className="w-8 h-8 text-indigo-400" />
+        </div>
+
+        {/* Text */}
+        <div className="text-center space-y-1">
+          <div className="text-white text-xs font-black uppercase tracking-widest text-indigo-300">
+            🛡️ Secure SafeLink Gateway
+          </div>
+          <h4 className="text-lg font-black text-white leading-tight font-heading">
+            HUMAN VERIFICATION
+          </h4>
+          <p className="text-zinc-350 dark:text-zinc-300 text-xs px-2 leading-relaxed">
+            Click this banner to complete security verification and unlock your download.
+          </p>
+        </div>
+
+        {/* Action Button */}
+        <div className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 group-hover:scale-[1.02] transition-transform">
+          Verify & Continue
+          <ArrowRight className="w-4 h-4" />
+        </div>
+      </div>
+    </a>
+  );
+}
+
 export default function PostDetail() {
   const { postId } = useParams();
   const navigate = useNavigate();
@@ -533,15 +578,11 @@ export default function PostDetail() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            <div className="w-full flex items-center justify-center bg-transparent border-0 outline-none">
-              <AdUnit 
-                key="popup-ad-unit"
-                slot="5754054742"
-                format="auto"
-                style={{ margin: 0, padding: 0 }}
-                minHeight="250px"
-              />
-            </div>
+            <PopupDirectLinkBanner 
+              onClick={() => {
+                sessionStorage.setItem('SAFELINK_AD_CLICKED', 'true');
+              }}
+            />
           </div>
 
           {/* Footer indicator */}
