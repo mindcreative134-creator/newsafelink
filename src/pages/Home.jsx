@@ -259,7 +259,16 @@ export default function Home() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
       {/* Safelink Verification Widget */}
       {showVerification && (
-        <div className="flex flex-col items-center justify-center my-6 gap-2">
+        <div className="w-full max-w-xl mx-auto bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] overflow-hidden shadow-sm p-6 sm:p-8 flex flex-col items-center gap-5 my-8 transition-all">
+          <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200">
+            <ShieldCheck className="w-5.5 h-5.5 text-indigo-600 dark:text-indigo-450" />
+            <span className="text-xs font-black uppercase tracking-wider font-heading">Security Verification Gate</span>
+          </div>
+          
+          <p className="text-xs sm:text-sm font-semibold text-zinc-500 dark:text-zinc-450 text-center max-w-sm">
+            Please complete the security check below to verify your session and transit to your target URL destination.
+          </p>
+
           {/* Ad ABOVE checkbox */}
           <div className="w-full flex items-center justify-center home-robot-ad-container" style={{ margin: 0, padding: 0 }}>
             <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" />
@@ -271,7 +280,7 @@ export default function Home() {
               {verifying ? (
                 <div className="w-7 h-7 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
               ) : verified ? (
-                <svg className="w-7 h-7 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-7 h-7 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               ) : (
@@ -368,28 +377,28 @@ export default function Home() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {post.labels && (
-                      <span className="absolute top-3 left-3 px-2.5 py-1 text-[10px] font-bold uppercase rounded-full bg-indigo-600 text-white shadow-sm">
+                      <span className="absolute top-3.5 left-3.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-600/20">
                         {post.labels[0]}
                       </span>
                     )}
                   </div>
 
                   {/* Content */}
-                  <div className="p-5 flex-1 flex flex-col justify-between gap-5">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center text-[10px] font-bold text-zinc-400 dark:text-zinc-500 gap-3 uppercase tracking-wider">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5" />
-                          {new Date(post.published).toLocaleDateString()}
+                  <div className="p-6 flex-1 flex flex-col justify-between gap-5">
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center text-[9px] font-black text-zinc-400 dark:text-zinc-500 gap-3.5 uppercase tracking-widest">
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-indigo-550" />
+                          {new Date(post.published).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <User className="w-3.5 h-3.5" />
-                          Staff
+                        <span className="flex items-center gap-1.5">
+                          <User className="w-3.5 h-3.5 text-indigo-550" />
+                          Staff Writer
                         </span>
                       </div>
                       <h3
                         onClick={() => navigate(`/post/${post.id}`)}
-                        className="text-base font-extrabold text-zinc-900 dark:text-white hover:text-indigo-650 dark:hover:text-indigo-400 line-clamp-2 leading-snug cursor-pointer font-heading transition-colors"
+                        className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug cursor-pointer font-heading transition-colors"
                       >
                         {post.title}
                       </h3>
@@ -400,9 +409,9 @@ export default function Home() {
 
                     <button
                       onClick={() => navigate(`/post/${post.id}`)}
-                      className="inline-flex items-center text-indigo-650 dark:text-indigo-400 font-bold text-xs gap-1.5 self-start group-hover:translate-x-1.5 transition-transform"
+                      className="inline-flex items-center text-indigo-600 dark:text-indigo-400 font-extrabold text-xs gap-1.5 self-start group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors"
                     >
-                      Read Excerpt <ArrowRight className="w-3.5 h-3.5" />
+                      Read Full Article <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                     </button>
                   </div>
                 </article>

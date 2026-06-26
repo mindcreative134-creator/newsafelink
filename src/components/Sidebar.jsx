@@ -45,7 +45,7 @@ export default function Sidebar() {
         <div className="flex flex-wrap gap-2.5">
           {categories.map((cat) => {
             // Pick a styling based on tag
-            let tagClass = 'bg-zinc-100 text-zinc-700 hover:bg-indigo-55 hover:text-indigo-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-750';
+            let tagClass = 'bg-zinc-100/60 dark:bg-zinc-800/40 text-zinc-700 dark:text-zinc-300 border border-zinc-200/50 dark:border-zinc-800/50 hover:border-indigo-250 dark:hover:border-indigo-900/50 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 hover:text-indigo-600 dark:hover:text-indigo-400';
             if (cat.toLowerCase().includes('tech')) {
               tagClass = 'badge-tech';
             } else if (cat.toLowerCase().includes('design')) {

@@ -153,7 +153,7 @@ export default function Category() {
                 {posts.map((post) => (
                   <article
                     key={post.id}
-                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group"
+                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[24px] overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group"
                   >
                     {/* Image */}
                     <div
@@ -163,44 +163,44 @@ export default function Category() {
                       <img
                         src={getPostImage(post)}
                         alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       {post.labels && (
-                        <span className="absolute top-3 left-3 px-2.5 py-1 text-[10px] font-bold uppercase rounded-full bg-indigo-600 text-white">
+                        <span className="absolute top-3.5 left-3.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-600/20">
                           {post.labels[0]}
                         </span>
                       )}
                     </div>
 
                     {/* Content */}
-                    <div className="p-5 flex-1 flex flex-col justify-between gap-4">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center text-xs text-zinc-400 dark:text-zinc-500 gap-3">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5" />
-                            {new Date(post.published).toLocaleDateString()}
+                    <div className="p-6 flex-1 flex flex-col justify-between gap-5">
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center text-[9px] font-black text-zinc-400 dark:text-zinc-500 gap-3.5 uppercase tracking-widest">
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 text-indigo-550" />
+                            {new Date(post.published).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                           </span>
-                          <span className="flex items-center gap-1">
-                            <User className="w-3.5 h-3.5" />
-                            Staff
+                          <span className="flex items-center gap-1.5">
+                            <User className="w-3.5 h-3.5 text-indigo-550" />
+                            Staff Writer
                           </span>
                         </div>
                         <h3
                           onClick={() => navigate(`/post/${post.id}`)}
-                          className="text-base font-bold text-zinc-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug cursor-pointer font-heading"
+                          className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug cursor-pointer font-heading transition-colors"
                         >
                           {post.title}
                         </h3>
-                        <p className="text-zinc-650 dark:text-zinc-400 text-sm line-clamp-3">
-                          {getExcerpt(post.content, 100)}
+                        <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm line-clamp-3 leading-relaxed font-medium">
+                          {getExcerpt(post.content, 120)}
                         </p>
                       </div>
 
                       <button
                         onClick={() => navigate(`/post/${post.id}`)}
-                        className="inline-flex items-center text-indigo-600 dark:text-indigo-400 font-semibold text-sm gap-1 self-start group-hover:translate-x-1 transition-transform"
+                        className="inline-flex items-center text-indigo-600 dark:text-indigo-400 font-extrabold text-xs gap-1.5 self-start group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors"
                       >
-                        Read More <ArrowRight className="w-4 h-4" />
+                        Read Full Article <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                       </button>
                     </div>
                   </article>
