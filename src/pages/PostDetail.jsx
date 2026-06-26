@@ -98,31 +98,34 @@ export default function PostDetail() {
   }, [postId]);
 
   // Global Image Click Handler for Adsterra SmartLink
+  // Guard: only fires during the safelink flow (currentStep > 0)
   useEffect(() => {
+    if (currentStep === 0) return;
     const handleImageClick = (e) => {
       const img = e.target.closest('img');
-      if (img) {
+      // Skip logo/UI images marked with data-ui-image
+      if (img && !img.getAttribute('data-ui-image')) {
         if (!img.getAttribute('data-smartlink-clicked')) {
           img.setAttribute('data-smartlink-clicked', 'true');
           window.open('https://www.effectivecpmnetwork.com/wm9u7q6i7?key=2322f579e7bdafc50bc0259df918895f', '_blank');
         }
       }
     };
-
     document.addEventListener('click', handleImageClick);
     return () => {
       document.removeEventListener('click', handleImageClick);
     };
-  }, []);
+  }, [currentStep]);
 
   // Ad click detection (iframe hover + window blur)
+  // Guard: only active when the verification popup is actually open
   useEffect(() => {
+    if (!showAdPopup) return;
     const handleBlur = () => {
       if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
         if (isMouseOverAd) {
           setIsTopVerified(true);
           setShowAdPopup(false);
-          // Scroll to the bottom trigger smoothly
           setTimeout(() => {
             const bottomEl = document.getElementById('safelink-bottom-trigger');
             if (bottomEl) {
@@ -132,21 +135,24 @@ export default function PostDetail() {
         }
       }
     };
-
     window.addEventListener('blur', handleBlur);
     return () => {
       window.removeEventListener('blur', handleBlur);
     };
-  }, [isMouseOverAd]);
+  }, [showAdPopup, isMouseOverAd]);
 
   // Dynamically push adsense ad inside the popup modal when opened
   useEffect(() => {
     if (showAdPopup) {
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) {
-        // ignore adsbygoogle push errors
-      }
+      // Delay to allow DOM to mount the <ins> element first
+      const t = setTimeout(() => {
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {
+          // ignore adsbygoogle push errors
+        }
+      }, 150);
+      return () => clearTimeout(t);
     }
   }, [showAdPopup]);
 
@@ -699,8 +705,8 @@ export default function PostDetail() {
         </div>
       </div>
 
-      {/* Verification Ad Click popup modal */}
-      {showAdPopup && (
+      {/* Verification Ad Click popup modal - ONLY shown during safelink flow */}
+      {showAdPopup && currentStep > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in">
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] max-w-lg w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl relative">
             
@@ -728,18 +734,20 @@ export default function PostDetail() {
               </p>
             </div>
 
+            {/* Ad container with mouse tracking for click detection */}
             <div 
-              className="w-full bg-zinc-50 dark:bg-zinc-950 rounded-2xl p-4 border border-zinc-150 dark:border-zinc-850 min-h-[280px] flex items-center justify-center relative overflow-hidden"
+              className="w-full bg-zinc-50 dark:bg-zinc-950 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 min-h-[280px] flex items-center justify-center relative overflow-hidden"
               onMouseEnter={() => setIsMouseOverAd(true)}
               onMouseLeave={() => setIsMouseOverAd(false)}
             >
               <div className="adsense-container w-full overflow-hidden flex items-center justify-center">
+                {/* Uses slot 7317709042 - unique for popup, no collision with inline ads */}
                 <ins className="adsbygoogle"
-                     style={{ display: "block", minWidth: "250px", minHeight: "250px" }}
+                     style={{ display: "block", width: "300px", height: "250px" }}
                      data-ad-client="ca-pub-9543073887536718"
-                     data-ad-slot="1909584638"
-                     data-ad-format="rectangle"
-                     data-full-width-responsive="true"></ins>
+                     data-ad-slot="7317709042"
+                     data-ad-format="auto"
+                     data-full-width-responsive="false"></ins>
               </div>
             </div>
 
@@ -757,7 +765,7 @@ export default function PostDetail() {
                     if (bottomEl) bottomEl.scrollIntoView({ behavior: 'smooth' });
                   }, 300);
                 }}
-                className="text-[10px] font-bold text-zinc-450 dark:text-zinc-550 hover:underline mt-2 uppercase tracking-widest"
+                className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 hover:underline mt-2 uppercase tracking-widest"
               >
                 Skip Verification (If Ad fails to load)
               </button>
