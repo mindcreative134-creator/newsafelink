@@ -493,48 +493,51 @@ export default function PostDetail() {
                     </div>
                   )}
 
-                  {/* Above Verify Ad (Ad 1) */}
-                  <AdUnit
-                    key={`post-above-verify-${currentStep}`}
-                    slot="1909584638"
-                    format="fluid"
-                    layoutKey="-6t+ed+2i-1n-4w"
-                    style={{ margin: 0, padding: 0 }}
-                  />
+                  {/* Wrap Middle Verification Ad & Action group in zero-gap flexbox */}
+                  <div className="w-full flex flex-col items-center" style={{ gap: 0, margin: 0, padding: 0 }}>
+                    {/* Above Verify Ad (Ad 1) */}
+                    <AdUnit
+                      key={`post-above-verify-${currentStep}`}
+                      slot="1909584638"
+                      format="fluid"
+                      layoutKey="-6t+ed+2i-1n-4w"
+                      style={{ margin: 0, padding: 0 }}
+                    />
 
-                  {timerActive ? (
-                    /* Click Ads Instruction Box (Text Box) */
-                    <div className="click-ads-box w-full" style={{ margin: 0, borderRadius: '12px' }}>
-                      <p className="text-sm font-extrabold text-white mb-1">🙏 Thank You For Visiting Our Site</p>
-                      <div className="inner-white-box" style={{ margin: '8px 0 0 0' }}>
-                        Please Click on any <strong>Ads</strong> 👆 Above Or Below 👇 and then <strong>Back</strong> to Continue
+                    {timerActive ? (
+                      /* Click Ads Instruction Box (Text Box) */
+                      <div className="click-ads-box w-full" style={{ margin: 0, borderRadius: '12px' }}>
+                        <p className="text-sm font-extrabold text-white mb-1">🙏 Thank You For Visiting Our Site</p>
+                        <div className="inner-white-box" style={{ margin: '8px 0 0 0' }}>
+                          Please Click on any <strong>Ads</strong> 👆 Above Or Below 👇 and then <strong>Back</strong> to Continue
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    /* Verify Now Button only - strictly touching both ads with no gap */
-                    <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
-                      <button
-                        onClick={() => {
-                          const bottomEl = document.getElementById('safelink-bottom-trigger');
-                          if (bottomEl) {
-                            bottomEl.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }}
-                        className="btn-neon-purple px-12 py-3.5 text-base font-extrabold"
-                        style={{ margin: 0 }}
-                      >
-                        ✅ Verify Now
-                      </button>
-                    </div>
-                  )}
+                    ) : (
+                      /* Verify Now Button only - strictly touching both ads with no gap */
+                      <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
+                        <button
+                          onClick={() => {
+                            const bottomEl = document.getElementById('safelink-bottom-trigger');
+                            if (bottomEl) {
+                              bottomEl.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          }}
+                          className="btn-neon-purple px-12 py-3.5 text-base font-extrabold"
+                          style={{ margin: 0 }}
+                        >
+                          ✅ Verify Now
+                        </button>
+                      </div>
+                    )}
 
-                  {/* Below Instruction Ad #1 (Ad 2) */}
-                  <AdUnit
-                    key={`post-verify-mid1-${currentStep}`}
-                    slot="5754054742"
-                    format="auto"
-                    style={{ margin: 0, padding: 0 }}
-                  />
+                    {/* Below Instruction Ad #1 (Ad 2) */}
+                    <AdUnit
+                      key={`post-verify-mid1-${currentStep}`}
+                      slot="5754054742"
+                      format="auto"
+                      style={{ margin: 0, padding: 0 }}
+                    />
+                  </div>
 
                   {!timerActive && (
                     <div className="w-full text-center space-y-1 my-3 px-4 animate-bounce">
@@ -556,48 +559,51 @@ export default function PostDetail() {
               {currentStep > 0 && (
                 <div id="safelink-bottom-trigger" className="mt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center" style={{ gap: 0, paddingTop: 0 }}>
 
-                  {/* Top Bottom Ad (Ad 1) */}
-                  <AdUnit
-                    key={`post-bottom-top-ad-${currentStep}`}
-                    slot="1909584638"
-                    format="auto"
-                    style={{ margin: 0, padding: 0 }}
-                  />
+                  {/* Wrap Bottom Verification Ad & Action group in zero-gap flexbox and use unique slots to prevent collisions */}
+                  <div className="w-full flex flex-col items-center" style={{ gap: 0, margin: 0, padding: 0 }}>
+                    {/* Top Bottom Ad (Ad 1) */}
+                    <AdUnit
+                      key={`post-bottom-top-ad-${currentStep}`}
+                      slot="7317709042"
+                      format="auto"
+                      style={{ margin: 0, padding: 0 }}
+                    />
 
-                  {!timerDone ? (
-                    <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-8 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 cursor-not-allowed select-none text-center">
-                      ⏳ Complete the countdown timer above to unlock the button
-                    </div>
-                  ) : (
-                    /* Generate Link or Continue Button */
-                    <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
-                      {currentStep === 3 ? (
-                        <button
-                          onClick={handleFinalRedirect}
-                          className="btn-neon-blue px-14 py-4 text-base font-extrabold uppercase tracking-widest"
-                          style={{ margin: 0 }}
-                        >
-                          Generate Link
-                        </button>
-                      ) : (
-                        <button
-                          onClick={handleStepTransition}
-                          className="btn-neon-orange px-14 py-4 text-base font-extrabold uppercase tracking-widest"
-                          style={{ margin: 0 }}
-                        >
-                          Continue Next Step
-                        </button>
-                      )}
-                    </div>
-                  )}
+                    {!timerDone ? (
+                      <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-8 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 cursor-not-allowed select-none text-center">
+                        ⏳ Complete the countdown timer above to unlock the button
+                      </div>
+                    ) : (
+                      /* Generate Link or Continue Button */
+                      <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
+                        {currentStep === 3 ? (
+                          <button
+                            onClick={handleFinalRedirect}
+                            className="btn-neon-blue px-14 py-4 text-base font-extrabold uppercase tracking-widest"
+                            style={{ margin: 0 }}
+                          >
+                            Generate Link
+                          </button>
+                        ) : (
+                          <button
+                            onClick={handleStepTransition}
+                            className="btn-neon-orange px-14 py-4 text-base font-extrabold uppercase tracking-widest"
+                            style={{ margin: 0 }}
+                          >
+                            Continue Next Step
+                          </button>
+                        )}
+                      </div>
+                    )}
 
-                  {/* Bottom Ad (Ad 2) */}
-                  <AdUnit
-                    key={`post-bottom-mid-${currentStep}`}
-                    slot="5754054742"
-                    format="auto"
-                    style={{ margin: 0, padding: 0 }}
-                  />
+                    {/* Bottom Ad (Ad 2) */}
+                    <AdUnit
+                      key={`post-bottom-mid-${currentStep}`}
+                      slot="1641433819"
+                      format="auto"
+                      style={{ margin: 0, padding: 0 }}
+                    />
+                  </div>
 
                   {/* Bottom relaxed Ad - always visible */}
                   <AdUnit key={`post-bottom-relax-${currentStep}`} slot="8617081290" format="autorelaxed" />
