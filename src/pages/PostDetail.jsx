@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getPostById, getPosts } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
-import StepHeader from '../components/StepHeader';
 import { Calendar, User, ArrowRight, ShieldCheck, AlertCircle, Clock } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
 
@@ -379,10 +378,6 @@ export default function PostDetail() {
 
   return (
     <>
-      {currentStep > 0 && (
-        <StepHeader timerActive={timerActive} timeLeft={timeLeft} />
-      )}
-      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Article Column */}
