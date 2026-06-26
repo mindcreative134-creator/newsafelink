@@ -381,6 +381,12 @@ export default function PostDetail() {
 
   return (
     <>
+      {currentStep > 0 && (
+        <div className="sticky top-[64px] z-30 w-full border-b border-blue-200 dark:border-blue-900/50 bg-blue-50/90 dark:bg-blue-950/90 text-blue-900 dark:text-blue-100 text-center font-bold text-xs sm:text-sm py-2.5 px-4 shadow-sm font-sans backdrop-blur-md">
+          You are Currently On Step ({currentStep}/3) From Destination.
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Article Column */}
@@ -433,121 +439,111 @@ export default function PostDetail() {
 
               {currentStep > 0 && (
                 <>
-                  {/* Step Header */}
-                  <div className="w-full max-w-xl mx-auto border-2 border-blue-600 bg-blue-50/50 dark:bg-blue-950/20 text-blue-900 dark:text-blue-100 text-center font-bold text-sm sm:text-base py-2.5 px-4 rounded-xl shadow-sm my-4 font-sans">
-                    You are Currently On Step ({currentStep}/2) From Destination.
+                  {/* Warning Bars (studyaf.com style) */}
+                  <div className="w-full flex flex-col gap-1.5 my-2">
+                    <div className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-400 border border-green-600 text-zinc-900 dark:text-zinc-950 text-center text-xs font-black uppercase tracking-wider rounded-md shadow-sm">
+                      ▼ CLICK ANY <span className="text-red-650 font-extrabold">IMAGE</span> 👆 & Wait 15 Seconds to <span className="text-blue-700 font-extrabold">GET LINK</span> ▼ 👆
+                    </div>
+                    <div className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-400 border border-green-600 text-zinc-900 dark:text-zinc-950 text-center text-xs font-black uppercase tracking-wider rounded-md shadow-sm">
+                      ▼ CLICK ANY <span className="text-red-650 font-extrabold">IMAGE</span> 👆 & Wait 15 Seconds to <span className="text-blue-700 font-extrabold">GET LINK</span> ▼ 👆
+                    </div>
                   </div>
 
-                  {currentStep === 1 && (
-                    <>
-                      {/* Warning Bars (studyaf.com style) */}
-                      <div className="w-full flex flex-col gap-1.5 my-2">
-                        <div className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-400 border border-green-600 text-zinc-900 dark:text-zinc-950 text-center text-xs font-black uppercase tracking-wider rounded-md shadow-sm">
-                          ▼ CLICK ANY <span className="text-red-650 font-extrabold">IMAGE</span> 👆 & Wait 15 Seconds to <span className="text-blue-700 font-extrabold">GET LINK</span> ▼ 👆
-                        </div>
-                        <div className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-400 border border-green-600 text-zinc-900 dark:text-zinc-950 text-center text-xs font-black uppercase tracking-wider rounded-md shadow-sm">
-                          ▼ CLICK ANY <span className="text-red-650 font-extrabold">IMAGE</span> 👆 & Wait 15 Seconds to <span className="text-blue-700 font-extrabold">GET LINK</span> ▼ 👆
+                  {/* Verification Instructions Alert (Hinglish/Hindi compliant) */}
+                  <div className="w-full text-center space-y-1 my-3 px-4">
+                    <p className="text-xs sm:text-sm font-extrabold text-zinc-800 dark:text-zinc-200">
+                      👉 Click Image & Wait & Come back this page to <span className="text-red-650 font-extrabold">Get Link - Download.</span>
+                    </p>
+                    <p className="text-xs sm:text-xs font-bold text-zinc-750 dark:text-zinc-350 font-hindi">
+                      <span className="text-red-650 font-extrabold">▼ LINK पाने और DOWNLOAD करने के लिए,</span> 👉 फोटो पर क्लिक करें, <span className="text-blue-750 font-extrabold">15 सेकंड रुकें</span> और फिर इसी पेज पर वापस आएं
+                    </p>
+                  </div>
+
+                  {timerActive && (
+                    /* Circular Loader (shown while timerActive is true) - thick circle like image */
+                    <div className="flex flex-col items-center justify-center my-6">
+                      <div className="relative w-32 h-32 flex items-center justify-center">
+                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                          <circle
+                            cx="60"
+                            cy="60"
+                            r="45"
+                            fill="transparent"
+                            stroke="#e2e8f0"
+                            className="dark:stroke-zinc-800"
+                            strokeWidth="14"
+                          />
+                          <circle
+                            cx="60"
+                            cy="60"
+                            r="45"
+                            fill="transparent"
+                            stroke="#3b82f6"
+                            strokeWidth="14"
+                            strokeDasharray={2 * Math.PI * 45}
+                            strokeDashoffset={2 * Math.PI * 45 - (Math.round(((15 - timeLeft) / 15) * 100) / 100) * (2 * Math.PI * 45)}
+                            strokeLinecap="round"
+                            className="transition-all duration-1000 ease-linear"
+                          />
+                        </svg>
+                        <div className="absolute text-2xl font-extrabold text-blue-600 dark:text-blue-400 font-mono">
+                          {Math.round(((15 - timeLeft) / 15) * 100)}%
                         </div>
                       </div>
-
-                      {/* Verification Instructions Alert (Hinglish/Hindi compliant) */}
-                      <div className="w-full text-center space-y-1 my-3 px-4">
-                        <p className="text-xs sm:text-sm font-extrabold text-zinc-800 dark:text-zinc-200">
-                          👉 Click Image & Wait & Come back this page to <span className="text-red-650 font-extrabold">Get Link - Download.</span>
-                        </p>
-                        <p className="text-xs sm:text-xs font-bold text-zinc-750 dark:text-zinc-350 font-hindi">
-                          <span className="text-red-650 font-extrabold">▼ LINK पाने और DOWNLOAD करने के लिए,</span> 👉 फोटो पर क्लिक करें, <span className="text-blue-750 font-extrabold">15 सेकंड रुकें</span> और फिर इसी पेज पर वापस आएं
-                        </p>
-                      </div>
-
-                      {timerActive && (
-                        /* Circular Loader (shown while timerActive is true) */
-                        <div className="flex flex-col items-center justify-center my-6">
-                          <div className="relative w-32 h-32 flex items-center justify-center">
-                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                              <circle
-                                cx="60"
-                                cy="60"
-                                r="50"
-                                fill="transparent"
-                                stroke="#f1f5f9"
-                                className="dark:stroke-zinc-800"
-                                strokeWidth="8"
-                              />
-                              <circle
-                                cx="60"
-                                cy="60"
-                                r="50"
-                                fill="transparent"
-                                stroke="#3b82f6"
-                                strokeWidth="8"
-                                strokeDasharray={2 * Math.PI * 50}
-                                strokeDashoffset={2 * Math.PI * 50 - (Math.round(((15 - timeLeft) / 15) * 100) / 100) * (2 * Math.PI * 50)}
-                                strokeLinecap="round"
-                                className="transition-all duration-1000 ease-linear"
-                              />
-                            </svg>
-                            <div className="absolute text-2xl font-extrabold text-blue-600 dark:text-blue-400 font-mono">
-                              {Math.round(((15 - timeLeft) / 15) * 100)}%
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Above Verify Ad (Ad 1) */}
-                      <AdUnit
-                        key={`post-above-verify-${currentStep}`}
-                        slot="1909584638"
-                        format="fluid"
-                        layoutKey="-6t+ed+2i-1n-4w"
-                        minHeight="120px"
-                        style={{ margin: 0, padding: 0 }}
-                      />
-
-                      {timerActive ? (
-                        /* Click Ads Instruction Box (Text Box) */
-                        <div className="click-ads-box w-full" style={{ margin: 0, borderRadius: '12px' }}>
-                          <p className="text-sm font-extrabold text-white mb-1">🙏 Thank You For Visiting Our Site</p>
-                          <div className="inner-white-box" style={{ margin: '8px 0 0 0' }}>
-                            Please Click on any <strong>Ads</strong> 👆 Above Or Below 👇 and then <strong>Back</strong> to Continue
-                          </div>
-                        </div>
-                      ) : (
-                        /* Continue Button only - strictly touching both ads with no gap */
-                        <div className="w-full flex justify-center py-2" style={{ margin: 0, padding: 0 }}>
-                          <button
-                            onClick={handleStepTransition}
-                            className="btn-neon-orange px-12 py-3.5 text-base font-extrabold uppercase tracking-widest"
-                            style={{ margin: 0 }}
-                          >
-                            Continue
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Below Instruction Ad #1 (Ad 2) */}
-                      <AdUnit
-                        key={`post-verify-mid1-${currentStep}`}
-                        slot="5754054742"
-                        format="auto"
-                        minHeight="250px"
-                        style={{ margin: 0, padding: 0 }}
-                      />
-                    </>
+                    </div>
                   )}
 
-                  {currentStep === 2 && (
-                    <>
-                      {/* Instructions for Step 2 */}
-                      <div className="w-full text-center space-y-2 my-4 px-4">
-                        <p className="text-sm sm:text-base font-extrabold text-zinc-800 dark:text-zinc-200">
-                          👇 Scroll down and click on <span className="text-blue-600 font-extrabold">GENERATE LINK</span> to get your link.
-                        </p>
-                        <p className="text-xs sm:text-xs font-bold text-zinc-750 dark:text-zinc-350 font-hindi">
-                          👇 नीचे स्क्रॉल करें और अपना लिंक प्राप्त करने के लिए <span className="text-blue-600 font-extrabold">GENERATE LINK</span> पर क्लिक करें।
-                        </p>
+                  {/* Above Verify Ad (Ad 1) */}
+                  <AdUnit
+                    key={`post-above-verify-${currentStep}`}
+                    slot="1909584638"
+                    format="fluid"
+                    layoutKey="-6t+ed+2i-1n-4w"
+                    minHeight="120px"
+                    style={{ margin: 0, padding: 0 }}
+                  />
+
+                  {timerActive ? (
+                    /* Click Ads Instruction Box (Text Box) */
+                    <div className="click-ads-box w-full" style={{ margin: 0, borderRadius: '12px' }}>
+                      <p className="text-sm font-extrabold text-white mb-1">🙏 Thank You For Visiting Our Site</p>
+                      <div className="inner-white-box" style={{ margin: '8px 0 0 0' }}>
+                        Please Click on any <strong>Ads</strong> 👆 Above Or Below 👇 and then <strong>Back</strong> to Continue
                       </div>
-                    </>
+                    </div>
+                  ) : (
+                    /* Verify Now Button only - strictly touching both ads with no gap */
+                    <div className="w-full flex justify-center py-2" style={{ margin: 0, padding: 0 }}>
+                      <button
+                        onClick={() => {
+                          const bottomEl = document.getElementById('safelink-bottom-trigger');
+                          if (bottomEl) {
+                            bottomEl.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                        className="btn-neon-purple px-12 py-3.5 text-base font-extrabold"
+                        style={{ margin: 0 }}
+                      >
+                        ✅ Verify Now
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Below Instruction Ad #1 (Ad 2) */}
+                  <AdUnit
+                    key={`post-verify-mid1-${currentStep}`}
+                    slot="5754054742"
+                    format="auto"
+                    minHeight="250px"
+                    style={{ margin: 0, padding: 0 }}
+                  />
+
+                  {!timerActive && (
+                    <div className="w-full text-center space-y-1 my-3 px-4 animate-bounce">
+                      <p className="text-sm font-extrabold text-red-600 dark:text-red-400">
+                        👇 Scroll down to bottom and click on {currentStep === 3 ? '"GENERATE LINK"' : '"CONTINUE NEXT STEP"'} 👇
+                      </p>
+                    </div>
                   )}
                 </>
               )}
@@ -559,7 +555,7 @@ export default function PostDetail() {
               />
 
               {/* Bottom Safelink Action Trigger */}
-              {currentStep === 2 && (
+              {currentStep > 0 && (
                 <div id="safelink-bottom-trigger" className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center" style={{ gap: 0 }}>
 
                   {/* Top Bottom Ad (Ad 1) */}
@@ -571,16 +567,32 @@ export default function PostDetail() {
                     style={{ margin: 0, padding: 0 }}
                   />
 
-                  {/* Generate Link Button */}
-                  <div className="w-full flex justify-center py-2" style={{ margin: 0, padding: 0 }}>
-                    <button
-                      onClick={handleFinalRedirect}
-                      className="btn-neon-blue px-14 py-4 text-base font-extrabold uppercase tracking-widest"
-                      style={{ margin: 0 }}
-                    >
-                      Generate Link
-                    </button>
-                  </div>
+                  {!timerDone ? (
+                    <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-8 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 cursor-not-allowed select-none text-center">
+                      ⏳ Complete the countdown timer above to unlock the button
+                    </div>
+                  ) : (
+                    /* Generate Link or Continue Button */
+                    <div className="w-full flex justify-center py-2" style={{ margin: 0, padding: 0 }}>
+                      {currentStep === 3 ? (
+                        <button
+                          onClick={handleFinalRedirect}
+                          className="btn-neon-blue px-14 py-4 text-base font-extrabold uppercase tracking-widest"
+                          style={{ margin: 0 }}
+                        >
+                          Generate Link
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleStepTransition}
+                          className="btn-neon-orange px-14 py-4 text-base font-extrabold uppercase tracking-widest"
+                          style={{ margin: 0 }}
+                        >
+                          Continue Next Step
+                        </button>
+                      )}
+                    </div>
+                  )}
 
                   {/* Bottom Ad (Ad 2) */}
                   <AdUnit
