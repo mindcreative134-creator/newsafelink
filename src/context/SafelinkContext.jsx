@@ -20,6 +20,7 @@ export function SafelinkProvider({ children }) {
 
     sessionStorage.setItem('SAFE_L', decodedUrl);
     sessionStorage.setItem('SAFE_STEP', '1');
+    sessionStorage.removeItem('SAFELINK_POPUP_SHOWN');
     setTargetUrl(decodedUrl);
     setCurrentStep(1);
   };
