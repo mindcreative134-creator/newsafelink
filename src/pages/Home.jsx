@@ -261,7 +261,7 @@ export default function Home() {
       {showVerification && (
         <div className="flex flex-col items-center justify-center my-6 gap-2">
           {/* Ad ABOVE checkbox */}
-          <div className="w-full flex items-center justify-center" style={{ margin: 0, padding: 0 }}>
+          <div className="w-full flex items-center justify-center home-robot-ad-container" style={{ margin: 0, padding: 0 }}>
             <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" />
           </div>
 

@@ -294,3 +294,10 @@ ins.adsbygoogle[data-ad-status="unfilled"],
   margin: 0 !important;
   padding: 0 !important;
 }
+
+/* Limit height of the home robot verification top ad to eliminate spacing gaps */
+.home-robot-ad-container,
+.home-robot-ad-container .ad-unit-wrapper,
+.home-robot-ad-container ins.adsbygoogle {
+  max-height: 140px !important;
+}
