@@ -303,7 +303,7 @@ export default function Home() {
 
           {/* Ad BELOW checkbox */}
           <div className="w-full flex flex-col gap-0" style={{ margin: 0, padding: 0 }}>
-            <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" style={{ margin: 0, padding: 0 }} />
+            <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="auto" style={{ margin: 0, padding: 0 }} />
             <AdUnit key={`home-robot-ad3-${safelinkTarget}`} slot="5754054742" format="auto" style={{ margin: 0, padding: 0 }} />
           </div>
         </div>

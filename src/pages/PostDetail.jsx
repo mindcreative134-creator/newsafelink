@@ -717,8 +717,7 @@ export default function PostDetail() {
                         <AdUnit
                           key={`post-above-verify-${currentStep}`}
                           slot="1909584638"
-                          format="fluid"
-                          layoutKey="-6t+ed+2i-1n-4w"
+                          format="auto"
                           style={{ margin: 0, padding: 0 }}
                         />
                       )}
