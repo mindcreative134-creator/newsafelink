@@ -65,6 +65,56 @@ function PostDetailSkeleton() {
   );
 }
 
+// Living Text Banner Mascot Character Component
+function LivingBanner() {
+  return (
+    <a
+      href="https://www.effectivecpmnetwork.com/wm9u7q6i7?key=2322f579e7bdafc50bc0259df918895f"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="living-banner-container block no-underline"
+    >
+      <div className="living-banner-body">
+        {/* Mascot Face */}
+        <div className="living-eyes">
+          <div className="living-eye"></div>
+          <div className="living-eye"></div>
+          <div className="living-mouth"></div>
+        </div>
+        
+        {/* Mascot Arms */}
+        <div className="living-arm-left"></div>
+        <div className="living-arm-right"></div>
+        
+        {/* Banner Text Content */}
+        <div className="flex flex-col items-center">
+          <div className="text-yellow-300 dark:text-yellow-400 text-xs sm:text-sm font-black uppercase tracking-widest flex items-center justify-center gap-1.5 animate-pulse">
+            🚨 CLICK THIS BANNER OR ANY ADS 🚨
+          </div>
+          <div className="text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider mt-1 px-4">
+            👇 To Confirm & Activate Your Download Link 👇
+          </div>
+        </div>
+
+        {/* Clicking Hand Pointer SVG */}
+        <svg 
+          className="living-hand-pointer text-yellow-400" 
+          viewBox="0 0 24 24" 
+          fill="currentColor"
+        >
+          <path d="M9 11.24V7.5a2.5 2.5 0 0 1 5 0v3.74l.84-.28a2.5 2.5 0 0 1 3.2 1.6l.46 1.38a5.5 5.5 0 0 1-5.2 7.06H9a5 5 0 0 1-5-5v-1.74a2.5 2.5 0 0 1 3.2-2.4l1.8.6z" />
+        </svg>
+
+        {/* Mascot Legs */}
+        <div className="living-legs">
+          <div className="living-leg living-leg-left"></div>
+          <div className="living-leg living-leg-right"></div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
 export default function PostDetail() {
   const { postId } = useParams();
   const navigate = useNavigate();
@@ -439,15 +489,8 @@ export default function PostDetail() {
 
               {currentStep > 0 && (
                 <>
-                  {/* Warning Bars (studyaf.com style) */}
-                  <div className="w-full flex flex-col gap-1.5 my-2">
-                    <div className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-400 border border-green-600 text-zinc-900 dark:text-zinc-950 text-center text-xs font-black uppercase tracking-wider rounded-md shadow-sm">
-                      ▼ CLICK ANY <span className="text-red-650 font-extrabold">IMAGE</span> 👆 & Wait 15 Seconds to <span className="text-blue-700 font-extrabold">GET LINK</span> ▼ 👆
-                    </div>
-                    <div className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-400 border border-green-600 text-zinc-900 dark:text-zinc-950 text-center text-xs font-black uppercase tracking-wider rounded-md shadow-sm">
-                      ▼ CLICK ANY <span className="text-red-650 font-extrabold">IMAGE</span> 👆 & Wait 15 Seconds to <span className="text-blue-700 font-extrabold">GET LINK</span> ▼ 👆
-                    </div>
-                  </div>
+                  {/* Living Warning Banner character linked to Adsterra SmartLink */}
+                  <LivingBanner />
 
                   {/* Verification Instructions Alert (Hinglish/Hindi compliant) */}
                   <div className="w-full text-center space-y-1 my-3 px-4">

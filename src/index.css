@@ -298,4 +298,246 @@ ins.adsbygoogle[data-ad-status="unfilled"],
   padding: 0 !important;
 }
 
+/* ── Living Text Banner Character ── */
+
+.living-banner-container {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  margin: 1.5rem auto 2.5rem;
+  padding-bottom: 24px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.living-banner-body {
+  position: relative;
+  background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
+  border: 3px solid #8b5cf6;
+  border-radius: 20px;
+  padding: 16px 20px;
+  box-shadow: 0 10px 25px -5px rgba(109, 40, 217, 0.4), 0 0 15px rgba(139, 92, 246, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 85px;
+  animation: mascot-bob 3s ease-in-out infinite;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: visible;
+}
+
+.dark .living-banner-body {
+  background: linear-gradient(135deg, #5b21b6 0%, #3730a3 100%);
+  border-color: #a78bfa;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(167, 139, 250, 0.15);
+}
+
+.living-banner-container:hover .living-banner-body {
+  transform: translateY(-2px) scale(1.01);
+  border-color: #c084fc;
+  box-shadow: 0 12px 30px -5px rgba(109, 40, 217, 0.5), 0 0 25px rgba(192, 132, 252, 0.35);
+}
+
+.living-banner-container:active .living-banner-body {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* Eyes on the banner itself */
+.living-eyes {
+  display: flex;
+  gap: 5px;
+  position: absolute;
+  top: -12px;
+  left: 24px;
+  background: #1e1b4b;
+  padding: 4px 6px;
+  border-radius: 10px;
+  border: 2px solid #8b5cf6;
+}
+
+.dark .living-eyes {
+  background: #090514;
+  border-color: #a78bfa;
+}
+
+.living-eye {
+  width: 9px;
+  height: 12px;
+  background: #10b981; /* Glowing green eye */
+  border-radius: 50%;
+  animation: mascot-eyes-blink 4s infinite;
+  position: relative;
+}
+
+.living-eye::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 2.5px;
+  height: 2.5px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* Mouth */
+.living-mouth {
+  position: absolute;
+  top: 10px;
+  left: 36px;
+  width: 12px;
+  height: 6px;
+  border-bottom: 2px solid #8b5cf6;
+  border-radius: 0 0 12px 12px;
+}
+
+.dark .living-mouth {
+  border-color: #a78bfa;
+}
+
+/* Left Arm waving */
+.living-arm-left {
+  position: absolute;
+  left: -14px;
+  top: 30%;
+  width: 18px;
+  height: 10px;
+  background: #6d28d9;
+  border: 2px solid #8b5cf6;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  transform-origin: right center;
+  animation: wave-arm-left 2s ease-in-out infinite;
+}
+
+.dark .living-arm-left {
+  background: #5b21b6;
+  border-color: #a78bfa;
+}
+
+/* Right Arm extending */
+.living-arm-right {
+  position: absolute;
+  right: -16px;
+  top: 30%;
+  width: 20px;
+  height: 10px;
+  background: #6d28d9;
+  border: 2px solid #8b5cf6;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  transform-origin: left center;
+  animation: wave-arm-right 1.5s ease-in-out infinite;
+}
+
+.dark .living-arm-right {
+  background: #5b21b6;
+  border-color: #a78bfa;
+}
+
+/* Cute hand indicator pointer clicking the banner */
+.living-hand-pointer {
+  position: absolute;
+  right: 15px;
+  bottom: -20px;
+  width: 32px;
+  height: 32px;
+  z-index: 12;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  animation: hand-click 1.5s ease-in-out infinite;
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+
+/* Legs dangling at the bottom */
+.living-legs {
+  display: flex;
+  gap: 16px;
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: -1;
+}
+
+.living-leg {
+  width: 6px;
+  height: 20px;
+  background: #6d28d9;
+  border: 2px solid #8b5cf6;
+  border-top: none;
+  border-radius: 0 0 3px 3px;
+  transform-origin: top center;
+  position: relative;
+}
+
+.dark .living-leg {
+  background: #5b21b6;
+  border-color: #a78bfa;
+}
+
+.living-leg::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: -4px;
+  width: 12px;
+  height: 6px;
+  background: #4f46e5;
+  border: 2px solid #8b5cf6;
+  border-radius: 4px;
+}
+
+.dark .living-leg::after {
+  background: #3730a3;
+  border-color: #a78bfa;
+}
+
+.living-leg-left {
+  animation: mascot-leg-swing-left 2s ease-in-out infinite;
+}
+
+.living-leg-right {
+  animation: mascot-leg-swing-right 2s ease-in-out infinite;
+}
+
+/* Keyframes */
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes mascot-eyes-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+@keyframes wave-arm-left {
+  0%, 100% { transform: rotate(15deg); }
+  50% { transform: rotate(-15deg); }
+}
+
+@keyframes wave-arm-right {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(15deg); }
+}
+
+@keyframes hand-click {
+  0%, 100% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(0.85) translate(-3px, 3px); }
+}
+
+@keyframes mascot-leg-swing-left {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+
+@keyframes mascot-leg-swing-right {
+  0%, 100% { transform: rotate(8deg); }
+  50% { transform: rotate(-8deg); }
+}
+
+
 
