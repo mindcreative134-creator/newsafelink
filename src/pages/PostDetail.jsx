@@ -80,10 +80,75 @@ export default function PostDetail() {
   const [timerDone, setTimerDone] = useState(false);
   const timerRef = useRef(null);
 
+  // States for verification flow
+  const [isTopVerified, setIsTopVerified] = useState(false);
+  const [showAdPopup, setShowAdPopup] = useState(false);
+  const [isMouseOverAd, setIsMouseOverAd] = useState(false);
+
+  // Reset verification states on step or post change
+  useEffect(() => {
+    setIsTopVerified(false);
+    setShowAdPopup(false);
+    setIsMouseOverAd(false);
+  }, [currentStep, postId]);
+
   // Scroll to top when post changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [postId]);
+
+  // Global Image Click Handler for Adsterra SmartLink
+  useEffect(() => {
+    const handleImageClick = (e) => {
+      const img = e.target.closest('img');
+      if (img) {
+        if (!img.getAttribute('data-smartlink-clicked')) {
+          img.setAttribute('data-smartlink-clicked', 'true');
+          window.open('https://www.effectivecpmnetwork.com/wm9u7q6i7?key=2322f579e7bdafc50bc0259df918895f', '_blank');
+        }
+      }
+    };
+
+    document.addEventListener('click', handleImageClick);
+    return () => {
+      document.removeEventListener('click', handleImageClick);
+    };
+  }, []);
+
+  // Ad click detection (iframe hover + window blur)
+  useEffect(() => {
+    const handleBlur = () => {
+      if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
+        if (isMouseOverAd) {
+          setIsTopVerified(true);
+          setShowAdPopup(false);
+          // Scroll to the bottom trigger smoothly
+          setTimeout(() => {
+            const bottomEl = document.getElementById('safelink-bottom-trigger');
+            if (bottomEl) {
+              bottomEl.scrollIntoView({ behavior: 'smooth' });
+            }
+          }, 300);
+        }
+      }
+    };
+
+    window.addEventListener('blur', handleBlur);
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, [isMouseOverAd]);
+
+  // Dynamically push adsense ad inside the popup modal when opened
+  useEffect(() => {
+    if (showAdPopup) {
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        // ignore adsbygoogle push errors
+      }
+    }
+  }, [showAdPopup]);
 
   // Fetch post details
   useEffect(() => {
@@ -459,6 +524,17 @@ export default function PostDetail() {
                     </p>
                   </div>
 
+                  {/* Interactive Force-Click Banner */}
+                  <div className="w-full flex justify-center px-4 my-3">
+                    <div className="relative group overflow-hidden rounded-[24px] border border-zinc-200 dark:border-zinc-800 shadow-md cursor-pointer max-w-lg w-full transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+                      <img 
+                        src="/force-click-banner.png" 
+                        alt="Force Click to Verify" 
+                        className="w-full h-auto object-cover"
+                      />
+                    </div>
+                  </div>
+
                   {timerActive && (
                     /* Circular Loader (shown while timerActive is true) - thick circle like image */
                     <div className="flex flex-col items-center justify-center my-6">
@@ -513,14 +589,11 @@ export default function PostDetail() {
                         </div>
                       </div>
                     ) : (
-                      /* Verify Now Button only - strictly touching both ads with no gap */
+                      /* Verify Now Button only - triggers ad click popup */
                       <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
                         <button
                           onClick={() => {
-                            const bottomEl = document.getElementById('safelink-bottom-trigger');
-                            if (bottomEl) {
-                              bottomEl.scrollIntoView({ behavior: 'smooth' });
-                            }
+                            setShowAdPopup(true);
                           }}
                           className="btn-neon-purple px-12 py-3.5 text-base font-extrabold"
                           style={{ margin: 0 }}
@@ -539,9 +612,17 @@ export default function PostDetail() {
                     />
                   </div>
 
-                  {!timerActive && (
+                  {!timerActive && !isTopVerified && (
                     <div className="w-full text-center space-y-1 my-3 px-4 animate-bounce">
-                      <p className="text-sm font-extrabold text-red-600 dark:text-red-400">
+                      <p className="text-sm font-extrabold text-red-650 dark:text-red-400">
+                        👆 Click on "VERIFY NOW" to unlock download link 👆
+                      </p>
+                    </div>
+                  )}
+
+                  {!timerActive && isTopVerified && (
+                    <div className="w-full text-center space-y-1 my-3 px-4 animate-bounce">
+                      <p className="text-sm font-extrabold text-green-600 dark:text-green-400">
                         👇 Scroll down to bottom and click on {currentStep === 3 ? '"GENERATE LINK"' : '"CONTINUE NEXT STEP"'} 👇
                       </p>
                     </div>
@@ -555,9 +636,9 @@ export default function PostDetail() {
                 dangerouslySetInnerHTML={{ __html: injectAds(post.content) }}
               />
 
-              {/* Bottom Safelink Action Trigger */}
-              {currentStep > 0 && (
-                <div id="safelink-bottom-trigger" className="mt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center" style={{ gap: 0, paddingTop: 0 }}>
+              {/* Bottom Safelink Action Trigger - Hidden until isTopVerified is true */}
+              {currentStep > 0 && isTopVerified && (
+                <div id="safelink-bottom-trigger" className="mt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center animate-fade-in" style={{ gap: 0, paddingTop: 0 }}>
 
                   {/* Wrap Bottom Verification Ad & Action group in zero-gap flexbox and use unique slots to prevent collisions */}
                   <div className="w-full flex flex-col items-center" style={{ gap: 0, margin: 0, padding: 0 }}>
@@ -617,6 +698,73 @@ export default function PostDetail() {
           <Sidebar />
         </div>
       </div>
+
+      {/* Verification Ad Click popup modal */}
+      {showAdPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] max-w-lg w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl relative">
+            
+            <button 
+              onClick={() => setShowAdPopup(false)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-200 p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 bg-red-50 dark:bg-red-950/30 text-red-650 dark:text-red-400 rounded-2xl border border-red-150/40 animate-pulse">
+                <ShieldCheck className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-heading">
+                Anti-Bot Verification Check
+              </h3>
+              <p className="text-sm font-extrabold text-zinc-600 dark:text-zinc-350">
+                To unlock the next step button, please click on the advertisement below. Once clicked, this verification will complete automatically.
+              </p>
+              <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 font-hindi leading-relaxed">
+                <span className="text-red-650 font-black">लिंक अनलॉक करने के लिए,</span> नीचे दिए गए विज्ञापन पर क्लिक करें। क्लिक करने के बाद यह अपने आप अनलॉक हो जाएगा।
+              </p>
+            </div>
+
+            <div 
+              className="w-full bg-zinc-50 dark:bg-zinc-950 rounded-2xl p-4 border border-zinc-150 dark:border-zinc-850 min-h-[280px] flex items-center justify-center relative overflow-hidden"
+              onMouseEnter={() => setIsMouseOverAd(true)}
+              onMouseLeave={() => setIsMouseOverAd(false)}
+            >
+              <div className="adsense-container w-full overflow-hidden flex items-center justify-center">
+                <ins className="adsbygoogle"
+                     style={{ display: "block", minWidth: "250px", minHeight: "250px" }}
+                     data-ad-client="ca-pub-9543073887536718"
+                     data-ad-slot="1909584638"
+                     data-ad-format="rectangle"
+                     data-full-width-responsive="true"></ins>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                <Clock className="w-4 h-4 animate-spin" />
+                Waiting for Ad Click...
+              </div>
+              <button 
+                onClick={() => {
+                  setIsTopVerified(true);
+                  setShowAdPopup(false);
+                  setTimeout(() => {
+                    const bottomEl = document.getElementById('safelink-bottom-trigger');
+                    if (bottomEl) bottomEl.scrollIntoView({ behavior: 'smooth' });
+                  }, 300);
+                }}
+                className="text-[10px] font-bold text-zinc-450 dark:text-zinc-550 hover:underline mt-2 uppercase tracking-widest"
+              >
+                Skip Verification (If Ad fails to load)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
