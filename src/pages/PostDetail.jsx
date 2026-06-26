@@ -450,18 +450,42 @@ export default function PostDetail() {
                     </p>
                   </div>
 
-                  {/* Above Verify Ad */}
-                  <AdUnit key={`post-above-verify-${currentStep}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
+                  {/* Above Verify Ad (Ad 1) */}
+                  <AdUnit
+                    key={`post-above-verify-${currentStep}`}
+                    slot="1909584638"
+                    format="fluid"
+                    layoutKey="-6t+ed+2i-1n-4w"
+                    minHeight="120px"
+                    style={{ margin: 0, padding: 0 }}
+                  />
 
-                  {/* Countdown Timer */}
-                  <div className="w-full flex items-center justify-center my-4">
+                  {/* Click Ads Instruction Box (Text Box) */}
+                  <div className="click-ads-box w-full" style={{ margin: 0, borderRadius: '12px' }}>
+                    <p className="text-sm font-extrabold text-white mb-1">🙏 Thank You For Visiting Our Site</p>
+                    <div className="inner-white-box" style={{ margin: '8px 0 0 0' }}>
+                      Please Click on any <strong>Ads</strong> 👆 Above Or Below 👇 and then <strong>Back</strong> to Continue
+                    </div>
+                  </div>
+
+                  {/* Below Instruction Ad #1 (Ad 2) */}
+                  <AdUnit
+                    key={`post-verify-mid1-${currentStep}`}
+                    slot="5754054742"
+                    format="auto"
+                    minHeight="250px"
+                    style={{ margin: 0, padding: 0 }}
+                  />
+
+                  {/* Countdown Timer / Verification / Continue Button (Verification Process) */}
+                  <div className="w-full flex flex-col items-center justify-center" style={{ margin: 0, padding: '10px 0' }}>
                     {timerActive ? (
-                      <div className="w-full max-w-sm flex flex-col items-center gap-3 py-4">
-                        <div className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest animate-pulse">
+                      <div className="w-full max-w-sm flex flex-col items-center gap-2.5 py-2">
+                        <div className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                           Verifying Secure Link...
                         </div>
                         <div className="flex items-center gap-2 bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40 px-5 py-2 rounded-full">
-                          <Clock className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 animate-spin" />
+                          <Clock className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                           <span className="text-sm font-extrabold text-purple-700 dark:text-purple-300 font-mono">
                             {timeLeft}s remaining
                           </span>
@@ -477,40 +501,31 @@ export default function PostDetail() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center gap-3 my-2">
-                        {/* Neon Purple - Verify Now Button */}
+                      <div className="flex flex-col items-center justify-center gap-3 py-1">
+                        <p className="text-xs sm:text-sm font-extrabold text-zinc-800 dark:text-zinc-200 text-center m-0">
+                          👇 Click <span className="text-orange-500 font-black">CONTINUE</span> to get your link
+                        </p>
                         <div className="neon-btn-wrap">
                           <button
-                            onClick={() => {
-                              const bottomEl = document.getElementById('safelink-bottom-trigger');
-                              if (bottomEl) {
-                                bottomEl.scrollIntoView({ behavior: 'smooth' });
-                              } else {
-                                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                              }
-                            }}
-                            className="btn-neon-purple px-10 py-3 text-sm"
+                            onClick={currentStep === 3 ? handleFinalRedirect : handleStepTransition}
+                            className="btn-neon-orange px-12 py-3.5 text-base"
                           >
-                            ✅ Verify Now
+                            🔥 Continue
                           </button>
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Click Ads Instruction Box + Ad - Maximize Earnings */}
-                  <div className="click-ads-box w-full my-4">
-                    <p className="text-sm font-extrabold text-white mb-1">🙏 Thank You For Visiting Our Site</p>
-                    <div className="inner-white-box">
-                      Please Click on any <strong>Ads</strong> 👆 Above Or Below 👇 and then <strong>Back</strong> to Continue
-                    </div>
-                  </div>
-
-                  {/* Below Instruction Ad #1 */}
-                  <AdUnit key={`post-verify-mid1-${currentStep}`} slot="5754054742" format="auto" minHeight="250px" />
-
-                  {/* Below Instruction Ad #2 - in-article */}
-                  <AdUnit key={`post-verify-mid2-${currentStep}`} slot="1641433819" format="fluid" layout="in-article" minHeight="120px" />
+                  {/* Below Instruction Ad #2 - in-article (Ad 3) */}
+                  <AdUnit
+                    key={`post-verify-mid2-${currentStep}`}
+                    slot="1641433819"
+                    format="fluid"
+                    layout="in-article"
+                    minHeight="120px"
+                    style={{ margin: 0, padding: 0 }}
+                  />
                 </>
               )}
 
