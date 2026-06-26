@@ -57,20 +57,24 @@ export default function Header() {
           
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-transform duration-200">
-                <svg className="w-5.5 h-5.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                  <polyline points="17 6 23 6 23 12" />
+            <Link to="/" className="flex items-center gap-2.5 group" aria-label="SarkariTrend Home">
+              {/* Icon mark */}
+              <div className="relative flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden shadow-md shadow-indigo-500/25 group-hover:shadow-indigo-500/40 group-hover:scale-[1.06] transition-all duration-200" style={{background:'linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%)'}}>
+                {/* White trending chart */}
+                <svg viewBox="0 0 36 36" width="22" height="22" fill="none">
+                  <polyline points="4,26 13,16 20,22 32,9" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="25,9 32,9 32,16" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
+                {/* Subtle shine on top */}
+                <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-lg font-black tracking-tight text-zinc-900 dark:text-white leading-none font-heading flex items-center">
-                  Sarkari<span className="text-indigo-600 dark:text-indigo-400 font-black">Trend</span>
-                </span>
-                <span className="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-1">
-                  Jobs & Education
-                </span>
+              {/* Wordmark */}
+              <div className="flex flex-col leading-none">
+                <div className="flex items-baseline gap-px">
+                  <span className="text-[17px] font-black tracking-tight text-zinc-900 dark:text-white font-heading leading-none">Sarkari</span>
+                  <span className="text-[17px] font-black tracking-tight text-indigo-600 dark:text-indigo-400 font-heading leading-none">Trend</span>
+                </div>
+                <span className="text-[8.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.18em] mt-[3px]">Jobs &amp; Education</span>
               </div>
             </Link>
           </div>
