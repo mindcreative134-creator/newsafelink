@@ -26,7 +26,7 @@ export function SafelinkProvider({ children }) {
 
   const nextStep = () => {
     const nextVal = currentStep + 1;
-    if (nextVal <= 3) {
+    if (nextVal <= 2) {
       sessionStorage.setItem('SAFE_STEP', String(nextVal));
       setCurrentStep(nextVal);
     }
