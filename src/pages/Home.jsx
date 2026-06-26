@@ -182,7 +182,7 @@ export default function Home() {
             '@type': 'ItemList',
             'name': 'Latest Sarkari Job & Education Articles',
             'description': 'Most recent government job notifications, exam updates, and career guidance articles from SarkariTrend.',
-            'url': 'https://sarkaritrend.vercel.app/',
+            'url': 'https://iwantgovjob.vercel.app/',
             'numberOfItems': data.items.length,
             'itemListElement': data.items.map((item, index) => {
               const plain = item.content ? item.content.replace(/<\/?[^>]+(>|$)/g, '') : '';
@@ -190,16 +190,16 @@ export default function Home() {
               return {
                 '@type': 'ListItem',
                 'position': index + 1,
-                'url': `https://sarkaritrend.vercel.app/post/${item.id}`,
+                'url': `https://iwantgovjob.vercel.app/post/${item.id}`,
                 'name': item.title,
                 'item': {
                   '@type': 'Article',
                   'headline': item.title,
                   'description': desc,
                   'datePublished': item.published,
-                  'url': `https://sarkaritrend.vercel.app/post/${item.id}`,
+                  'url': `https://iwantgovjob.vercel.app/post/${item.id}`,
                   'keywords': item.labels ? item.labels.join(', ') : 'sarkari job',
-                  'publisher': { '@id': 'https://sarkaritrend.vercel.app/#organization' },
+                  'publisher': { '@id': 'https://iwantgovjob.vercel.app/#organization' },
                 },
               };
             }),

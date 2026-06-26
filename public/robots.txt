@@ -1,4 +1,4 @@
-# robots.txt for sarkaritrend.vercel.app
+# robots.txt for iwantgovjob.vercel.app
 # Last updated: 2025
 
 # ── Standard Search Engines ────────────────────────────────────
@@ -86,5 +86,5 @@ User-agent: *
 Allow: /
 
 # ── Sitemap ───────────────────────────────────────────────────
-Sitemap: https://sarkaritrend.vercel.app/sitemap.xml
+Sitemap: https://iwantgovjob.vercel.app/sitemap.xml
 Sitemap: https://www.blogger.com/feeds/6924208631263306852/posts/default
