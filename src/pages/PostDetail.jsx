@@ -83,17 +83,69 @@ export default function PostDetail() {
   // States for verification flow
   const [isTopVerified, setIsTopVerified] = useState(false);
   const [showAdPopup, setShowAdPopup] = useState(false);
+  const [popupShownThisStep, setPopupShownThisStep] = useState(false); // show only once
+  const [showSkipBtn, setShowSkipBtn] = useState(false); // skip after 5s
+
+  // Helper: verify and close popup, scroll to bottom
+  const completeVerification = () => {
+    setIsTopVerified(true);
+    setShowAdPopup(false);
+    setTimeout(() => {
+      const el = document.getElementById('safelink-bottom-trigger');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 400);
+  };
 
   // Reset verification states on step or post change
   useEffect(() => {
     setIsTopVerified(false);
     setShowAdPopup(false);
+    setPopupShownThisStep(false);
+    setShowSkipBtn(false);
   }, [currentStep, postId]);
 
   // Scroll to top when post changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [postId]);
+
+  // Auto-close popup when user returns from clicking the ad (visibilitychange)
+  useEffect(() => {
+    if (!showAdPopup) return;
+
+    // Wait 1 second before listening - avoids firing immediately on popup open
+    let ready = false;
+    const readyTimer = setTimeout(() => { ready = true; }, 1000);
+
+    const handleVisibility = () => {
+      if (ready && document.visibilityState === 'visible') {
+        completeVerification();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      clearTimeout(readyTimer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showAdPopup]);
+
+  // Show skip button 5 seconds after popup opens
+  useEffect(() => {
+    if (!showAdPopup) { setShowSkipBtn(false); return; }
+    const t = setTimeout(() => setShowSkipBtn(true), 5000);
+    return () => clearTimeout(t);
+  }, [showAdPopup]);
+
+  // Push AdSense ad when popup opens (slot 7317709042 - NOT in DOM at popup open time)
+  useEffect(() => {
+    if (!showAdPopup) return;
+    const t = setTimeout(() => {
+      try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+    }, 200);
+    return () => clearTimeout(t);
+  }, [showAdPopup]);
 
   // Global Image Click Handler for Adsterra SmartLink
   // Guard: only fires during the safelink flow (currentStep > 0)
@@ -554,11 +606,18 @@ export default function PostDetail() {
                         </div>
                       </div>
                     ) : (
-                      /* Verify Now Button only - triggers ad click popup */
+                      /* Verify Now Button - opens popup ONCE per step */
                       <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
                         <button
                           onClick={() => {
-                            setShowAdPopup(true);
+                            if (!popupShownThisStep) {
+                              // First time: show popup
+                              setShowAdPopup(true);
+                              setPopupShownThisStep(true);
+                            } else {
+                              // Already seen popup: directly unlock
+                              completeVerification();
+                            }
                           }}
                           className="btn-neon-purple px-12 py-3.5 text-base font-extrabold"
                           style={{ margin: 0 }}
@@ -664,64 +723,67 @@ export default function PostDetail() {
         </div>
       </div>
 
-      {/* Verification Popup — ONLY shown during safelink flow (currentStep > 0) */}
+      {/* Verification Popup — shows ONCE per step, auto-closes when user returns */}
       {showAdPopup && currentStep > 0 && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] max-w-sm w-full p-6 sm:p-8 flex flex-col gap-5 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[28px] max-w-md w-full shadow-2xl relative overflow-hidden">
 
-            {/* Close button */}
-            <button
-              onClick={() => setShowAdPopup(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            {/* Header */}
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-2xl">
-                <ShieldCheck className="w-8 h-8" />
+            {/* Header bar */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center gap-2 text-zinc-900 dark:text-white">
+                <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <span className="font-black text-sm">Anti-Bot Verification</span>
               </div>
-              <h3 className="text-lg font-black text-zinc-900 dark:text-white font-heading">
-                Verify to Unlock Link
-              </h3>
-              <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                Click the banner below to verify you are human and unlock the next step.
+              <button
+                onClick={() => setShowAdPopup(false)}
+                className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 p-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Instruction */}
+            <div className="px-5 pt-4 pb-2 text-center flex flex-col gap-1">
+              <p className="text-xs font-extrabold text-zinc-700 dark:text-zinc-300">
+                👆 <span className="text-indigo-600 dark:text-indigo-400">Click the ad below</span>, wait a moment, then come back — your link will unlock automatically.
               </p>
               <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 font-hindi">
-                <span className="text-red-600 font-black">नीचे बैनर पर क्लिक करें</span> — क्लिक होते ही लिंक अनलॉक हो जाएगा।
+                <span className="text-red-600 font-black">नीचे दिए गए विज्ञापन पर क्लिक करें</span>, फिर वापस आएं — लिंक अपने आप अनलॉक हो जाएगा।
               </p>
             </div>
 
-            {/* Adsterra SmartLink clickable banner — always visible, earns on click */}
-            <button
-              onClick={() => {
-                // Open Adsterra SmartLink
-                window.open('https://www.effectivecpmnetwork.com/wm9u7q6i7?key=2322f579e7bdafc50bc0259df918895f', '_blank');
-                // Auto-verify after click
-                setIsTopVerified(true);
-                setShowAdPopup(false);
-                setTimeout(() => {
-                  const bottomEl = document.getElementById('safelink-bottom-trigger');
-                  if (bottomEl) bottomEl.scrollIntoView({ behavior: 'smooth' });
-                }, 400);
-              }}
-              className="w-full rounded-2xl overflow-hidden border-2 border-indigo-400 dark:border-indigo-600 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] cursor-pointer bg-transparent p-0 focus:outline-none"
-            >
-              <img
-                src="/force-click-banner.png"
-                alt="Click to Verify & Unlock"
-                data-ui-image="true"
-                className="w-full h-auto object-cover block"
-              />
-            </button>
+            {/* AdSense ad — slot 7317709042 is NOT loaded on page until after verification */}
+            <div className="px-4 pb-2">
+              <div
+                className="w-full bg-zinc-50 dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 min-h-[260px] flex items-center justify-center overflow-hidden"
+              >
+                <ins
+                  className="adsbygoogle"
+                  style={{ display: 'block', width: '300px', height: '250px' }}
+                  data-ad-client="ca-pub-9543073887536718"
+                  data-ad-slot="7317709042"
+                  data-ad-format="auto"
+                  data-full-width-responsive="false"
+                ></ins>
+              </div>
+            </div>
 
-            {/* Pulsing click instruction */}
-            <div className="flex items-center justify-center gap-2 text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 animate-pulse">
-              <ArrowRight className="w-4 h-4" />
-              Click the Banner Above to Continue
+            {/* Footer */}
+            <div className="px-5 pb-5 pt-2 flex flex-col items-center gap-2">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-600 dark:text-amber-400 animate-pulse">
+                <Clock className="w-3.5 h-3.5" />
+                Waiting... page will unlock when you come back
+              </div>
+              {showSkipBtn && (
+                <button
+                  onClick={completeVerification}
+                  className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:underline uppercase tracking-widest transition-colors"
+                >
+                  Skip — Ad didn't load?
+                </button>
+              )}
             </div>
           </div>
         </div>
