@@ -83,13 +83,11 @@ export default function PostDetail() {
   // States for verification flow
   const [isTopVerified, setIsTopVerified] = useState(false);
   const [showAdPopup, setShowAdPopup] = useState(false);
-  const [isMouseOverAd, setIsMouseOverAd] = useState(false);
 
   // Reset verification states on step or post change
   useEffect(() => {
     setIsTopVerified(false);
     setShowAdPopup(false);
-    setIsMouseOverAd(false);
   }, [currentStep, postId]);
 
   // Scroll to top when post changes
@@ -116,45 +114,6 @@ export default function PostDetail() {
       document.removeEventListener('click', handleImageClick);
     };
   }, [currentStep]);
-
-  // Ad click detection (iframe hover + window blur)
-  // Guard: only active when the verification popup is actually open
-  useEffect(() => {
-    if (!showAdPopup) return;
-    const handleBlur = () => {
-      if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
-        if (isMouseOverAd) {
-          setIsTopVerified(true);
-          setShowAdPopup(false);
-          setTimeout(() => {
-            const bottomEl = document.getElementById('safelink-bottom-trigger');
-            if (bottomEl) {
-              bottomEl.scrollIntoView({ behavior: 'smooth' });
-            }
-          }, 300);
-        }
-      }
-    };
-    window.addEventListener('blur', handleBlur);
-    return () => {
-      window.removeEventListener('blur', handleBlur);
-    };
-  }, [showAdPopup, isMouseOverAd]);
-
-  // Dynamically push adsense ad inside the popup modal when opened
-  useEffect(() => {
-    if (showAdPopup) {
-      // Delay to allow DOM to mount the <ins> element first
-      const t = setTimeout(() => {
-        try {
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {
-          // ignore adsbygoogle push errors
-        }
-      }, 150);
-      return () => clearTimeout(t);
-    }
-  }, [showAdPopup]);
 
   // Fetch post details
   useEffect(() => {
@@ -705,70 +664,64 @@ export default function PostDetail() {
         </div>
       </div>
 
-      {/* Verification Ad Click popup modal - ONLY shown during safelink flow */}
+      {/* Verification Popup — ONLY shown during safelink flow (currentStep > 0) */}
       {showAdPopup && currentStep > 0 && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] max-w-lg w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl relative">
-            
-            <button 
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] max-w-sm w-full p-6 sm:p-8 flex flex-col gap-5 shadow-2xl relative">
+
+            {/* Close button */}
+            <button
               onClick={() => setShowAdPopup(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-200 p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 bg-red-50 dark:bg-red-950/30 text-red-650 dark:text-red-400 rounded-2xl border border-red-150/40 animate-pulse">
+            {/* Header */}
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-2xl">
                 <ShieldCheck className="w-8 h-8" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-heading">
-                Anti-Bot Verification Check
+              <h3 className="text-lg font-black text-zinc-900 dark:text-white font-heading">
+                Verify to Unlock Link
               </h3>
-              <p className="text-sm font-extrabold text-zinc-600 dark:text-zinc-350">
-                To unlock the next step button, please click on the advertisement below. Once clicked, this verification will complete automatically.
+              <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                Click the banner below to verify you are human and unlock the next step.
               </p>
-              <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 font-hindi leading-relaxed">
-                <span className="text-red-650 font-black">लिंक अनलॉक करने के लिए,</span> नीचे दिए गए विज्ञापन पर क्लिक करें। क्लिक करने के बाद यह अपने आप अनलॉक हो जाएगा।
+              <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 font-hindi">
+                <span className="text-red-600 font-black">नीचे बैनर पर क्लिक करें</span> — क्लिक होते ही लिंक अनलॉक हो जाएगा।
               </p>
             </div>
 
-            {/* Ad container with mouse tracking for click detection */}
-            <div 
-              className="w-full bg-zinc-50 dark:bg-zinc-950 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 min-h-[280px] flex items-center justify-center relative overflow-hidden"
-              onMouseEnter={() => setIsMouseOverAd(true)}
-              onMouseLeave={() => setIsMouseOverAd(false)}
+            {/* Adsterra SmartLink clickable banner — always visible, earns on click */}
+            <button
+              onClick={() => {
+                // Open Adsterra SmartLink
+                window.open('https://www.effectivecpmnetwork.com/wm9u7q6i7?key=2322f579e7bdafc50bc0259df918895f', '_blank');
+                // Auto-verify after click
+                setIsTopVerified(true);
+                setShowAdPopup(false);
+                setTimeout(() => {
+                  const bottomEl = document.getElementById('safelink-bottom-trigger');
+                  if (bottomEl) bottomEl.scrollIntoView({ behavior: 'smooth' });
+                }, 400);
+              }}
+              className="w-full rounded-2xl overflow-hidden border-2 border-indigo-400 dark:border-indigo-600 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] cursor-pointer bg-transparent p-0 focus:outline-none"
             >
-              <div className="adsense-container w-full overflow-hidden flex items-center justify-center">
-                {/* Uses slot 7317709042 - unique for popup, no collision with inline ads */}
-                <ins className="adsbygoogle"
-                     style={{ display: "block", width: "300px", height: "250px" }}
-                     data-ad-client="ca-pub-9543073887536718"
-                     data-ad-slot="7317709042"
-                     data-ad-format="auto"
-                     data-full-width-responsive="false"></ins>
-              </div>
-            </div>
+              <img
+                src="/force-click-banner.png"
+                alt="Click to Verify & Unlock"
+                data-ui-image="true"
+                className="w-full h-auto object-cover block"
+              />
+            </button>
 
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                <Clock className="w-4 h-4 animate-spin" />
-                Waiting for Ad Click...
-              </div>
-              <button 
-                onClick={() => {
-                  setIsTopVerified(true);
-                  setShowAdPopup(false);
-                  setTimeout(() => {
-                    const bottomEl = document.getElementById('safelink-bottom-trigger');
-                    if (bottomEl) bottomEl.scrollIntoView({ behavior: 'smooth' });
-                  }, 300);
-                }}
-                className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 hover:underline mt-2 uppercase tracking-widest"
-              >
-                Skip Verification (If Ad fails to load)
-              </button>
+            {/* Pulsing click instruction */}
+            <div className="flex items-center justify-center gap-2 text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 animate-pulse">
+              <ArrowRight className="w-4 h-4" />
+              Click the Banner Above to Continue
             </div>
           </div>
         </div>
