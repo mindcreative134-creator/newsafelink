@@ -179,6 +179,14 @@ export default function PostDetail() {
   const [showPopup, setShowPopup] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Verification state
+  const [isVerified, setIsVerified] = useState(false);
+
+  // Reset verification state on step change
+  useEffect(() => {
+    setIsVerified(false);
+  }, [postId, currentStep]);
+
   // Show popup on redirect land
   useEffect(() => {
     const hasClicked = sessionStorage.getItem('SAFELINK_AD_CLICKED');
@@ -652,14 +660,7 @@ export default function PostDetail() {
                   </span>
                 </div>
 
-                {/* Featured Image */}
-                <div className="w-full rounded-[24px] overflow-hidden shadow-sm aspect-video border border-zinc-200/10">
-                  <img
-                    src={getPostImage(post)}
-                    alt={post.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+
 
                 {currentStep > 0 && (
                   <>
@@ -735,6 +736,7 @@ export default function PostDetail() {
                         <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
                           <button
                             onClick={() => {
+                              setIsVerified(true);
                               const bottomEl = document.getElementById('safelink-bottom-trigger');
                               if (bottomEl) {
                                 bottomEl.scrollIntoView({ behavior: 'smooth' });
@@ -794,6 +796,10 @@ export default function PostDetail() {
                       {!timerDone ? (
                         <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-8 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 cursor-not-allowed select-none text-center">
                           ⏳ Complete the countdown timer above to unlock the button
+                        </div>
+                      ) : !isVerified ? (
+                        <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-8 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 cursor-not-allowed select-none text-center">
+                          ⏳ Click the "Verify Now" button above to unlock the button
                         </div>
                       ) : (
                         /* Generate Link or Continue Button */
