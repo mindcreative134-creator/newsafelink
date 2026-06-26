@@ -456,7 +456,7 @@ export default function PostDetail() {
           const nextPost = postsList[randomIndex];
           
           nextStep();
-          navigate(`/post/${nextPost.id}`);
+          window.location.href = `/post/${nextPost.id}`;
         } else {
           nextStep();
           setLoading(false);

@@ -20,6 +20,7 @@ export default function AdUnit({
   layoutKey = '',
   style = {},
   minHeight = 'auto',
+  fullWidthResponsive = 'false',
 }) {
   const insRef = useRef(null);
   const pushed = useRef(false);
@@ -50,7 +51,7 @@ export default function AdUnit({
     'data-ad-client': AD_CLIENT,
     'data-ad-slot': slot,
     'data-ad-format': format,
-    'data-full-width-responsive': 'true',
+    'data-full-width-responsive': fullWidthResponsive,
   };
 
   if (layout) insProps['data-ad-layout'] = layout;

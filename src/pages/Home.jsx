@@ -133,7 +133,7 @@ export default function Home() {
         if (data.items && data.items.length > 0) {
           const randomIndex = Math.floor(Math.random() * data.items.length);
           const randomPost = data.items[randomIndex];
-          navigate(`/post/${randomPost.id}`);
+          window.location.href = `/post/${randomPost.id}`;
         }
       });
     }, 1500);
