@@ -254,3 +254,24 @@ body {
 .prose [style*="color"] { color: inherit !important; }
 .prose font[color] { color: inherit !important; }
 .prose span { color: inherit !important; }
+
+/* ── Google reCAPTCHA v2 Replica Box ── */
+.recaptcha-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 302px;
+  height: 76px;
+  background-color: #f9f9f9;
+  border: 1px solid #d3d3d3;
+  border-radius: 3px;
+  padding: 0 12px 0 14px;
+  font-family: Roboto, helvetica, arial, sans-serif;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.08);
+}
+
+.dark .recaptcha-box {
+  background-color: #18181b;
+  border-color: #27272a;
+  box-shadow: none;
+}

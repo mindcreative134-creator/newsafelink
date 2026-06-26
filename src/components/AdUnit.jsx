@@ -19,7 +19,7 @@ export default function AdUnit({
   layout = '',
   layoutKey = '',
   style = {},
-  minHeight = '120px',
+  minHeight = 'auto',
 }) {
   const insRef = useRef(null);
   const pushed = useRef(false);

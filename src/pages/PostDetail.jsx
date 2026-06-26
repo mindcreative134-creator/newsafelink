@@ -499,7 +499,6 @@ export default function PostDetail() {
                     slot="1909584638"
                     format="fluid"
                     layoutKey="-6t+ed+2i-1n-4w"
-                    minHeight="120px"
                     style={{ margin: 0, padding: 0 }}
                   />
 
@@ -513,7 +512,7 @@ export default function PostDetail() {
                     </div>
                   ) : (
                     /* Verify Now Button only - strictly touching both ads with no gap */
-                    <div className="w-full flex justify-center py-2" style={{ margin: 0, padding: 0 }}>
+                    <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
                       <button
                         onClick={() => {
                           const bottomEl = document.getElementById('safelink-bottom-trigger');
@@ -534,7 +533,6 @@ export default function PostDetail() {
                     key={`post-verify-mid1-${currentStep}`}
                     slot="5754054742"
                     format="auto"
-                    minHeight="250px"
                     style={{ margin: 0, padding: 0 }}
                   />
 
@@ -563,7 +561,6 @@ export default function PostDetail() {
                     key={`post-bottom-top-ad-${currentStep}`}
                     slot="1909584638"
                     format="auto"
-                    minHeight="250px"
                     style={{ margin: 0, padding: 0 }}
                   />
 
@@ -573,7 +570,7 @@ export default function PostDetail() {
                     </div>
                   ) : (
                     /* Generate Link or Continue Button */
-                    <div className="w-full flex justify-center py-2" style={{ margin: 0, padding: 0 }}>
+                    <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
                       {currentStep === 3 ? (
                         <button
                           onClick={handleFinalRedirect}
@@ -599,12 +596,11 @@ export default function PostDetail() {
                     key={`post-bottom-mid-${currentStep}`}
                     slot="5754054742"
                     format="auto"
-                    minHeight="250px"
                     style={{ margin: 0, padding: 0 }}
                   />
 
                   {/* Bottom relaxed Ad - always visible */}
-                  <AdUnit key={`post-bottom-relax-${currentStep}`} slot="8617081290" format="autorelaxed" minHeight="280px" />
+                  <AdUnit key={`post-bottom-relax-${currentStep}`} slot="8617081290" format="autorelaxed" />
                 </div>
               )}
 

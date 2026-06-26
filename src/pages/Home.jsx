@@ -257,52 +257,54 @@ export default function Home() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
-      
       {/* Safelink Verification Widget */}
       {showVerification && (
-        <div className="bg-gradient-to-r from-indigo-50/60 to-purple-50/60 dark:from-zinc-900/40 dark:to-zinc-900/20 border border-indigo-100/80 dark:border-zinc-800 rounded-3xl p-6 sm:p-10 flex flex-col items-center justify-center text-center gap-6 mb-12 shadow-md backdrop-blur-md">
-          <div className="flex flex-col items-center gap-2">
-            <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-heading tracking-tight flex items-center gap-2">
-              <ShieldCheck className="w-6.5 h-6.5 text-indigo-650 dark:text-indigo-400" /> Gateway Security Verification
-            </h2>
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 max-w-sm">
-              Verify your session parameters to proceed to the secure portal destination.
-            </p>
-          </div>
-
+        <div className="flex flex-col items-center justify-center my-6 gap-2">
           {/* Ad ABOVE checkbox */}
-          <div className="w-full flex items-center justify-center my-2">
-            <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" minHeight="250px" />
+          <div className="w-full flex items-center justify-center" style={{ margin: 0, padding: 0 }}>
+            <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" />
           </div>
 
-          <div className="flex items-center gap-5 bg-white dark:bg-zinc-950 px-6 py-4.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-850/80 shadow-sm min-w-[280px] sm:min-w-[340px] justify-between transition-all duration-300">
-            <div className="flex items-center gap-3.5">
+          {/* Exact Replica of Google reCAPTCHA Box */}
+          <div className="recaptcha-box flex items-center justify-between" style={{ margin: 0 }}>
+            <div className="flex items-center gap-3">
               {verifying ? (
-                <div className="w-5.5 h-5.5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-7 h-7 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
               ) : verified ? (
-                <div className="w-5.5 h-5.5 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">✓</div>
+                <svg className="w-7 h-7 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
               ) : (
                 <input
                   type="checkbox"
                   id="not-robot"
-                  className="w-5.5 h-5.5 rounded-lg border-zinc-350 text-indigo-650 focus:ring-indigo-500 cursor-pointer transition-all duration-150"
+                  className="w-7 h-7 border-2 border-zinc-350 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-blue-600 rounded-sm focus:ring-0 cursor-pointer"
+                  style={{ width: '28px', height: '28px' }}
                   onChange={handleRobotCheck}
                 />
               )}
-              <label htmlFor="not-robot" className="text-xs sm:text-sm font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
-                {verifying ? 'Checking browser parameters...' : verified ? 'Verification Complete' : "I'm not a robot"}
+              <label htmlFor="not-robot" className="text-[15px] font-normal text-zinc-900 dark:text-zinc-100 cursor-pointer select-none font-sans pl-1">
+                {verifying ? 'Verifying...' : verified ? 'Verified' : "I'm not a robot"}
               </label>
             </div>
 
-            <div className="flex flex-col items-center gap-0.5 opacity-60">
-              <span className="text-[9px] text-zinc-400 font-extrabold uppercase tracking-widest">v3-Shield</span>
+            {/* Google Logo & Privacy/Terms */}
+            <div className="flex flex-col items-center justify-center">
+              <svg className="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              <div className="text-[8px] text-zinc-400 font-medium font-sans flex flex-col items-center leading-none mt-1">
+                <span className="font-semibold text-zinc-500 dark:text-zinc-350 text-[10px]">reCAPTCHA</span>
+                <span className="mt-0.5"><a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer" className="hover:underline text-zinc-400">Privacy</a> - <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer" className="hover:underline text-zinc-400">Terms</a></span>
+              </div>
             </div>
           </div>
 
           {/* Ad BELOW checkbox */}
-          <div className="w-full flex flex-col gap-4 mt-2">
-            <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
-            <AdUnit key={`home-robot-ad3-${safelinkTarget}`} slot="5754054742" format="auto" minHeight="250px" />
+          <div className="w-full flex flex-col gap-0 mt-1" style={{ margin: 0, padding: 0 }}>
+            <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" />
+            <AdUnit key={`home-robot-ad3-${safelinkTarget}`} slot="5754054742" format="auto" />
           </div>
         </div>
       )}
