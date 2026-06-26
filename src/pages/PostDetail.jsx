@@ -174,12 +174,12 @@ export default function PostDetail() {
               'author': {
                 '@type': 'Person',
                 'name': 'SarkariTrend Editorial Team',
-                'url': 'https://sarkaritrend.news/about',
+                'url': 'https://sarkaritrend.vercel.app/about',
               },
               'publisher': {
-                '@id': 'https://sarkaritrend.news/#organization',
+                '@id': 'https://sarkaritrend.vercel.app/#organization',
               },
-              'isPartOf': { '@id': 'https://sarkaritrend.news/#website' },
+              'isPartOf': { '@id': 'https://sarkaritrend.vercel.app/#website' },
               'url': window.location.href,
               'mainEntityOfPage': window.location.href,
               'keywords': data.labels ? data.labels.join(', ') : 'sarkari job, government job, India',
@@ -198,13 +198,13 @@ export default function PostDetail() {
                   '@type': 'ListItem',
                   'position': 1,
                   'name': 'Home',
-                  'item': 'https://sarkaritrend.news/',
+                  'item': 'https://sarkaritrend.vercel.app/',
                 },
                 ...(data.labels && data.labels[0] ? [{
                   '@type': 'ListItem',
                   'position': 2,
                   'name': data.labels[0],
-                  'item': `https://sarkaritrend.news/category/${encodeURIComponent(data.labels[0])}`,
+                  'item': `https://sarkaritrend.vercel.app/category/${encodeURIComponent(data.labels[0])}`,
                 }] : []),
                 {
                   '@type': 'ListItem',

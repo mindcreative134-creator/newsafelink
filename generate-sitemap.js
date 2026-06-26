@@ -49,7 +49,7 @@ async function run() {
   const posts = await fetchAllPosts();
   console.log(`Fetched ${posts.length} posts successfully.`);
 
-  const baseUrl = 'https://sarkaritrend.news';
+  const baseUrl = 'https://sarkaritrend.vercel.app';
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 

@@ -86,5 +86,5 @@ User-agent: *
 Allow: /
 
 # ── Sitemap ───────────────────────────────────────────────────
-Sitemap: https://sarkaritrend.news/sitemap.xml
+Sitemap: https://sarkaritrend.vercel.app/sitemap.xml
 Sitemap: https://www.blogger.com/feeds/6924208631263306852/posts/default
