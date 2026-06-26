@@ -289,11 +289,13 @@ ins.adsbygoogle[data-ad-status="unfilled"],
   padding: 0 !important;
 }
 
-/* Force zero margins and paddings for all AdSense wrappers, slots, and iframes to eliminate spacing gaps */
+/* Force zero margins and paddings for all AdSense elements, wrappers, slots, iframes, and sub-elements */
 .ad-unit-wrapper,
-.ad-unit-wrapper ins.adsbygoogle,
-.ad-unit-wrapper ins.adsbygoogle iframe,
-.ad-unit-wrapper iframe {
+.ad-unit-wrapper *,
+.ad-unit-wrapper ins,
+.ad-unit-wrapper ins *,
+.ad-unit-wrapper iframe,
+.ad-unit-wrapper iframe * {
   margin: 0 !important;
   padding: 0 !important;
 }
