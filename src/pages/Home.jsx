@@ -259,16 +259,7 @@ export default function Home() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
       {/* Safelink Verification Widget */}
       {showVerification && (
-        <div className="w-full max-w-xl mx-auto bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] overflow-hidden shadow-sm p-6 sm:p-8 flex flex-col items-center gap-5 my-8 transition-all">
-          <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200">
-            <ShieldCheck className="w-5.5 h-5.5 text-indigo-600 dark:text-indigo-450" />
-            <span className="text-xs font-black uppercase tracking-wider font-heading">Security Verification Gate</span>
-          </div>
-          
-          <p className="text-xs sm:text-sm font-semibold text-zinc-500 dark:text-zinc-450 text-center max-w-sm">
-            Please complete the security check below to verify your session and transit to your target URL destination.
-          </p>
-
+        <div className="w-full flex flex-col items-center justify-center my-6" style={{ gap: 0, margin: 0, padding: 0 }}>
           {/* Ad ABOVE checkbox */}
           <div className="w-full flex items-center justify-center home-robot-ad-container" style={{ margin: 0, padding: 0 }}>
             <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" />
