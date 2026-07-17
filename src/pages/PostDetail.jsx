@@ -69,7 +69,7 @@ function PostDetailSkeleton() {
 function LivingBanner() {
   return (
     <a
-      href="https://www.effectivecpmnetwork.com/wm9u7q6i7?key=2322f579e7bdafc50bc0259df918895f"
+      href="https://www.effectivecpmnetwork.com/a68j5jmk?key=c8c5452b8453670bac43efdd5523db83"
       target="_blank"
       rel="noopener noreferrer"
       className="living-banner-container block no-underline"
@@ -116,7 +116,7 @@ function LivingBanner() {
 }
 
 // Direct Link Banner component for popup modal
-const POPUP_DIRECT_LINK = "https://www.effectivecpmnetwork.com/wm9u7q6i7?key=2322f579e7bdafc50bc0259df918895f";
+const POPUP_DIRECT_LINK = "https://www.effectivecpmnetwork.com/a68j5jmk?key=c8c5452b8453670bac43efdd5523db83";
 
 function PopupDirectLinkBanner({ onClick }) {
   return (
