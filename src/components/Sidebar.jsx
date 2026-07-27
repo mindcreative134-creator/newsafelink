@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPosts } from '../services/bloggerApi';
-import { Rss, Folder, Image, Star } from 'lucide-react';
+import { Rss, Folder, Star, ShieldCheck, Sparkles, Send, ArrowUpRight, Flame } from 'lucide-react';
 import AdUnit from './AdUnit';
 
 export default function Sidebar({ hideAds = false }) {
@@ -9,7 +9,7 @@ export default function Sidebar({ hideAds = false }) {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    getPosts({ maxResults: 5 })
+    getPosts({ maxResults: 6 })
       .then((data) => {
         if (data.items) {
           setRecentPosts(data.items);
@@ -19,7 +19,7 @@ export default function Sidebar({ hideAds = false }) {
               post.labels.forEach((label) => labelsSet.add(label));
             }
           });
-          setCategories(Array.from(labelsSet).slice(0, 8));
+          setCategories(Array.from(labelsSet).slice(0, 10));
         }
       })
       .catch(() => {});
@@ -27,74 +27,100 @@ export default function Sidebar({ hideAds = false }) {
 
   return (
     <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8">
-      {/* About Me Widget */}
-      <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
-        <h3 className="text-base font-extrabold text-zinc-900 dark:text-white mb-4 border-b border-zinc-100 dark:border-zinc-800/60 pb-3 flex items-center gap-2 font-heading">
-          <Star className="w-4 h-4 text-indigo-500" /> About SarkariTrend
-        </h3>
-        <p className="text-sm text-zinc-655 dark:text-zinc-400 leading-relaxed font-medium">
-          Welcome to SarkariTrend! We provide official exam updates, government job vacancies notifications, career counseling guides, and secure web gateways.
-        </p>
-      </div>
+      
+      {/* ── Official Trust & Portal Info Widget ── */}
+      <div className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-purple-950 border border-indigo-700/40 rounded-[28px] p-6 text-white shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+        
+        <div className="flex items-center gap-2 mb-3">
+          <span className="p-1.5 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+            <ShieldCheck className="w-5 h-5 text-amber-400" />
+          </span>
+          <span className="text-xs font-black uppercase tracking-wider text-indigo-200">Official Portal</span>
+        </div>
 
-      {/* Categories Widget */}
-      <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
-        <h3 className="text-base font-extrabold text-zinc-900 dark:text-white mb-4 border-b border-zinc-100 dark:border-zinc-800/60 pb-3 flex items-center gap-2 font-heading">
-          <Folder className="w-4 h-4 text-indigo-500" /> Categories
+        <h3 className="text-lg font-black font-heading text-white mb-2 leading-tight">
+          SarkariTrend Alerts
         </h3>
-        <div className="flex flex-wrap gap-2.5">
-          {categories.map((cat) => {
-            // Pick a styling based on tag
-            let tagClass = 'bg-zinc-100/60 dark:bg-zinc-800/40 text-zinc-700 dark:text-zinc-300 border border-zinc-200/50 dark:border-zinc-800/50 hover:border-indigo-250 dark:hover:border-indigo-900/50 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 hover:text-indigo-650 dark:hover:text-indigo-400';
-            if (cat.toLowerCase().includes('tech')) {
-              tagClass = 'badge-tech';
-            } else if (cat.toLowerCase().includes('design')) {
-              tagClass = 'badge-design';
-            } else if (cat.toLowerCase().includes('work') || cat.toLowerCase().includes('job')) {
-              tagClass = 'badge-work';
-            } else if (cat.toLowerCase().includes('analytics')) {
-              tagClass = 'badge-analytics';
-            }
-            return (
-              <Link
-                key={cat}
-                to={`/category/${encodeURIComponent(cat)}`}
-                className={`inline-block px-3 py-1.5 text-xs font-bold rounded-xl transition-all duration-200 ${tagClass}`}
-              >
-                {cat}
-              </Link>
-            );
-          })}
+        
+        <p className="text-xs text-indigo-200/90 leading-relaxed mb-4 font-medium">
+          India's trusted destination for genuine government job vacancy updates, admit cards, exam answer keys, and education news.
+        </p>
+
+        <div className="flex items-center gap-4 pt-2 border-t border-indigo-800/60 text-[11px] font-bold text-indigo-300">
+          <span className="flex items-center gap-1">✅ Verified Source</span>
+          <span className="flex items-center gap-1">⚡ Daily Updates</span>
         </div>
       </div>
 
-      {/* Ad Placement */}
+      {/* ── Instant Telegram / Social Join Banner Widget ── */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[28px] p-6 text-white shadow-lg shadow-blue-600/20 flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <span className="px-3 py-1 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-wider">
+            FREE JOB ALERTS
+          </span>
+          <Send className="w-5 h-5 text-blue-200" />
+        </div>
+        <h4 className="text-base font-black font-heading leading-tight">
+          Get Instant Govt Job Updates on Telegram
+        </h4>
+        <p className="text-xs text-blue-100 font-medium">
+          Never miss an application deadline! Join 50,000+ job seekers.
+        </p>
+        <a
+          href="https://t.me"
+          target="_blank"
+          rel="noreferrer"
+          className="mt-1 px-4 py-2.5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs text-center uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5"
+        >
+          Join Telegram Channel <ArrowUpRight className="w-4 h-4" />
+        </a>
+      </div>
+
+      {/* ── Trending Categories Widget ── */}
+      <div className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] p-6 shadow-sm">
+        <h3 className="text-base font-black text-zinc-900 dark:text-white mb-4 border-b border-zinc-100 dark:border-zinc-800/80 pb-3 flex items-center gap-2 font-heading">
+          <Folder className="w-4.5 h-4.5 text-indigo-600" /> Trending Topics
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <Link
+              key={cat}
+              to={`/category/${encodeURIComponent(cat)}`}
+              className="inline-block px-3.5 py-1.5 text-xs font-extrabold rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+            >
+              {cat}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Ad Unit Slot ── */}
       {!hideAds && (
-        <div className="adsense-container w-full overflow-hidden flex items-center justify-center p-2">
+        <div className="adsense-container w-full overflow-hidden flex items-center justify-center p-2 rounded-[28px]">
           <AdUnit slot="7317709042" format="auto" minHeight="250px" />
         </div>
       )}
 
-      {/* Recent Posts Widget */}
-      <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
-        <h3 className="text-base font-extrabold text-zinc-900 dark:text-white mb-4 border-b border-zinc-100 dark:border-zinc-800/60 pb-3 flex items-center gap-2 font-heading">
-          <Rss className="w-4 h-4 text-indigo-500" /> Recent Posts
+      {/* ── Recent Articles Widget ── */}
+      <div className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] p-6 shadow-sm">
+        <h3 className="text-base font-black text-zinc-900 dark:text-white mb-4 border-b border-zinc-100 dark:border-zinc-800/80 pb-3 flex items-center gap-2 font-heading">
+          <Flame className="w-4.5 h-4.5 text-amber-500" /> Recent Updates
         </h3>
-        <ul className="flex flex-col gap-5">
+        <ul className="flex flex-col gap-4">
           {recentPosts.map((post) => {
-            // Extract image or use fallback
-            const postImg = post.content?.match(/<img[^>]+src="([^">]+)"/) ? post.content.match(/<img[^>]+src="([^">]+)"/)[1] : 'https://picsum.photos/400/250';
+            const postImg = post.content?.match(/<img[^>]+src="([^">]+)"/) ? post.content.match(/<img[^>]+src="([^">]+)"/)[1] : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=200&auto=format&fit=crop&q=80';
             return (
-              <li key={post.id} className="flex gap-4 group">
-                <Link to={`/post/${post.id}`} className="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 border border-zinc-150 dark:border-zinc-800 shadow-sm relative block">
-                  <img src={postImg} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <li key={post.id} className="flex gap-3.5 group items-center">
+                <Link to={`/post/${post.id}`} className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 border border-zinc-200/60 dark:border-zinc-800 shadow-sm relative block bg-zinc-100 dark:bg-zinc-800">
+                  <img src={postImg} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                 </Link>
-                <div className="flex flex-col gap-1.5 min-w-0">
-                  <Link to={`/post/${post.id}`} className="text-xs font-bold text-zinc-900 dark:text-white hover:text-indigo-650 dark:hover:text-indigo-400 line-clamp-2 leading-snug transition-colors">
+                <div className="flex flex-col gap-1 min-w-0">
+                  <Link to={`/post/${post.id}`} className="text-xs font-bold text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug transition-colors">
                     {post.title}
                   </Link>
-                  <span className="text-[10px] text-zinc-400 dark:text-zinc-550 font-bold uppercase tracking-wider">
-                    {new Date(post.published).toLocaleDateString()}
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-extrabold uppercase tracking-wider">
+                    {new Date(post.published).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                   </span>
                 </div>
               </li>
@@ -102,6 +128,7 @@ export default function Sidebar({ hideAds = false }) {
           })}
         </ul>
       </div>
+
     </aside>
   );
 }

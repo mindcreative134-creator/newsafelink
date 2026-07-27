@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { getPosts } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
-import { Calendar, User, ArrowRight, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Calendar, User, ArrowRight, ShieldCheck, RefreshCw, Sparkles, TrendingUp, Award, FileText, CheckCircle2, Bookmark, Clock } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
 
 // Card skeleton component
 function PostCardSkeleton() {
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm flex flex-col animate-pulse">
+    <div className="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl overflow-hidden shadow-sm flex flex-col animate-pulse">
       <div className="aspect-video w-full bg-zinc-200 dark:bg-zinc-800" />
-      <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+      <div className="p-6 flex-1 flex flex-col justify-between gap-4">
         <div className="flex flex-col gap-3">
           <div className="flex gap-3">
             <div className="h-3.5 w-16 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
@@ -24,7 +24,7 @@ function PostCardSkeleton() {
             <div className="h-3 w-5/6 bg-zinc-200 dark:bg-zinc-800 rounded" />
           </div>
         </div>
-        <div className="h-4 w-20 bg-zinc-200 dark:bg-zinc-800 rounded-full mt-2" />
+        <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-full mt-2" />
       </div>
     </div>
   );
@@ -33,38 +33,15 @@ function PostCardSkeleton() {
 // Hero featured card skeleton component
 function FeaturedPostSkeleton() {
   return (
-    <div className="bg-zinc-200 dark:bg-zinc-900 h-96 rounded-[32px] animate-pulse flex flex-col justify-end p-6 sm:p-12 gap-4 mb-12">
-      <div className="h-6 w-24 bg-zinc-300 dark:bg-zinc-800 rounded-full" />
-      <div className="h-10 w-3/4 bg-zinc-300 dark:bg-zinc-800 rounded-lg" />
+    <div className="bg-zinc-200 dark:bg-zinc-900 h-[420px] rounded-[32px] animate-pulse flex flex-col justify-end p-6 sm:p-12 gap-4 mb-12">
+      <div className="h-6 w-28 bg-zinc-300 dark:bg-zinc-800 rounded-full" />
+      <div className="h-10 w-3/4 bg-zinc-300 dark:bg-zinc-800 rounded-xl" />
       <div className="space-y-2 max-w-2xl">
         <div className="h-4 w-full bg-zinc-300 dark:bg-zinc-800 rounded" />
         <div className="h-4 w-5/6 bg-zinc-300 dark:bg-zinc-800 rounded" />
       </div>
-      <div className="h-12 w-40 bg-zinc-300 dark:bg-zinc-800 rounded-xl mt-2" />
+      <div className="h-12 w-44 bg-zinc-300 dark:bg-zinc-800 rounded-2xl mt-2" />
     </div>
-  );
-}
-
-// Sidebar widget skeleton component
-function SidebarSkeleton() {
-  return (
-    <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8 animate-pulse">
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm">
-        <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 rounded mb-4" />
-        <div className="space-y-2">
-          <div className="h-3 w-full bg-zinc-200 dark:bg-zinc-800 rounded" />
-          <div className="h-3 w-5/6 bg-zinc-200 dark:bg-zinc-800 rounded" />
-        </div>
-      </div>
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm">
-        <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-800 rounded mb-4" />
-        <div className="flex flex-wrap gap-2">
-          <div className="h-7 w-16 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
-          <div className="h-7 w-12 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
-          <div className="h-7 w-20 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
-        </div>
-      </div>
-    </aside>
   );
 }
 
@@ -85,7 +62,6 @@ function HomeSkeleton() {
             <PostCardSkeleton />
           </div>
         </div>
-        <SidebarSkeleton />
       </div>
     </div>
   );
@@ -113,8 +89,6 @@ export default function Home() {
 
     if (oParam || urlParam) {
       const target = oParam ? `https://piko.site.je/?o=${oParam}` : urlParam;
-      
-      // Store target, but don't redirect yet! Show "I am not robot" check block
       setSafelinkTarget(target);
       setShowVerification(true);
     }
@@ -126,7 +100,6 @@ export default function Home() {
       setVerifying(false);
       setVerified(true);
       
-      // Perform safelink initiation and navigate to random post
       startSafelink(safelinkTarget);
       
       getPosts({ maxResults: 15 }).then((data) => {
@@ -141,11 +114,10 @@ export default function Home() {
 
   // Fetch posts for standard display
   useEffect(() => {
-    document.title = "SarkariTrend News - Career Guidance and Education";
+    document.title = "SarkariTrend - Official Govt Job Notifications & Exam Updates";
     
-    // Update Meta Description
     let metaDesc = document.querySelector('meta[name="description"]');
-    const descText = "SarkariTrend News is a premium online hub featuring career guidance, education updates, trending news, secure gateway integrations, and job notification updates.";
+    const descText = "SarkariTrend is India's trusted portal for government job notifications, admit cards, exam results, syllabus, and career guidance updates.";
     if (metaDesc) {
       metaDesc.setAttribute('content', descText);
     } else {
@@ -155,7 +127,6 @@ export default function Home() {
       document.head.appendChild(metaDesc);
     }
 
-    // Update Canonical URL
     let canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) {
       canonical.setAttribute('href', window.location.href);
@@ -166,14 +137,14 @@ export default function Home() {
       document.head.appendChild(canonical);
     }
 
-    getPosts({ maxResults: 10 })
+    getPosts({ maxResults: 13 })
       .then((data) => {
         if (data.items && data.items.length > 0) {
           setFeaturedPost(data.items[0]);
           setPosts(data.items.slice(1));
           setNextPageToken(data.nextPageToken || '');
 
-          // ── JSON-LD ItemList Schema for AI SEO ──
+          // JSON-LD Schema
           const existingHomeSchema = document.querySelector('script[data-home-schema]');
           if (existingHomeSchema) existingHomeSchema.remove();
 
@@ -244,23 +215,30 @@ export default function Home() {
   }
 
   const getPostImage = (post) => {
-    if (!post.content) return 'https://picsum.photos/600/400';
+    if (!post.content) return 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80';
     const match = post.content.match(/<img[^>]+src="([^">]+)"/);
-    return match ? match[1] : 'https://picsum.photos/600/400';
+    return match ? match[1] : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80';
   };
 
-  const getExcerpt = (content, limit = 150) => {
+  const getExcerpt = (content, limit = 140) => {
     if (!content) return '';
     const plainText = content.replace(/<\/?[^>]+(>|$)/g, "");
     return plainText.length > limit ? plainText.substring(0, limit) + '...' : plainText;
   };
 
+  const getReadTime = (content) => {
+    if (!content) return '3 min';
+    const words = content.replace(/<\/?[^>]+(>|$)/g, "").split(/\s+/).length;
+    const mins = Math.ceil(words / 200);
+    return `${mins} min read`;
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
+      
       {/* Safelink Verification Widget */}
       {showVerification && (
         <div className="w-full flex flex-col items-center justify-center my-6" style={{ gap: 0, margin: 0, padding: 0 }}>
-          {/* Ad ABOVE checkbox */}
           <div className="w-full flex items-center justify-center home-robot-ad-container" style={{ margin: 0, padding: 0 }}>
             <AdUnit key={`home-robot-ad1-${safelinkTarget}`} slot="7317709042" format="auto" style={{ margin: 0, padding: 0 }} />
           </div>
@@ -269,16 +247,16 @@ export default function Home() {
           <div className="recaptcha-box flex items-center justify-between" style={{ margin: 0 }}>
             <div className="flex items-center gap-3">
               {verifying ? (
-                <div className="w-7 h-7 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-7 h-7 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
               ) : verified ? (
-                <svg className="w-7 h-7 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-7 h-7 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               ) : (
                 <input
                   type="checkbox"
                   id="not-robot"
-                  className="w-7 h-7 border-2 border-zinc-350 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-blue-600 rounded-sm focus:ring-0 cursor-pointer"
+                  className="w-7 h-7 border-2 border-zinc-350 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-indigo-600 rounded-sm focus:ring-0 cursor-pointer"
                   style={{ width: '28px', height: '28px' }}
                   onChange={handleRobotCheck}
                 />
@@ -288,9 +266,8 @@ export default function Home() {
               </label>
             </div>
 
-            {/* Google Logo & Privacy/Terms */}
             <div className="flex flex-col items-center justify-center">
-              <svg className="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-8 h-8 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 <path d="m9 12 2 2 4-4" />
               </svg>
@@ -301,7 +278,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Ad BELOW checkbox */}
           <div className="w-full flex flex-col gap-0" style={{ margin: 0, padding: 0 }}>
             <AdUnit key={`home-robot-ad2-${safelinkTarget}`} slot="1909584638" format="auto" style={{ margin: 0, padding: 0 }} />
             <AdUnit key={`home-robot-ad3-${safelinkTarget}`} slot="5754054742" format="auto" style={{ margin: 0, padding: 0 }} />
@@ -309,90 +285,134 @@ export default function Home() {
         </div>
       )}
 
-      {/* Featured/Hero Post */}
+      {/* ── Featured / Hero Showcase Banner ── */}
       {featuredPost && !showVerification && (
-        <div className="relative bg-zinc-900 rounded-[32px] overflow-hidden shadow-xl mb-12 group border border-zinc-200/10">
+        <div className="relative bg-zinc-950 rounded-[36px] overflow-hidden shadow-2xl mb-12 group border border-zinc-800/80">
           <div className="absolute inset-0">
             <img
               src={getPostImage(featuredPost)}
               alt={featuredPost.title}
-              className="w-full h-full object-cover opacity-60 group-hover:scale-[1.02] transition-transform duration-700"
+              className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700 ease-out"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/20" />
           </div>
 
-          <div className="relative max-w-3xl px-6 py-24 sm:px-12 sm:py-32 lg:px-16 flex flex-col items-start gap-4">
-            {featuredPost.labels && (
-              <span className="px-3 py-1 text-xs font-bold uppercase rounded-full bg-indigo-600 text-white shadow-sm">
-                Featured • {featuredPost.labels[0]}
+          <div className="relative max-w-4xl px-6 py-16 sm:px-12 sm:py-24 lg:px-16 flex flex-col items-start gap-5">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 text-xs font-black uppercase tracking-wider rounded-full bg-gradient-to-r from-amber-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20">
+                <Sparkles className="w-3.5 h-3.5 fill-white" /> FEATURED STORY
               </span>
-            )}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight font-heading">
+              {featuredPost.labels && (
+                <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-white/10 text-zinc-200 backdrop-blur-md border border-white/10">
+                  {featuredPost.labels[0]}
+                </span>
+              )}
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight font-heading drop-shadow-md">
               {featuredPost.title}
             </h1>
-            <p className="text-zinc-300 text-sm sm:text-base leading-relaxed max-w-2xl font-medium">
-              {getExcerpt(featuredPost.content, 220)}
+
+            <p className="text-zinc-300 text-sm sm:text-base leading-relaxed max-w-3xl font-medium line-clamp-3">
+              {getExcerpt(featuredPost.content, 240)}
             </p>
-            <button
-              onClick={() => navigate(`/post/${featuredPost.id}`)}
-              className="inline-flex items-center justify-center px-6 py-3.5 border border-transparent text-sm font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all gap-2"
-            >
-              Read Full Article <ArrowRight className="w-4 h-4" />
-            </button>
+
+            <div className="flex flex-wrap items-center gap-6 pt-2">
+              <button
+                onClick={() => navigate(`/post/${featuredPost.id}`)}
+                className="inline-flex items-center justify-center px-7 py-3.5 border border-transparent text-sm font-black rounded-2xl text-white bg-indigo-600 hover:bg-indigo-500 shadow-xl shadow-indigo-600/30 active:scale-95 transition-all gap-2.5"
+              >
+                Read Full Article <ArrowRight className="w-4 h-4" />
+              </button>
+              <div className="flex items-center gap-4 text-xs font-semibold text-zinc-400">
+                <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-indigo-400" /> {new Date(featuredPost.published).toLocaleDateString()}</span>
+                <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-indigo-400" /> {getReadTime(featuredPost.content)}</span>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Main Grid + Sidebar Layout */}
-      <div className="flex flex-col lg:flex-row gap-12">
-        {/* Posts Grid Column */}
-        <main className="flex-1 flex flex-col gap-10">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-white pb-3 border-b border-zinc-200 dark:border-zinc-800/80 font-heading tracking-tight flex items-center gap-2">
-            <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span> Latest Announcements
-          </h2>
+      {/* ── Quick Category Strip ── */}
+      {!showVerification && (
+        <div className="mb-10 overflow-x-auto pb-2 scrollbar-none">
+          <div className="flex items-center gap-3 min-w-max">
+            <span className="text-xs font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 flex items-center gap-1 pr-2">
+              <TrendingUp className="w-4 h-4 text-indigo-500" /> TOP SECTIONS:
+            </span>
+            {['Latest Jobs', 'Admit Cards', 'Results', 'Answer Key', 'Syllabus', 'Tech & Career'].map((section) => (
+              <button
+                key={section}
+                onClick={() => navigate(`/category/${encodeURIComponent(section)}`)}
+                className="px-4 py-2 rounded-2xl text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm hover:shadow-md"
+              >
+                {section}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
+      {/* ── Main Grid & Sidebar Layout ── */}
+      <div className="flex flex-col lg:flex-row gap-10">
+        
+        {/* Main Feed Column */}
+        <main className="flex-1 flex flex-col gap-8">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
+            <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-heading tracking-tight flex items-center gap-2.5">
+              <span className="w-2 h-7 bg-indigo-600 rounded-full"></span> Latest Notifications & News
+            </h2>
+            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+              Updated Today
+            </span>
+          </div>
+
+          {/* Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post, index) => (
               <React.Fragment key={post.id}>
                 <article
-                  className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group"
+                  className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col group"
                 >
-                  {/* Image */}
+                  {/* Thumbnail Image */}
                   <div
                     onClick={() => navigate(`/post/${post.id}`)}
-                    className="aspect-video w-full overflow-hidden cursor-pointer relative"
+                    className="aspect-video w-full overflow-hidden cursor-pointer relative bg-zinc-100 dark:bg-zinc-800"
                   >
                     <img
                       src={getPostImage(post)}
                       alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     />
                     {post.labels && (
-                      <span className="absolute top-3.5 left-3.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-600/20">
+                      <span className="absolute top-3.5 left-3.5 px-3 py-1 text-[9px] font-black uppercase tracking-wider rounded-xl bg-indigo-600/90 text-white backdrop-blur-md shadow-md shadow-indigo-600/20">
                         {post.labels[0]}
                       </span>
                     )}
                   </div>
 
-                  {/* Content */}
-                  <div className="p-6 flex-1 flex flex-col justify-between gap-5">
+                  {/* Body Content */}
+                  <div className="p-6 flex-1 flex flex-col justify-between gap-4">
                     <div className="flex flex-col gap-3">
-                      <div className="flex items-center text-[9px] font-black text-zinc-400 dark:text-zinc-500 gap-3.5 uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-indigo-550" />
-                          {new Date(post.published).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      <div className="flex items-center text-[10px] font-extrabold text-zinc-400 dark:text-zinc-500 gap-3 uppercase tracking-wider">
+                        <span className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(post.published).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                         </span>
-                        <span className="flex items-center gap-1.5">
-                          <User className="w-3.5 h-3.5 text-indigo-550" />
-                          Staff Writer
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {getReadTime(post.content)}
                         </span>
                       </div>
+
                       <h3
                         onClick={() => navigate(`/post/${post.id}`)}
-                        className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug cursor-pointer font-heading transition-colors"
+                        className="text-base sm:text-lg font-black text-zinc-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug cursor-pointer font-heading transition-colors"
                       >
                         {post.title}
                       </h3>
+
                       <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm line-clamp-3 leading-relaxed font-medium">
                         {getExcerpt(post.content, 120)}
                       </p>
@@ -400,16 +420,16 @@ export default function Home() {
 
                     <button
                       onClick={() => navigate(`/post/${post.id}`)}
-                      className="inline-flex items-center text-indigo-600 dark:text-indigo-400 font-extrabold text-xs gap-1.5 self-start group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors"
+                      className="inline-flex items-center text-indigo-600 dark:text-indigo-400 font-extrabold text-xs gap-1.5 self-start group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors pt-1"
                     >
-                      Read Full Article <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                      Read Full Story <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                     </button>
                   </div>
                 </article>
 
-                {/* In-feed Ad after the 3rd post */}
+                {/* In-feed Ad Unit after 3rd post */}
                 {index === 2 && (
-                  <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] p-4 flex items-center justify-center min-h-[120px]">
+                  <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] p-4 flex items-center justify-center min-h-[120px]">
                     <AdUnit key={`home-list-ad-${index}`} slot="1909584638" format="fluid" layoutKey="-6t+ed+2i-1n-4w" minHeight="120px" />
                   </div>
                 )}
@@ -423,11 +443,11 @@ export default function Home() {
               <button
                 onClick={loadMore}
                 disabled={loading}
-                className="px-6 py-3.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 text-xs font-bold uppercase tracking-wider rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 shadow-sm"
+                className="px-7 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider rounded-2xl transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-indigo-600/20 active:scale-95"
               >
                 {loading ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" /> Loading Articles...
+                    <RefreshCw className="w-4 h-4 animate-spin" /> Fetching More Articles...
                   </>
                 ) : (
                   'Load More Articles'

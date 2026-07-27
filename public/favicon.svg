@@ -1,22 +1,98 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4f46e5"/>
-      <stop offset="100%" stop-color="#7c3aed"/>
+    <!-- Background Gradient -->
+    <linearGradient id="stBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
     </linearGradient>
-    <linearGradient id="arrow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
-      <stop offset="100%" stop-color="#c4b5fd" stop-opacity="0.9"/>
+
+    <!-- Glassmorphic Glow Gradient -->
+    <linearGradient id="stGlassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.4"/>
+      <stop offset="40%" stop-color="#C7D2FE" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.5"/>
     </linearGradient>
+
+    <!-- Dynamic Ribbon Gradient -->
+    <linearGradient id="stRibbonGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#F3E8FF"/>
+      <stop offset="100%" stop-color="#E0E7FF"/>
+    </linearGradient>
+
+    <!-- Gold Accent Star Gradient -->
+    <linearGradient id="stGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+
+    <!-- Cyan Accent Gradient -->
+    <linearGradient id="stCyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="stShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#090D16" flood-opacity="0.38"/>
+    </filter>
+
+    <filter id="stGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
   </defs>
-  <!-- Rounded square background -->
-  <rect width="64" height="64" rx="14" ry="14" fill="url(#bg)"/>
-  <!-- Subtle inner highlight -->
-  <rect x="1" y="1" width="62" height="31" rx="13" ry="13" fill="white" fill-opacity="0.06"/>
-  <!-- Trending chart icon: line going up-right -->
-  <polyline points="10,46 24,30 34,38 54,16" stroke="url(#arrow)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <!-- Arrow tip at top-right -->
-  <polyline points="44,16 54,16 54,26" stroke="url(#arrow)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <!-- Small dot at start -->
-  <circle cx="10" cy="46" r="3" fill="white" fill-opacity="0.7"/>
+
+  <!-- Background Squircle Container -->
+  <rect x="20" y="20" width="472" height="472" rx="116" fill="url(#stBgGrad)" filter="url(#stShadow)"/>
+
+  <!-- Inner Glass Accent Border -->
+  <rect x="20" y="20" width="472" height="472" rx="116" fill="none" stroke="url(#stGlassGrad)" stroke-width="6"/>
+
+  <!-- Glossy Sheen Overlay -->
+  <path d="M 20 136 C 20 72 72 20 136 20 L 376 20 C 440 20 492 72 492 136 C 492 152 420 188 256 188 C 92 188 20 152 20 136 Z" fill="#FFFFFF" fill-opacity="0.09"/>
+
+  <!-- Logo Mark Group -->
+  <g filter="url(#stShadow)">
+    <!-- Stylized 'S' Ribbon with Upward Trend Arrow -->
+    <!-- Base Shadow Path -->
+    <path d="M 124 350 C 124 382 156 402 206 402 L 290 402 C 348 402 388 372 388 326 C 388 278 338 262 278 250 L 234 242 C 184 232 150 214 150 172 C 150 128 192 98 254 98 L 332 98 C 366 98 392 114 402 130" 
+          fill="none" 
+          stroke="#1E1B4B" 
+          stroke-opacity="0.3" 
+          stroke-width="48" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+
+    <!-- Main White Fluid 'S' Path -->
+    <path d="M 124 346 C 124 378 156 398 206 398 L 290 398 C 348 398 388 368 388 322 C 388 274 338 258 278 246 L 234 238 C 184 228 150 210 150 168 C 150 124 192 94 254 94 L 332 94 C 366 94 392 110 402 126" 
+          fill="none" 
+          stroke="url(#stRibbonGrad)" 
+          stroke-width="44" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+
+    <!-- Upward Trend Arrow (Breakout Top Right) -->
+    <!-- Arrow Stem & Head Base -->
+    <path d="M 310 160 L 396 74" stroke="url(#stRibbonGrad)" stroke-width="44" stroke-linecap="round"/>
+    
+    <!-- Dynamic Arrowhead Polygon -->
+    <path d="M 324 74 L 416 74 L 416 166 L 388 138 L 388 102 L 352 102 Z" fill="url(#stGoldGrad)" filter="url(#stGlow)"/>
+    <path d="M 324 74 L 416 74 L 416 166 L 388 138 L 388 102 L 352 102 Z" fill="#FFFFFF" opacity="0.95"/>
+
+    <!-- Bottom Left Origin Node -->
+    <circle cx="124" cy="346" r="26" fill="url(#stCyanGrad)"/>
+    <circle cx="124" cy="346" r="12" fill="#FFFFFF"/>
+
+    <!-- Golden 4-Point Diamond Sparkle Star (Top Right Accent) -->
+    <g transform="translate(406, 52)">
+      <path d="M 28 0 Q 28 28 56 28 Q 28 28 28 56 Q 28 28 0 28 Q 28 28 28 0 Z" fill="url(#stGoldGrad)"/>
+    </g>
+
+    <!-- Secondary White Diamond Sparkle Star (Left Mid Accent) -->
+    <g transform="translate(94, 134) scale(0.65)">
+      <path d="M 28 0 Q 28 28 56 28 Q 28 28 28 56 Q 28 28 0 28 Q 28 28 28 0 Z" fill="#FFFFFF" opacity="0.85"/>
+    </g>
+  </g>
 </svg>

@@ -1,5 +1,5 @@
 :root {
-  --text: #4b5563;
+  --text: #475569;
   --text-h: #0f172a;
   --bg: #f8fafc;
   --border: #e2e8f0;
@@ -9,10 +9,10 @@
   --accent-bg: rgba(79, 70, 229, 0.08);
   --accent-border: rgba(79, 70, 229, 0.4);
   --social-bg: rgba(241, 245, 249, 0.6);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.06);
+  --shadow: 0 4px 12px -2px rgb(0 0 0 / 0.08);
+  --shadow-md: 0 12px 24px -4px rgb(0 0 0 / 0.12);
+  --shadow-lg: 0 24px 36px -6px rgb(0 0 0 / 0.16);
 
   --sans: 'Inter', system-ui, -apple-system, sans-serif;
   --heading: 'Outfit', system-ui, -apple-system, sans-serif;
@@ -26,7 +26,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Reduce layout shifts */
   font-display: swap;
 }
 
@@ -42,10 +41,10 @@
     --accent-bg: rgba(129, 140, 248, 0.12);
     --accent-border: rgba(129, 140, 248, 0.4);
     --social-bg: rgba(30, 41, 59, 0.6);
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
-    --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
-    --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+    --shadow: 0 4px 14px -2px rgb(0 0 0 / 0.5);
+    --shadow-md: 0 12px 24px -4px rgb(0 0 0 / 0.6);
+    --shadow-lg: 0 24px 36px -6px rgb(0 0 0 / 0.7);
   }
 }
 
