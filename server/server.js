@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
 import Parser from 'rss-parser';
+import * as cheerio from 'cheerio';
+import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -27,71 +29,131 @@ app.use(cors());
 app.use(express.json());
 
 // Blogger Configuration
-const BLOG_ID = process.env.BLOG_ID || '6924208631263306852';
-const CLIENT_ID = process.env.BLOGGER_CLIENT_ID || '';
-const CLIENT_SECRET = process.env.BLOGGER_CLIENT_SECRET || '';
-const REFRESH_TOKEN = process.env.BLOGGER_REFRESH_TOKEN || '';
+const BLOG_ID = process.env.BLOGGER_BLOG_ID || process.env.BLOG_ID || '6924208631263306852';
+const CLIENT_ID = process.env.BLOGGER_CLIENT_ID;
+const CLIENT_SECRET = process.env.BLOGGER_CLIENT_SECRET;
+const REFRESH_TOKEN = process.env.BLOGGER_REFRESH_TOKEN;
 
-// Load / Save Helpers
-function loadJson(file, fallback = []) {
+// ── Helpers for persistent state ──
+function loadJson(filePath, defaultValue) {
   try {
-    if (fs.existsSync(file)) {
-      return JSON.parse(fs.readFileSync(file, 'utf-8'));
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, JSON.stringify(defaultValue, null, 2));
+      return defaultValue;
     }
-  } catch (e) {}
-  return fallback;
-}
-
-function saveJson(file, data) {
-  try {
-    fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
-  } catch (e) {
-    console.error('Error saving file:', file, e.message);
+    const data = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch {
+    return defaultValue;
   }
 }
 
-// Log event helper
+function saveJson(filePath, data) {
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error(`Error saving ${filePath}:`, err.message);
+  }
+}
+
 function logEvent(message, type = 'info') {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] [${type.toUpperCase()}] ${message}`);
   const logs = loadJson(LOGS_FILE, []);
-  const entry = {
-    id: Date.now(),
-    timestamp: new Date().toISOString(),
-    message,
-    type,
-  };
-  logs.unshift(entry);
-  saveJson(LOGS_FILE, logs.slice(0, 50));
-  console.log(`[${entry.type.toUpperCase()}] ${entry.message}`);
+  logs.unshift({ timestamp, message, type });
+  saveJson(LOGS_FILE, logs.slice(0, 100)); // keep last 100 logs
 }
 
 /**
- * Format article into a rich HTML blog post with tables
+ * Direct HTML Web Scraper (Cheerio / BeautifulSoup style as in CodeWithHarry tutorial)
+ * Directly parses HTML, extracts tables, links, titles, and snippets from any regular webpage.
  */
-function buildHtmlArticle(title, description, sourceName, category, link) {
-  const today = new Date().toISOString().split('T')[0];
-  const cleanSummary = (description || title).replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+async function scrapeDirectWebsite(feed) {
+  logEvent(`Scraping website HTML directly with Cheerio: ${feed.url}...`);
+  const response = await axios.get(feed.url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    },
+    timeout: 12000,
+  });
+
+  const $ = cheerio.load(response.data);
+  const items = [];
+  const selector = feed.itemSelector || 'table tr, .post-item, article, .job-item, .entry, li a';
+
+  $(selector).each((_, el) => {
+    let title = '';
+    let link = '';
+    let snippet = '';
+
+    if ($(el).is('tr')) {
+      const linkEl = $(el).find('a').first();
+      title = linkEl.text().trim() || $(el).find('td').first().text().trim();
+      link = linkEl.attr('href') || feed.url;
+      snippet = $(el).text().replace(/\s+/g, ' ').trim();
+    } else {
+      const linkEl = $(el).is('a') ? $(el) : $(el).find('a').first();
+      title = $(el).find('h2, h3, h4, .title').first().text().trim() || linkEl.text().trim();
+      link = linkEl.attr('href') || feed.url;
+      snippet = $(el).find('p, .desc, .summary').first().text().trim() || title;
+    }
+
+    if (link && link.startsWith('/')) {
+      try {
+        const u = new URL(feed.url);
+        link = `${u.origin}${link}`;
+      } catch {
+        // keep link as is
+      }
+    }
+
+    if (title && title.length > 8 && title.length < 250 && link && link.startsWith('http')) {
+      // Deduplicate within this single scrape run
+      if (!items.some((it) => it.title === title)) {
+        items.push({ title, link, contentSnippet: snippet });
+      }
+    }
+  });
+
+  logEvent(`Scraped ${items.length} items from ${feed.name}`, 'info');
+  return items;
+}
+
+/**
+ * Clean AdSense-Compliant HTML Article Builder for Blogger
+ */
+function buildHtmlArticle(title, snippet, sourceName, category, sourceUrl) {
+  const today = new Date().toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
   return `
-    <div style="font-family: Arial, sans-serif; line-height: 1.7; color: #1e293b; max-width: 800px; margin: 0 auto;">
-      <!-- Quick Information Summary -->
-      <div style="background: #f0f4ff; border-left: 5px solid #4f46e5; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px;">
-        <h3 style="margin-top: 0; color: #312e81; font-size: 18px;">📢 Quick Information & Highlights</h3>
-        <p style="margin-bottom: 12px; font-size: 14px;">${cleanSummary}</p>
-        <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+    <div class="sarkari-article" style="font-family: Arial, sans-serif; line-height: 1.7; color: #1e293b; max-width: 800px; margin: 0 auto;">
+      <!-- Top Overview Box -->
+      <div style="background: #f8fafc; border-left: 5px solid #2563eb; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+        <h3 style="margin: 0 0 10px; color: #1e293b; font-size: 18px;">📌 Overview & Quick Facts</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
           <tr>
-            <td style="padding: 6px; font-weight: bold; width: 35%;">Authority / Source:</td>
-            <td style="padding: 6px;">${sourceName}</td>
+            <td style="padding: 6px; font-weight: bold; width: 35%; color: #475569;">Post Name:</td>
+            <td style="padding: 6px; color: #0f172a;">${title}</td>
           </tr>
           <tr>
-            <td style="padding: 6px; font-weight: bold;">Category:</td>
-            <td style="padding: 6px; color: #4f46e5; font-weight: bold;">${category}</td>
+            <td style="padding: 6px; font-weight: bold; color: #475569;">Category:</td>
+            <td style="padding: 6px; color: #2563eb; font-weight: bold;">${category}</td>
           </tr>
           <tr>
-            <td style="padding: 6px; font-weight: bold;">Notification Date:</td>
-            <td style="padding: 6px;">${today}</td>
+            <td style="padding: 6px; font-weight: bold; color: #475569;">Update Date:</td>
+            <td style="padding: 6px; color: #0f172a;">${today}</td>
           </tr>
           <tr>
-            <td style="padding: 6px; font-weight: bold;">Status:</td>
+            <td style="padding: 6px; font-weight: bold; color: #475569;">Source / Board:</td>
+            <td style="padding: 6px; color: #0f172a;">${sourceName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px; font-weight: bold; color: #475569;">Status:</td>
             <td style="padding: 6px; color: #16a34a; font-weight: bold;">Active Online</td>
           </tr>
         </table>
@@ -143,10 +205,13 @@ function buildHtmlArticle(title, description, sourceName, category, link) {
       <!-- Action Button Box -->
       <div style="background: #0f172a; border-radius: 12px; padding: 20px; text-align: center; margin: 30px 0; color: #ffffff;">
         <h4 style="margin: 0 0 12px; color: #f59e0b; font-size: 16px; text-transform: uppercase;">
-          ⚡ Official Direct Links & Access
+          Official Link &amp; Application Portal
         </h4>
-        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-          <a href="${link}" target="_blank" rel="noopener noreferrer" style="background: #4f46e5; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-block;">
+        <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 16px;">
+          Direct link to official advertisement and recruitment portal:
+        </p>
+        <div>
+          <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" style="background: #2563eb; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 15px;">
             🔗 Open Official Notice & Apply Online
           </a>
         </div>
@@ -217,7 +282,7 @@ async function postToBlogger(title, contentHtml, labels = []) {
 }
 
 /**
- * Main Fetch & Post Sync Routine
+ * Main Fetch & Post Sync Routine (Supports both RSS and Direct Cheerio Web Scraping)
  */
 async function syncFeedsToBlogger() {
   logEvent('Starting sync routine across configured sites/feeds...');
@@ -229,12 +294,28 @@ async function syncFeedsToBlogger() {
     if (!feed.enabled) continue;
 
     try {
-      logEvent(`Fetching: ${feed.name}...`);
-      const parsed = await parser.parseURL(feed.url);
+      logEvent(`Processing: ${feed.name} (${feed.type || 'rss'})...`);
+      let items = [];
 
-      if (parsed && Array.isArray(parsed.items)) {
+      if (feed.type === 'scrape') {
+        items = await scrapeDirectWebsite(feed);
+      } else {
+        try {
+          const parsed = await parser.parseURL(feed.url);
+          if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
+            items = parsed.items;
+          } else {
+            throw new Error('No items returned by RSS feed');
+          }
+        } catch (rssErr) {
+          logEvent(`RSS failed for "${feed.name}" (${rssErr.message}). Falling back to Cheerio HTML scraper...`, 'warning');
+          items = await scrapeDirectWebsite(feed);
+        }
+      }
+
+      if (Array.isArray(items) && items.length > 0) {
         // Take up to 2 newest items per feed per sync run
-        for (const item of parsed.items.slice(0, 2)) {
+        for (const item of items.slice(0, 2)) {
           const cleanTitle = (item.title || '').replace(/\s*-\s*[^-]+$/, '').trim();
           if (!cleanTitle || postedCache.has(cleanTitle)) {
             continue;
@@ -242,14 +323,14 @@ async function syncFeedsToBlogger() {
 
           const htmlContent = buildHtmlArticle(
             cleanTitle,
-            item.contentSnippet || item.content || item.summary,
+            item.contentSnippet || item.content || item.summary || cleanTitle,
             feed.name,
             feed.category,
-            item.link || 'https://sarkariresult.com'
+            item.link || feed.url
           );
 
           try {
-            const res = await postToBlogger(cleanTitle, htmlContent, feed.labels || [feed.category]);
+            await postToBlogger(cleanTitle, htmlContent, feed.labels || [feed.category]);
             postedCache.add(cleanTitle);
             newPostsCount++;
             logEvent(`✅ Successfully published: "${cleanTitle}" to Blogger!`, 'success');
@@ -259,7 +340,7 @@ async function syncFeedsToBlogger() {
         }
       }
     } catch (feedErr) {
-      logEvent(`Error fetching ${feed.name}: ${feedErr.message}`, 'error');
+      logEvent(`Error processing ${feed.name}: ${feedErr.message}`, 'error');
     }
   }
 
@@ -290,7 +371,7 @@ app.get('/api/feeds', (req, res) => {
 
 // Add new feed
 app.post('/api/feeds', (req, res) => {
-  const { name, url, category, labels } = req.body;
+  const { name, url, category, type, itemSelector, labels } = req.body;
   if (!name || !url) {
     return res.status(400).json({ error: 'Name and URL are required' });
   }
@@ -301,12 +382,14 @@ app.post('/api/feeds', (req, res) => {
     name,
     url,
     category: category || 'Latest Jobs',
+    type: type || 'rss',
+    itemSelector: itemSelector || '',
     labels: labels || ['Sarkari Update'],
     enabled: true,
   };
   feeds.push(newFeed);
   saveJson(FEEDS_FILE, feeds);
-  logEvent(`Added new feed: ${name}`);
+  logEvent(`Added new source: ${name} (${newFeed.type})`);
   res.json({ success: true, feed: newFeed });
 });
 
@@ -346,7 +429,7 @@ app.get('/', (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>SarkariTrend Blogger Auto-Publisher Bot</title>
+      <title>Sarkari Blogger Auto-Publisher & Web Scraper Bot</title>
       <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-8 font-sans">
@@ -355,9 +438,14 @@ app.get('/', (req, res) => {
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-800 gap-4">
           <div>
-            <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-400 text-xs font-black uppercase tracking-wider">
-              Render Backend Worker
-            </span>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-400 text-xs font-black uppercase tracking-wider">
+                Render Backend Worker
+              </span>
+              <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-black uppercase tracking-wider">
+                Cheerio / BeautifulSoup Web Scraper
+              </span>
+            </div>
             <h1 class="text-3xl font-black text-white mt-1">Sarkari Blogger Auto-Publisher Bot</h1>
             <p class="text-slate-400 text-sm mt-1">
               Target Blog ID: <code class="bg-slate-900 px-2 py-0.5 rounded text-amber-400">${BLOG_ID}</code> | 
@@ -380,8 +468,8 @@ app.get('/', (req, res) => {
             </h3>
             <p class="text-xs leading-relaxed mt-1 opacity-90">
               ${isOauthConfigured 
-                ? 'Your backend server is fully connected to Google Blogger API. New posts from the 6 feeds below are automatically uploaded to your blog.' 
-                : 'To post live on Blogger, set your BLOGGER_CLIENT_ID, BLOGGER_CLIENT_SECRET and BLOGGER_REFRESH_TOKEN in your Render Environment Variables. Until set, the bot runs in simulation/preview mode.'}
+                ? 'Your backend server is fully connected to Google Blogger API. New posts from the configured sites are automatically published.' 
+                : 'To post live on Blogger, set BLOGGER_CLIENT_ID, BLOGGER_CLIENT_SECRET, and BLOGGER_REFRESH_TOKEN in your Render Environment Variables. Until set, the bot runs safely in simulation/preview mode.'}
             </p>
           </div>
         </div>
@@ -389,8 +477,8 @@ app.get('/', (req, res) => {
         <!-- Feeds List -->
         <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 flex flex-col gap-4">
           <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-            <h2 class="text-lg font-black text-white">Connected Target Sites / RSS Feeds (${feeds.length})</h2>
-            <span class="text-xs text-slate-400">All feeds automatically processed</span>
+            <h2 class="text-lg font-black text-white">Connected Target Sites / Scrapers (${feeds.length})</h2>
+            <span class="text-xs text-slate-400">Supports RSS &amp; Direct HTML Scraping</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -398,7 +486,10 @@ app.get('/', (req, res) => {
               <div class="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 flex flex-col justify-between gap-3">
                 <div class="flex items-center justify-between">
                   <span class="font-bold text-sm text-white">${f.name}</span>
-                  <span class="px-2.5 py-0.5 rounded-full bg-indigo-950 text-indigo-300 text-[10px] font-bold uppercase">${f.category}</span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="px-2 py-0.5 rounded-full ${f.type === 'scrape' ? 'bg-emerald-950 text-emerald-400' : 'bg-blue-950 text-blue-400'} text-[9px] font-bold uppercase">${f.type || 'rss'}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 text-[9px] font-bold uppercase">${f.category}</span>
+                  </div>
                 </div>
                 <div class="text-xs text-slate-400 truncate font-mono">${f.url}</div>
                 <div class="flex items-center justify-between pt-2 border-t border-slate-800 text-xs">
@@ -410,12 +501,17 @@ app.get('/', (req, res) => {
           </div>
         </div>
 
-        <!-- Add Feed Form -->
+        <!-- Add Feed / Scraper Form -->
         <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6">
-          <h2 class="text-lg font-black text-white mb-4">Add Another Target Site / RSS Feed</h2>
-          <form onsubmit="addFeed(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <h2 class="text-lg font-black text-white mb-2">Add Target Website / RSS Feed</h2>
+          <p class="text-xs text-slate-400 mb-4">Add any RSS feed link OR any normal website URL (which will be scraped using Cheerio HTML parser).</p>
+          <form onsubmit="addFeed(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <input id="feedName" type="text" placeholder="Site Name (e.g. FreeJobAlert)" required class="px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-            <input id="feedUrl" type="url" placeholder="RSS Feed URL" required class="px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input id="feedUrl" type="url" placeholder="URL (RSS or Webpage)" required class="px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <select id="feedType" class="px-3 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white">
+              <option value="rss">Type: RSS Feed (Auto)</option>
+              <option value="scrape">Type: HTML Web Scraper</option>
+            </select>
             <div class="flex gap-2">
               <select id="feedCategory" class="px-3 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white flex-1">
                 <option value="Latest Jobs">Latest Jobs</option>
@@ -433,11 +529,14 @@ app.get('/', (req, res) => {
 
         <!-- Live Activity Logs -->
         <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6">
-          <h2 class="text-lg font-black text-white mb-4">Live Activity &amp; Posting Logs</h2>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-black text-white">Live Activity &amp; Posting Logs</h2>
+            <button onclick="location.reload()" class="text-xs text-indigo-400 hover:underline">Refresh Logs</button>
+          </div>
           <div class="flex flex-col gap-2 max-h-64 overflow-y-auto font-mono text-xs text-slate-300">
             ${logs.length === 0 ? '<div class="text-slate-500">No logs recorded yet.</div>' : logs.map(l => `
               <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between gap-4">
-                <span class="${l.type === 'success' ? 'text-emerald-400' : l.type === 'error' ? 'text-red-400' : 'text-slate-300'}">${l.message}</span>
+                <span class="${l.type === 'success' ? 'text-emerald-400' : l.type === 'error' ? 'text-red-400' : l.type === 'warning' ? 'text-amber-400' : 'text-slate-300'}">${l.message}</span>
                 <span class="text-slate-500 text-[10px] shrink-0">${new Date(l.timestamp).toLocaleTimeString()}</span>
               </div>
             `).join('')}
@@ -468,17 +567,18 @@ app.get('/', (req, res) => {
           e.preventDefault();
           const name = document.getElementById('feedName').value;
           const url = document.getElementById('feedUrl').value;
+          const type = document.getElementById('feedType').value;
           const category = document.getElementById('feedCategory').value;
           await fetch('/api/feeds', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, url, category })
+            body: JSON.stringify({ name, url, type, category })
           });
           location.reload();
         }
 
         async function deleteFeed(id) {
-          if (confirm('Delete this feed?')) {
+          if (confirm('Delete this source?')) {
             await fetch('/api/feeds/' + id, { method: 'DELETE' });
             location.reload();
           }

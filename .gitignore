@@ -15,6 +15,8 @@ dist-ssr
 .env.local
 .env.*.local
 !.env.example
+server/logs.json
+server/posted_cache.json
 
 # Editor directories and files
 .vscode/*
