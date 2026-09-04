@@ -4,6 +4,7 @@
     "name": "Sarkari Naukri Updates",
     "url": "https://news.google.com/rss/search?q=sarkari+naukri+recruitment+when:1d&hl=hi&gl=IN&ceid=IN:hi",
     "category": "Latest Jobs",
+    "type": "rss",
     "labels": ["Sarkari Naukri", "Latest Jobs", "Govt Recruitment"],
     "enabled": true
   },
@@ -12,6 +13,7 @@
     "name": "Government Schemes & Yojana",
     "url": "https://news.google.com/rss/search?q=sarkari+yojana+when:2d&hl=hi&gl=IN&ceid=IN:hi",
     "category": "Govt Schemes & Yojana",
+    "type": "rss",
     "labels": ["Sarkari Yojana", "Govt Schemes", "PM Yojana"],
     "enabled": true
   },
@@ -20,6 +22,7 @@
     "name": "University Admissions & CUET",
     "url": "https://news.google.com/rss/search?q=university+admission+cuet+when:2d&hl=hi&gl=IN&ceid=IN:hi",
     "category": "University & Admissions",
+    "type": "rss",
     "labels": ["University Admission", "CUET 2026", "College Admission"],
     "enabled": true
   },
@@ -28,6 +31,7 @@
     "name": "Govt Exam Admit Cards",
     "url": "https://news.google.com/rss/search?q=admit+card+hall+ticket+when:2d&hl=hi&gl=IN&ceid=IN:hi",
     "category": "Admit Cards",
+    "type": "rss",
     "labels": ["Admit Card", "Hall Ticket", "Exam Update"],
     "enabled": true
   },
@@ -36,6 +40,7 @@
     "name": "Sarkari Exam Results",
     "url": "https://news.google.com/rss/search?q=sarkari+result+declared+when:2d&hl=hi&gl=IN&ceid=IN:hi",
     "category": "Results",
+    "type": "rss",
     "labels": ["Sarkari Result", "Cutoff Marks", "Scorecard"],
     "enabled": true
   },
@@ -44,7 +49,18 @@
     "name": "Employment News & Defense Recruitment",
     "url": "https://news.google.com/rss/search?q=employment+news+army+police+railway+when:2d&hl=en-IN&gl=IN&ceid=IN:en",
     "category": "Latest Jobs",
+    "type": "rss",
     "labels": ["Defense Jobs", "Railway Jobs", "Police Bharti"],
+    "enabled": true
+  },
+  {
+    "id": "feed-7",
+    "name": "SarkariResult Web Portal Scraper",
+    "url": "https://www.sarkariresult.com",
+    "category": "Latest Jobs",
+    "type": "scrape",
+    "itemSelector": "#post ul li, .post-item, table tr",
+    "labels": ["Sarkari Result", "Latest Jobs"],
     "enabled": true
   }
 ]
