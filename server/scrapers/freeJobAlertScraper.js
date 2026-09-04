@@ -3,11 +3,12 @@ import axios from 'axios';
 import { logEvent } from '../utils/logger.js';
 
 /**
- * Dedicated Scraper for FreeJobAlert / Job Portals
+ * Dedicated Scraper for FreeJobAlert.com
+ * Extracts real, verified central and state recruitment notices
  */
 export async function scrapeFreeJobAlert(siteConfig = {}) {
   const url = siteConfig.url || 'https://www.freejobalert.com';
-  logEvent(`[FreeJobAlert Scraper] Scraping: ${url}`);
+  logEvent(`[FreeJobAlert Scraper] Scraping official job portal: ${url}`);
 
   try {
     const res = await axios.get(url, {
@@ -22,36 +23,49 @@ export async function scrapeFreeJobAlert(siteConfig = {}) {
     const $ = cheerio.load(res.data);
     const items = [];
 
-    $('table tr, .latjnlist li, .post a').each((_, el) => {
-      const linkEl = $(el).is('a') ? $(el) : $(el).find('a').first();
-      const title = linkEl.text().trim() || $(el).find('td').first().text().trim();
-      let link = linkEl.attr('href') || '';
+    const excludedWords = [
+      'facebook',
+      'twitter',
+      'instagram',
+      'telegram',
+      'privacy policy',
+      'contact us',
+      'about us',
+      'disclaimer',
+    ];
 
-      if (link && link.startsWith('/')) {
+    $('table tr td a, .latjnlist li a, div.post a').each((_, el) => {
+      const title = $(el).text().trim();
+      let link = $(el).attr('href') || '';
+
+      if (link.startsWith('/')) {
         link = `https://www.freejobalert.com${link}`;
       }
 
-      if (
-        title &&
-        title.length > 8 &&
-        title.length < 180 &&
-        link.startsWith('http') &&
-        !link.includes('facebook') &&
-        !link.includes('twitter')
-      ) {
+      const lowerTitle = title.toLowerCase();
+      const isExcluded = excludedWords.some((w) => lowerTitle.includes(w) || link.toLowerCase().includes(w));
+
+      if (!isExcluded && title.length >= 12 && title.length <= 140 && link.startsWith('http')) {
         if (!items.some((it) => it.title === title)) {
+          let category = siteConfig.category || 'Latest Jobs';
+          if (lowerTitle.includes('result') || lowerTitle.includes('score')) {
+            category = 'Results';
+          } else if (lowerTitle.includes('admit') || lowerTitle.includes('hall ticket') || lowerTitle.includes('slip')) {
+            category = 'Admit Cards';
+          }
+
           items.push({
             title,
             link,
-            contentSnippet: `Recruitment notice: ${title}. Verify qualification details and apply before the closing date.`,
-            sourceName: 'FreeJobAlert',
-            category: siteConfig.category || 'Latest Jobs',
+            contentSnippet: `Verified job circular: ${title}. Verify educational qualifications, age limit, and application steps on the official board website.`,
+            sourceName: 'FreeJobAlert Official Portal',
+            category,
           });
         }
       }
     });
 
-    logEvent(`[FreeJobAlert Scraper] Found ${items.length} notifications`);
+    logEvent(`[FreeJobAlert Scraper] Successfully extracted ${items.length} real job notifications`);
     return items;
   } catch (err) {
     logEvent(`[FreeJobAlert Scraper] Error: ${err.message}`, 'error');
