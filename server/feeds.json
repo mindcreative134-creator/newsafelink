@@ -1,0 +1,50 @@
+[
+  {
+    "id": "feed-1",
+    "name": "Sarkari Naukri Updates",
+    "url": "https://news.google.com/rss/search?q=sarkari+naukri+recruitment+when:1d&hl=hi&gl=IN&ceid=IN:hi",
+    "category": "Latest Jobs",
+    "labels": ["Sarkari Naukri", "Latest Jobs", "Govt Recruitment"],
+    "enabled": true
+  },
+  {
+    "id": "feed-2",
+    "name": "Government Schemes & Yojana",
+    "url": "https://news.google.com/rss/search?q=sarkari+yojana+when:2d&hl=hi&gl=IN&ceid=IN:hi",
+    "category": "Govt Schemes & Yojana",
+    "labels": ["Sarkari Yojana", "Govt Schemes", "PM Yojana"],
+    "enabled": true
+  },
+  {
+    "id": "feed-3",
+    "name": "University Admissions & CUET",
+    "url": "https://news.google.com/rss/search?q=university+admission+cuet+when:2d&hl=hi&gl=IN&ceid=IN:hi",
+    "category": "University & Admissions",
+    "labels": ["University Admission", "CUET 2026", "College Admission"],
+    "enabled": true
+  },
+  {
+    "id": "feed-4",
+    "name": "Govt Exam Admit Cards",
+    "url": "https://news.google.com/rss/search?q=admit+card+hall+ticket+when:2d&hl=hi&gl=IN&ceid=IN:hi",
+    "category": "Admit Cards",
+    "labels": ["Admit Card", "Hall Ticket", "Exam Update"],
+    "enabled": true
+  },
+  {
+    "id": "feed-5",
+    "name": "Sarkari Exam Results",
+    "url": "https://news.google.com/rss/search?q=sarkari+result+declared+when:2d&hl=hi&gl=IN&ceid=IN:hi",
+    "category": "Results",
+    "labels": ["Sarkari Result", "Cutoff Marks", "Scorecard"],
+    "enabled": true
+  },
+  {
+    "id": "feed-6",
+    "name": "Employment News & Defense Recruitment",
+    "url": "https://news.google.com/rss/search?q=employment+news+army+police+railway+when:2d&hl=en-IN&gl=IN&ceid=IN:en",
+    "category": "Latest Jobs",
+    "labels": ["Defense Jobs", "Railway Jobs", "Police Bharti"],
+    "enabled": true
+  }
+]
