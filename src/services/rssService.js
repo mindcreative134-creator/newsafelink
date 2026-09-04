@@ -1,8 +1,8 @@
 import defaultJobs from '../data/liveJobs.json';
 
-const CACHE_KEY = 'SARKARI_RSS_CACHE_V5_CLEAN';
-const CACHE_TIME_KEY = 'SARKARI_RSS_CACHE_TIME_V5_CLEAN';
-const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+const CACHE_KEY = 'SARKARI_RSS_CACHE_V7_REAL_ONLY';
+const CACHE_TIME_KEY = 'SARKARI_RSS_CACHE_TIME_V7_REAL_ONLY';
+const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
 /**
  * Strict Authenticity Filter:

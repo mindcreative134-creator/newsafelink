@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import { CONFIG } from '../config/index.js';
 import { scrapeSite } from '../scrapers/index.js';
 import { buildHtmlArticle } from './articleTemplate.js';
+import { fetchFullArticleDetails } from './articleEnhancer.js';
 import { postToBlogger } from './bloggerPublisher.js';
 import { loadJson, saveJson, logEvent, POSTED_CACHE_FILE, SCRAPED_POSTS_FILE } from '../utils/logger.js';
 
@@ -40,14 +41,14 @@ export async function runSyncRoutine() {
               category: item.category || feed.category || 'Latest Jobs',
               organization: item.sourceName || feed.name,
               totalPosts: 'Refer to Notification',
-              qualification: '10th / 12th / Graduate Pass',
+              qualification: 'As per Official Notice',
               lastDate: 'Online Application Active',
               status: 'Active',
               badge: (feed.category || '').toUpperCase().includes('RESULT') ? 'RESULT' : (feed.category || '').toUpperCase().includes('ADMIT') ? 'ADMIT' : 'JOB',
               applyUrl: item.link || feed.url,
               summary: item.contentSnippet || `Latest recruitment update from ${feed.name}: ${cleanTitle}`,
               publishedDate: new Date().toISOString().split('T')[0],
-              ageLimit: 'As per central/state recruitment criteria',
+              ageLimit: 'As per official recruitment rules',
               imageUrl: item.imageUrl || '',
               sourceName: item.sourceName || feed.name,
               isScrapedLive: true,
@@ -62,12 +63,23 @@ export async function runSyncRoutine() {
             continue;
           }
 
+          logEvent(`Fetching real article details & media for: "${cleanTitle}"...`);
+          const enhanced = await fetchFullArticleDetails(item.link || feed.url);
+
+          // Update scrapedMap with real image and real links for website feed
+          const mapItem = scrapedMap.get(cleanTitle.toLowerCase());
+          if (mapItem && enhanced) {
+            if (enhanced.imageUrl) mapItem.imageUrl = enhanced.imageUrl;
+            if (enhanced.applyUrl) mapItem.applyUrl = enhanced.applyUrl;
+          }
+
           const htmlContent = buildHtmlArticle(
             cleanTitle,
             item.contentSnippet || cleanTitle,
             item.sourceName || feed.name,
             feed.category,
-            item.link || feed.url
+            item.link || feed.url,
+            enhanced || {}
           );
 
           try {

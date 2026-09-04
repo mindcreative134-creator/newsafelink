@@ -7,14 +7,14 @@ import { getPostThumbnail } from '../utils/postThumbnail';
  * Generate high quality, comprehensive HTML blog post for a Sarkari/Yojana/Admission update
  */
 export function generateSarkariArticleHtml(item) {
-  const org = item.organization || 'Government Department / Board';
+  const org = item.organization || 'Official Recruitment Board';
   const category = item.category || 'Government Job Notification';
   const totalPosts = item.totalPosts || 'Refer to Official Notification';
-  const qualification = item.qualification || 'Graduate / 10th / 12th Pass';
-  const ageLimit = item.ageLimit || '18 to 35 Years (Age relaxation applicable as per rules)';
+  const qualification = item.qualification || 'As prescribed in official notification';
+  const ageLimit = item.ageLimit || 'Refer to official advertisement brochure';
   const lastDate = item.lastDate || 'Active Online';
   const pubDate = item.publishedDate || new Date().toISOString().split('T')[0];
-  const applyUrl = item.applyUrl || 'https://sarkariresult.com';
+  const applyUrl = item.applyUrl || 'https://biharhelp.in';
   const summary = item.summary || item.title;
 
   return `
@@ -66,7 +66,7 @@ export function generateSarkariArticleHtml(item) {
             <td class="p-3">${item.title}</td>
           </tr>
           <tr>
-            <td class="font-bold bg-zinc-100 dark:bg-zinc-800/80 p-3">Number of Vacancies / Scope</td>
+            <td class="font-bold bg-zinc-100 dark:bg-zinc-800/80 p-3">Vacancies / Scope</td>
             <td class="p-3">${totalPosts}</td>
           </tr>
           <tr>
@@ -78,61 +78,32 @@ export function generateSarkariArticleHtml(item) {
             <td class="p-3">${pubDate}</td>
           </tr>
           <tr>
-            <td class="font-bold bg-zinc-100 dark:bg-zinc-800/80 p-3">Last Date to Apply / Check</td>
-            <td class="p-3 text-red-600 font-bold">${lastDate}</td>
+            <td class="font-bold bg-zinc-100 dark:bg-zinc-800/80 p-3">Application Status</td>
+            <td class="p-3 text-emerald-600 font-bold">Active Online</td>
           </tr>
         </tbody>
       </table>
 
       <!-- Eligibility & Criteria Section -->
       <h3 class="text-lg font-black text-zinc-900 dark:text-white font-heading mt-6 mb-2">
-        🎯 Eligibility & Qualification Criteria
+        🎯 Eligibility & Criteria
       </h3>
       <ul class="list-disc pl-5 space-y-2 text-sm text-zinc-700 dark:text-zinc-300 mb-6">
-        <li><strong>Educational Qualification:</strong> ${qualification} from any recognized Board or University in India.</li>
-        <li><strong>Age Limit:</strong> ${ageLimit}. Age relaxation will be provided to SC/ST/OBC/EWS candidates as per Government of India guidelines.</li>
-        <li><strong>Nationality:</strong> Candidate must be a citizen of India.</li>
+        <li><strong>Eligibility / Qualification:</strong> ${qualification} from any recognized Board / University.</li>
+        <li><strong>Age Criteria:</strong> ${ageLimit}. Age relaxation will be provided to reserved categories as per government norms.</li>
+        <li><strong>Nationality:</strong> Citizen of India.</li>
       </ul>
-
-      <!-- Application Fee Section -->
-      <h3 class="text-lg font-black text-zinc-900 dark:text-white font-heading mt-6 mb-2">
-        💳 Application Fee & Payment Mode
-      </h3>
-      <table class="w-full text-xs sm:text-sm border-collapse my-4">
-        <thead>
-          <tr class="bg-zinc-100 dark:bg-zinc-800 text-left">
-            <th class="p-3 font-bold">Category</th>
-            <th class="p-3 font-bold">Application Fee</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="p-3">General / OBC / EWS</td>
-            <td class="p-3 font-semibold">₹100 to ₹500 (As per category guidelines)</td>
-          </tr>
-          <tr>
-            <td class="p-3">SC / ST / PwD / Female Candidates</td>
-            <td class="p-3 font-semibold text-emerald-600">Nil / Exempted</td>
-          </tr>
-          <tr>
-            <td class="p-3">Payment Method</td>
-            <td class="p-3">Online through Net Banking, UPI, Credit/Debit Card</td>
-          </tr>
-        </tbody>
-      </table>
 
       <!-- How to Apply Steps -->
       <h3 class="text-lg font-black text-zinc-900 dark:text-white font-heading mt-6 mb-3">
         📝 How to Apply / Check Status Online
       </h3>
       <ol class="list-decimal pl-5 space-y-2.5 text-sm text-zinc-700 dark:text-zinc-300 mb-6">
-        <li>Visit the official portal of <strong>${org}</strong> by clicking the direct link below.</li>
-        <li>Locate the notification link for <strong>${item.title}</strong> under the Latest Recruitment / Notifications section.</li>
+        <li>Visit the official portal by clicking the direct link below.</li>
+        <li>Locate the notification link for <strong>${item.title}</strong>.</li>
         <li>Read the official notification brochure carefully to ensure eligibility.</li>
-        <li>Click on <strong>"Apply Online"</strong> or <strong>"Registration"</strong> and complete your basic profile details.</li>
-        <li>Upload required scanned documents (photograph, signature, educational certificates).</li>
-        <li>Pay the online application fee (if applicable) and submit your final application form.</li>
-        <li>Download and print a hard copy of the final confirmation receipt for future reference.</li>
+        <li>Click on <strong>"Apply Online"</strong> and complete your registration / profile.</li>
+        <li>Upload required documents and submit your final application form.</li>
       </ol>
 
       <!-- Important Official Links Box -->
@@ -155,7 +126,7 @@ export function generateSarkariArticleHtml(item) {
             rel="noreferrer"
             class="p-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs uppercase tracking-wider text-center transition-all border border-white/20 flex items-center justify-center gap-2"
           >
-            📄 Download Official Notification (PDF)
+            📄 Official Advertisement & Details
           </a>
         </div>
         <p class="text-[11px] text-indigo-300/80 text-center mt-3">
@@ -170,7 +141,7 @@ export function generateSarkariArticleHtml(item) {
  * Format a job/RSS item into a standard post object for UI consistency
  */
 function formatJobAsPost(item) {
-  const posterImg = getPostThumbnail(item);
+  const posterImg = item.imageUrl || getPostThumbnail(item);
   const contentHtml = generateSarkariArticleHtml(item);
 
   return {
