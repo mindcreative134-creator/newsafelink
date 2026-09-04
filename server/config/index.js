@@ -13,6 +13,6 @@ export const CONFIG = {
   CLIENT_ID: process.env.BLOGGER_CLIENT_ID || '',
   CLIENT_SECRET: process.env.BLOGGER_CLIENT_SECRET || '',
   REFRESH_TOKEN: process.env.BLOGGER_REFRESH_TOKEN || '',
-  CRON_SCHEDULE: process.env.CRON_SCHEDULE || '0 */2 * * *',
+  CRON_SCHEDULE: process.env.CRON_SCHEDULE || '*/30 * * * *',
   FEEDS_FILE: path.join(__dirname, 'feeds.json'),
 };

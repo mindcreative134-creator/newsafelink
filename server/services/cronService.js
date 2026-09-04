@@ -1,8 +1,8 @@
 import cron from 'node-cron';
 import { CONFIG } from '../config/index.js';
 import { scrapeSite } from '../scrapers/index.js';
-import { buildHtmlArticle } from './articleTemplate.js';
-import { fetchFullArticleDetails } from './articleEnhancer.js';
+import { buildClonedHtmlArticle } from './articleTemplate.js';
+import { cloneAuthenticArticle } from '../scrapers/articleCloner.js';
 import { postToBlogger } from './bloggerPublisher.js';
 import { loadJson, saveJson, logEvent, POSTED_CACHE_FILE, SCRAPED_POSTS_FILE } from '../utils/logger.js';
 
@@ -63,38 +63,50 @@ export async function runSyncRoutine() {
             continue;
           }
 
-          logEvent(`Fetching real article details & media for: "${cleanTitle}"...`);
-          const enhanced = await fetchFullArticleDetails(item.link || feed.url);
+          logEvent(`Cloning 100% authentic article & media for: "${cleanTitle}"...`);
+          const cloned = await cloneAuthenticArticle(item.link || feed.url, feed.category);
 
-          // Update scrapedMap with real image and real links for website feed
-          const mapItem = scrapedMap.get(cleanTitle.toLowerCase());
-          if (mapItem && enhanced) {
-            if (enhanced.imageUrl) mapItem.imageUrl = enhanced.imageUrl;
-            if (enhanced.applyUrl) mapItem.applyUrl = enhanced.applyUrl;
+          let postTitle = cleanTitle;
+          let htmlContent = '';
+
+          if (cloned && cloned.bodyContentHtml) {
+            postTitle = cloned.title || cleanTitle;
+            htmlContent = buildClonedHtmlArticle(cloned, feed.category, item.sourceName || feed.name);
+
+            // Update scrapedMap with real media & links for website feed
+            const mapItem = scrapedMap.get(cleanTitle.toLowerCase());
+            if (mapItem) {
+              if (cloned.featuredImage) mapItem.imageUrl = cloned.featuredImage;
+              if (cloned.applyOnlineUrl) mapItem.applyUrl = cloned.applyOnlineUrl;
+            }
+          } else {
+            // Clean authentic fallback
+            htmlContent = `
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.8; color: #1e293b; max-width: 800px; margin: 0 auto;">
+                <h2 style="color: #0f172a;">${cleanTitle}</h2>
+                <p style="font-size: 15px; color: #334155;">${item.contentSnippet || cleanTitle}</p>
+                <div style="margin: 24px 0; text-align: center;">
+                  <a href="${item.link || feed.url}" target="_blank" rel="noopener noreferrer" style="background: #2563eb; color: #ffffff; padding: 12px 26px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                    🔗 Open Official Notification & Apply Online
+                  </a>
+                </div>
+              </div>
+            `;
           }
 
-          const htmlContent = buildHtmlArticle(
-            cleanTitle,
-            item.contentSnippet || cleanTitle,
-            item.sourceName || feed.name,
-            feed.category,
-            item.link || feed.url,
-            enhanced || {}
-          );
-
           try {
-            const pubResult = await postToBlogger(cleanTitle, htmlContent, feed.labels || [feed.category]);
+            const pubResult = await postToBlogger(postTitle, htmlContent, feed.labels || [feed.category]);
             if (pubResult && pubResult.status === 'simulated') {
-              logEvent(`[Blogger Preview] Post prepared: "${cleanTitle}" (Awaiting Blogger OAuth credentials for live publishing)`, 'info');
+              logEvent(`[Blogger Preview] Post prepared: "${postTitle}" (Awaiting Blogger OAuth credentials for live publishing)`, 'info');
             } else {
               postedCache.add(cleanTitle);
               newPostsCount++;
-              logEvent(`✅ Successfully published: "${cleanTitle}" to Blogger!`, 'success');
+              logEvent(`✅ Successfully published: "${postTitle}" to Blogger!`, 'success');
               // 5-second interval between posts to respect Google Cloud Blogger write limits
               await new Promise((res) => setTimeout(res, 5000));
             }
           } catch (postErr) {
-            logEvent(`Failed to post "${cleanTitle}": ${postErr.message}`, 'error');
+            logEvent(`Failed to post "${postTitle}": ${postErr.message}`, 'error');
             if (postErr.message && postErr.message.includes('quota')) {
               logEvent(`[Blogger Quota] Google Blogger API write quota limit reached. Pausing until next cycle.`, 'warning');
               break;
