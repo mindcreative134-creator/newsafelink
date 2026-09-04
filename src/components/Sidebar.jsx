@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPosts } from '../services/bloggerApi';
 import { getPostThumbnail } from '../utils/postThumbnail';
-import { Folder, ShieldCheck, Send, ArrowUpRight, Flame } from 'lucide-react';
+import { Folder, ShieldCheck, Send, ArrowUpRight, Flame, Sparkles } from 'lucide-react';
 import AdUnit from './AdUnit';
 
 export default function Sidebar({ hideAds = false }) {
@@ -30,32 +30,37 @@ export default function Sidebar({ hideAds = false }) {
     <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8">
       
       {/* ── Official Trust & Portal Info Widget ── */}
-      <div className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 border border-indigo-700/40 rounded-[28px] p-6 text-white shadow-xl relative overflow-hidden">
+      <div className="glass-panel-elevated rounded-[28px] p-6 text-zinc-900 dark:text-white shadow-xl relative overflow-hidden border border-indigo-500/25">
         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
         
         <div className="flex items-center gap-2 mb-3">
           <span className="p-1.5 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
             <ShieldCheck className="w-5 h-5 text-amber-400" />
           </span>
-          <span className="text-xs font-black uppercase tracking-wider text-indigo-200">Official Portal</span>
+          <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
+            Official Portal
+          </span>
         </div>
 
-        <h3 className="text-lg font-black font-heading text-white mb-2 leading-tight">
+        <h3 className="text-lg font-black font-heading text-zinc-900 dark:text-white mb-2 leading-tight">
           SarkariTrend Alerts
         </h3>
         
-        <p className="text-xs text-indigo-200/90 leading-relaxed mb-4 font-medium">
-          India's verified career destination for official government job vacancy notices, exam dates, admit cards, answer keys, and education updates.
+        <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4 font-medium">
+          India's verified intelligence destination for government job vacancy notices, exam dates, admit cards, answer keys, and welfare schemes.
         </p>
 
-        <div className="flex items-center gap-4 pt-2 border-t border-indigo-800/60 text-[11px] font-bold text-indigo-300">
-          <span className="flex items-center gap-1">✅ 100% Genuine</span>
+        <div className="flex items-center gap-4 pt-2 border-t border-zinc-200/80 dark:border-indigo-800/60 text-[11px] font-bold text-zinc-600 dark:text-indigo-300">
+          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-radar"></span>
+            100% Genuine
+          </span>
           <span className="flex items-center gap-1">⚡ Daily Updates</span>
         </div>
       </div>
 
-      {/* ── Instant Telegram Join Widget ── */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[28px] p-6 text-white shadow-lg shadow-blue-600/20 flex flex-col gap-3">
+      {/* ── Instant Telegram VIP Join Widget ── */}
+      <div className="btn-shimmer bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[28px] p-6 text-white shadow-lg shadow-blue-600/20 flex flex-col gap-3 relative overflow-hidden">
         <div className="flex items-center justify-between">
           <span className="px-3 py-1 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-wider">
             FREE JOB NOTIFICATIONS
@@ -66,7 +71,7 @@ export default function Sidebar({ hideAds = false }) {
           Get Instant Sarkari Alerts on Telegram
         </h4>
         <p className="text-xs text-blue-100 font-medium">
-          Never miss an application deadline! Join 50,000+ candidates today.
+          Never miss an application deadline! Join 250,000+ candidates today.
         </p>
         <a
           href="https://t.me"
@@ -79,16 +84,16 @@ export default function Sidebar({ hideAds = false }) {
       </div>
 
       {/* ── Trending Categories Widget ── */}
-      <div className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] p-6 shadow-sm">
+      <div className="glass-panel rounded-[28px] p-6 shadow-sm">
         <h3 className="text-base font-black text-zinc-900 dark:text-white mb-4 border-b border-zinc-100 dark:border-zinc-800/80 pb-3 flex items-center gap-2 font-heading">
-          <Folder className="w-4.5 h-4.5 text-indigo-600" /> Trending Topics
+          <Folder className="w-4.5 h-4.5 text-indigo-500" /> Trending Topics
         </h3>
         <div className="flex flex-wrap gap-2">
           {categories.map((cat) => (
             <Link
               key={cat}
               to={`/category/${encodeURIComponent(cat)}`}
-              className="inline-block px-3 py-1.5 text-xs font-extrabold rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+              className="inline-block px-3 py-1.5 text-xs font-extrabold rounded-xl bg-zinc-100/90 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all hover:scale-105"
             >
               {cat}
             </Link>
@@ -102,7 +107,7 @@ export default function Sidebar({ hideAds = false }) {
       )}
 
       {/* ── Recent Articles Widget ── */}
-      <div className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] p-6 shadow-sm">
+      <div className="glass-panel rounded-[28px] p-6 shadow-sm">
         <h3 className="text-base font-black text-zinc-900 dark:text-white mb-4 border-b border-zinc-100 dark:border-zinc-800/80 pb-3 flex items-center gap-2 font-heading">
           <Flame className="w-4.5 h-4.5 text-amber-500" /> Recent Updates
         </h3>
@@ -128,7 +133,7 @@ export default function Sidebar({ hideAds = false }) {
         </ul>
       </div>
 
-      {/* ── BiharHelp-Style Sticky Sidebar Ad (Stays in viewport while scrolling long content) ── */}
+      {/* ── BiharHelp-Style Sticky Sidebar Ad ── */}
       {!hideAds && (
         <AdUnit
           variant="sticky-sidebar"

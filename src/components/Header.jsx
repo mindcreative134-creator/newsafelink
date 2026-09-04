@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Sun, Moon, ChevronDown, Flame, Search, Send, Briefcase, FileCheck, Award, BookOpen } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { 
+  Menu, X, Sun, Moon, ChevronDown, Flame, Search, 
+  Send, Briefcase, FileCheck, Award, BookOpen, 
+  Sparkles, Landmark, GraduationCap, ArrowRight
+} from 'lucide-react';
 import { getPosts } from '../services/bloggerApi';
 import { searchUpdates } from '../services/rssService';
 
@@ -12,23 +16,17 @@ export default function Header() {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Breaking news ticker items
+  // Breaking news ticker items (continuous marquee)
   const tickerItems = [
-    '🔥 SSC CGL 2026 Notification Released: 14,500+ Group B & C Vacancies',
-    '📢 Railway RRB ALP & Technician 2026: 18,799 Posts Apply Online',
+    '🚀 SSC CGL 2026 Notification Released: 14,500+ Group B & C Vacancies',
+    '⚡ Railway RRB ALP & Technician 2026: 18,799 Posts Apply Online Portal Live',
     '🎯 UPSC Civil Services Prelims 2026 Admit Card & Exam Guidelines Out',
-    '📝 SBI PO Prelims 2026 Results & Cutoff Marks Declared',
-    '⚡ UP Police Constable Official Answer Key Released - Check Score'
+    '📢 SBI PO Prelims 2026 Results & Cutoff Marks Declared',
+    '🏛️ PM Kisan 17th Installment & Bihar Udyami Yojana Beneficiary List Active',
+    '🔥 UP Police Constable Official Answer Key Released - Check Normalized Score'
   ];
-  const [tickerIndex, setTickerIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTickerIndex((prev) => (prev + 1) % tickerItems.length);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, [tickerItems.length]);
 
   // Toggle Dark Mode
   const toggleTheme = () => {
@@ -51,6 +49,21 @@ export default function Header() {
     }
   }, [isDark]);
 
+  // Keyboard shortcut (Ctrl+K or Cmd+K) to open search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowSearchModal((prev) => !prev);
+      }
+      if (e.key === 'Escape') {
+        setShowSearchModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   useEffect(() => {
     getPosts({ maxResults: 50 })
       .then((data) => {
@@ -65,7 +78,7 @@ export default function Header() {
         }
       })
       .catch(() => {
-        setCategories(['Latest Jobs', 'Admit Cards', 'Results', 'Answer Key', 'Syllabus', 'Tech']);
+        setCategories(['Latest Jobs', 'Admit Cards', 'Results', 'Govt Schemes', 'Answer Key', 'Syllabus']);
       });
   }, []);
 
@@ -78,7 +91,7 @@ export default function Header() {
     const timer = setTimeout(async () => {
       const results = await searchUpdates(searchQuery);
       setSearchResults(results.slice(0, 6));
-    }, 200);
+    }, 180);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
@@ -91,122 +104,151 @@ export default function Header() {
     }
   };
 
+  const navLinks = [
+    { name: 'Latest Jobs', path: '/category/Latest%20Jobs', icon: Briefcase, color: 'text-indigo-400' },
+    { name: 'Admit Cards', path: '/category/Admit%20Cards', icon: FileCheck, color: 'text-amber-400' },
+    { name: 'Results', path: '/category/Results', icon: Award, color: 'text-emerald-400' },
+    { name: 'Schemes (योजना)', path: '/category/Govt%20Schemes%20%26%20Yojana', icon: Landmark, color: 'text-cyan-400' },
+  ];
+
   return (
     <>
-      {/* ── Top Breaking News / Ticker Bar ── */}
-      <div className="bg-gradient-to-r from-indigo-950 via-indigo-900 to-slate-950 text-white text-xs border-b border-indigo-800/40 py-2 px-4">
+      {/* ── 1. Futuristic Live Marquee Ticker Bar ── */}
+      <div className="bg-gradient-to-r from-indigo-950 via-slate-950 to-indigo-950 text-white text-xs border-b border-indigo-800/30 py-2 px-4 relative z-50 overflow-hidden">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5 overflow-hidden flex-1">
-            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-400 text-zinc-950 font-black tracking-wider text-[10px] uppercase shadow-sm shrink-0">
-              <Flame className="w-3 h-3 text-red-600 fill-red-600 animate-pulse" /> LIVE
+          
+          {/* Live indicator badge */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-radar"></span>
+              LIVE
             </span>
-            <div className="truncate font-semibold text-zinc-100 text-xs sm:text-[13px] transition-all duration-500">
-              {tickerItems[tickerIndex]}
+            <span className="hidden sm:inline-block text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+              FEED:
+            </span>
+          </div>
+
+          {/* Continuous scrolling marquee */}
+          <div className="ticker-wrap flex-1 overflow-hidden">
+            <div className="ticker-content font-medium text-zinc-200 text-xs sm:text-[13px] gap-8">
+              {tickerItems.map((item, idx) => (
+                <span key={idx} className="inline-flex items-center gap-2 hover:text-indigo-300 transition-colors cursor-pointer">
+                  {item} <span className="text-zinc-600">•</span>
+                </span>
+              ))}
+              {/* Duplicate for infinite seamless scroll */}
+              {tickerItems.map((item, idx) => (
+                <span key={`dup-${idx}`} className="inline-flex items-center gap-2 hover:text-indigo-300 transition-colors cursor-pointer">
+                  {item} <span className="text-zinc-600">•</span>
+                </span>
+              ))}
             </div>
           </div>
-          <div className="flex items-center gap-3 text-[11px] font-semibold text-indigo-200 shrink-0">
-            <span className="hidden md:inline">📅 {new Date().toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
+
+          {/* Right VIP Callouts */}
+          <div className="flex items-center gap-3 shrink-0">
             <a 
               href="https://t.me" 
               target="_blank" 
               rel="noreferrer" 
-              className="px-3 py-1 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-all flex items-center gap-1.5 shadow-sm text-xs"
+              className="btn-shimmer px-3.5 py-1 rounded-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold transition-all flex items-center gap-1.5 shadow-md shadow-indigo-600/20 text-xs"
             >
-              <Send className="w-3 h-3 text-amber-300" /> Join Telegram
+              <Send className="w-3 h-3 text-amber-300" />
+              <span className="hidden sm:inline">Join</span> Telegram
             </a>
           </div>
+
         </div>
       </div>
 
-      {/* ── Main Navigation Header ── */}
-      <header className="sticky top-0 z-40 w-full glass-nav transition-all duration-300 shadow-sm">
+      {/* ── 2. Futuristic Glassmorphic Navigation Header ── */}
+      <header className="sticky top-0 z-40 w-full glass-nav transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
             
-            {/* Logo */}
+            {/* Glowing Brand Logo */}
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center gap-3 group" aria-label="SarkariTrend Home">
-                <img 
-                  src="/favicon.svg" 
-                  alt="SarkariTrend" 
-                  className="w-10 h-10 rounded-2xl shadow-md shadow-indigo-500/20 group-hover:scale-105 group-hover:rotate-3 transition-transform" 
-                />
+                <div className="relative">
+                  <div className="absolute -inset-1 rounded-2xl bg-indigo-500/30 blur-md group-hover:bg-indigo-500/50 transition-all opacity-70 group-hover:opacity-100"></div>
+                  <img 
+                    src="/favicon.svg" 
+                    alt="SarkariTrend" 
+                    className="relative w-10 h-10 rounded-2xl shadow-lg group-hover:scale-105 group-hover:rotate-3 transition-transform" 
+                  />
+                </div>
                 <div className="flex flex-col leading-none">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white font-heading leading-none">
+                    <span className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white font-heading">
                       Sarkari
                     </span>
-                    <span className="text-xl sm:text-2xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 font-heading leading-none">
+                    <span className="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 dark:from-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent font-heading">
                       Trend
                     </span>
                   </div>
-                  <span className="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.22em] mt-1">
-                    Official Career &amp; News
+                  <span className="text-[9px] font-extrabold text-zinc-400 dark:text-indigo-300/60 uppercase tracking-[0.22em] mt-0.5">
+                    Official Intelligence Portal
                   </span>
                 </div>
               </Link>
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex space-x-6 items-center">
+            <nav className="hidden lg:flex space-x-1 items-center">
               <Link 
                 to="/" 
-                className="text-zinc-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold text-sm transition-colors duration-200"
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                  location.pathname === '/' 
+                    ? 'bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 shadow-sm' 
+                    : 'text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-white hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60'
+                }`}
               >
                 Home
               </Link>
 
-              <Link 
-                to="/category/Latest%20Jobs" 
-                className="text-zinc-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold text-sm transition-colors duration-200 flex items-center gap-1.5"
-              >
-                <Briefcase className="w-4 h-4 text-indigo-500" /> Latest Jobs
-              </Link>
-
-              <Link 
-                to="/category/Admit%20Cards" 
-                className="text-zinc-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold text-sm transition-colors duration-200 flex items-center gap-1.5"
-              >
-                <FileCheck className="w-4 h-4 text-amber-500" /> Admit Cards
-              </Link>
-
-              <Link 
-                to="/category/Results" 
-                className="text-zinc-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold text-sm transition-colors duration-200 flex items-center gap-1.5"
-              >
-                <Award className="w-4 h-4 text-emerald-500" /> Results
-              </Link>
-
-              <Link 
-                to="/category/Govt%20Schemes%20%26%20Yojana" 
-                className="text-zinc-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold text-sm transition-colors duration-200 flex items-center gap-1.5"
-              >
-                🏛️ Schemes (योजना)
-              </Link>
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link 
+                    key={link.name}
+                    to={link.path} 
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      isActive 
+                        ? 'bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 shadow-sm' 
+                        : 'text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-white hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 ${link.color}`} />
+                    {link.name}
+                  </Link>
+                );
+              })}
               
               {/* Category Dropdown */}
               <div className="relative group">
-                <button className="flex items-center text-zinc-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold text-sm transition-colors duration-200 gap-1 py-2">
+                <button className="flex items-center text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-white font-bold text-xs transition-colors gap-1 px-3 py-2 rounded-xl hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60">
                   <span>More Topics</span>
-                  <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180 text-zinc-400" />
+                  <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180 text-zinc-400" />
                 </button>
-                <div className="absolute left-0 mt-1 w-60 rounded-2xl shadow-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden p-2">
+
+                <div className="absolute left-0 mt-2 w-64 rounded-2xl shadow-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl border border-zinc-200/80 dark:border-indigo-900/40 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden p-2">
                   <div className="text-[10px] font-black uppercase text-zinc-400 dark:text-zinc-500 px-3 py-1.5 tracking-wider">
-                    Categories & Syllabus
+                    Categories &amp; Exams
                   </div>
                   {categories.slice(0, 8).map((cat) => (
                     <Link
                       key={cat}
                       to={`/category/${encodeURIComponent(cat)}`}
-                      className="block px-3 py-2 text-xs font-bold rounded-xl text-zinc-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+                      className="block px-3 py-2 text-xs font-bold rounded-xl text-zinc-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 hover:text-indigo-600 dark:hover:text-indigo-300 transition-all"
                     >
                       {cat}
                     </Link>
                   ))}
-                  <div className="border-t border-zinc-100 dark:border-zinc-800 mt-1 pt-1">
+                  <div className="border-t border-zinc-100 dark:border-zinc-800/80 mt-1 pt-1">
                     <Link
                       to="/category/Syllabus"
-                      className="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50"
                     >
                       <BookOpen className="w-3.5 h-3.5" /> Exam Syllabus PDF
                     </Link>
@@ -216,28 +258,32 @@ export default function Header() {
 
               <Link 
                 to="/about" 
-                className="text-zinc-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold text-sm transition-colors duration-200"
+                className="px-3 py-2 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-white transition-colors"
               >
                 About
               </Link>
             </nav>
 
-            {/* Right Actions: Search & Theme Toggle & Mobile Menu */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            {/* Right Actions: Search Modal Trigger, Theme Toggle & Mobile Menu */}
+            <div className="flex items-center gap-2.5">
+              
               {/* Search Trigger Button */}
               <button
                 onClick={() => setShowSearchModal(true)}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-zinc-500 dark:text-zinc-400 bg-zinc-100/80 dark:bg-zinc-900/80 hover:bg-zinc-200/80 dark:hover:bg-zinc-800 border border-zinc-200/70 dark:border-zinc-800 text-xs font-semibold transition-all"
+                className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-zinc-500 dark:text-zinc-400 bg-zinc-100/90 dark:bg-zinc-900/80 hover:bg-zinc-200/90 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 text-xs font-semibold transition-all hover:border-indigo-400/50"
                 aria-label="Search"
               >
                 <Search className="w-4 h-4 text-indigo-500" />
                 <span className="hidden sm:inline font-medium text-zinc-600 dark:text-zinc-400">Search Sarkari jobs...</span>
+                <kbd className="hidden md:inline-block px-1.5 py-0.5 text-[10px] font-bold text-zinc-400 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-md">
+                  ⌘K
+                </kbd>
               </button>
 
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
-                className="p-2.5 rounded-xl text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 border border-zinc-200/70 dark:border-zinc-800 transition-all active:scale-95 shadow-sm"
+                className="p-2.5 rounded-xl text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 transition-all active:scale-95 shadow-sm"
                 aria-label="Toggle Theme"
               >
                 {isDark ? <Sun className="w-4.5 h-4.5 text-amber-400" /> : <Moon className="w-4.5 h-4.5 text-indigo-600" />}
@@ -246,7 +292,7 @@ export default function Header() {
               {/* Mobile Drawer Trigger */}
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden p-2.5 rounded-xl text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 border border-zinc-200/70 dark:border-zinc-800 transition-all"
+                className="lg:hidden p-2.5 rounded-xl text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 transition-all"
                 aria-label="Open Menu"
               >
                 {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -257,7 +303,7 @@ export default function Header() {
 
         {/* ── Mobile Navigation Drawer ── */}
         {isOpen && (
-          <div className="lg:hidden bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 py-4 px-5 space-y-3 shadow-xl">
+          <div className="lg:hidden bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-zinc-200 dark:border-zinc-800 py-4 px-5 space-y-3 shadow-2xl">
             <Link
               to="/"
               onClick={() => setIsOpen(false)}
@@ -270,42 +316,42 @@ export default function Header() {
               <Link
                 to="/category/Latest%20Jobs"
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5"
+                className="px-3 py-2.5 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5"
               >
                 <Briefcase className="w-3.5 h-3.5" /> Latest Jobs
               </Link>
               <Link
                 to="/category/Govt%20Schemes%20%26%20Yojana"
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center gap-1.5"
+                className="px-3 py-2.5 rounded-xl text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center gap-1.5"
               >
-                🏛️ Schemes (योजना)
+                <Landmark className="w-3.5 h-3.5" /> Schemes (योजना)
               </Link>
               <Link
                 to="/category/University%20%26%20Admissions"
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center gap-1.5"
+                className="px-3 py-2.5 rounded-xl text-xs font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center gap-1.5"
               >
-                🎓 Admissions &amp; CUET
+                <GraduationCap className="w-3.5 h-3.5" /> Admissions
               </Link>
               <Link
                 to="/category/Admit%20Cards"
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs font-bold bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center gap-1.5"
+                className="px-3 py-2.5 rounded-xl text-xs font-bold bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center gap-1.5"
               >
                 <FileCheck className="w-3.5 h-3.5" /> Admit Cards
               </Link>
               <Link
                 to="/category/Results"
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"
+                className="px-3 py-2.5 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"
               >
                 <Award className="w-3.5 h-3.5" /> Results
               </Link>
               <Link
                 to="/category/Syllabus"
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center gap-1.5"
+                className="px-3 py-2.5 rounded-xl text-xs font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center gap-1.5"
               >
                 <BookOpen className="w-3.5 h-3.5" /> Syllabus
               </Link>
@@ -347,13 +393,13 @@ export default function Header() {
         )}
       </header>
 
-      {/* ── Instant Live Search Modal ── */}
+      {/* ── 3. Instant Live Search Modal ── */}
       {showSearchModal && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-zinc-950/70 backdrop-blur-md animate-fadeIn">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl w-full max-w-xl flex flex-col gap-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-zinc-950/75 backdrop-blur-md animate-fadeIn">
+          <div className="glass-panel-elevated rounded-3xl p-6 shadow-2xl w-full max-w-xl flex flex-col gap-4 border border-indigo-500/30">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-black text-zinc-900 dark:text-white flex items-center gap-2 font-heading">
-                <Search className="w-5 h-5 text-indigo-600" /> Search Sarkari Jobs & Updates
+                <Search className="w-5 h-5 text-indigo-500" /> Search Sarkari Jobs &amp; Updates
               </h3>
               <button 
                 onClick={() => setShowSearchModal(false)}
@@ -364,17 +410,20 @@ export default function Header() {
             </div>
 
             <form onSubmit={handleSearchSubmit} className="flex gap-2">
-              <input
-                type="text"
-                placeholder="E.g., SSC CGL, Railway ALP, UPSC, Admit Card..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                autoFocus
-                className="flex-1 px-4 py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <input
+                  type="text"
+                  placeholder="E.g., SSC CGL, Railway ALP, UPSC, PM Kisan..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                  className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
               <button
                 type="submit"
-                className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-indigo-600/20"
+                className="btn-shimmer px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-wider transition-all shadow-md shadow-indigo-600/20"
               >
                 Search
               </button>
@@ -382,7 +431,7 @@ export default function Header() {
 
             {/* Instant Live Search Results */}
             {searchResults.length > 0 && (
-              <div className="flex flex-col gap-2 mt-2 max-h-72 overflow-y-auto pr-1">
+              <div className="flex flex-col gap-2 mt-1 max-h-72 overflow-y-auto pr-1">
                 <div className="text-[11px] font-bold uppercase text-zinc-400 tracking-wider">Matching Notifications:</div>
                 {searchResults.map((item) => (
                   <div
@@ -392,7 +441,7 @@ export default function Header() {
                       setShowSearchModal(false);
                       setSearchQuery('');
                     }}
-                    className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-zinc-200/60 dark:border-zinc-800 flex flex-col gap-1 transition-all cursor-pointer"
+                    className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-zinc-200/60 dark:border-zinc-800 flex flex-col gap-1 transition-all cursor-pointer group"
                   >
                     <div className="flex items-center justify-between text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
                       <span>{item.organization}</span>
@@ -400,7 +449,9 @@ export default function Header() {
                         {item.category}
                       </span>
                     </div>
-                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 line-clamp-1">{item.title}</div>
+                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-500 transition-colors line-clamp-1">
+                      {item.title}
+                    </div>
                   </div>
                 ))}
               </div>
