@@ -172,7 +172,7 @@ export async function getPostById(postId) {
   }
 
   // 1. Try resolving from live RSS / scraped updates or default jobs
-  let allUpdates = [];
+  let allUpdates;
   try {
     allUpdates = await getLiveSarkariUpdates();
   } catch (_e) {
@@ -264,7 +264,7 @@ export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label =
   const formattedSarkari = filteredSarkari.map((item) => formatJobAsPost(item));
 
   // Merge items: if Blogger has posts, combine both; otherwise show all real Sarkari posts
-  let merged = [];
+  let merged;
   if (bloggerItems.length > 0) {
     merged = [...bloggerItems, ...formattedSarkari];
   } else {

@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Menu, X, Sun, Moon, ChevronDown, Flame, Search, 
   Send, Briefcase, FileCheck, Award, BookOpen, 
-  Sparkles, Landmark, GraduationCap, ArrowRight
+  Sparkles, Landmark, GraduationCap, ArrowRight, Zap
 } from 'lucide-react';
 import { getPosts } from '../services/bloggerApi';
 import { searchUpdates } from '../services/rssService';
