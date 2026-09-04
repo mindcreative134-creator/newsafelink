@@ -70,5 +70,23 @@
     "type": "scrape",
     "labels": ["OnlineUpdateSTM", "Latest Jobs", "Bihar Jobs"],
     "enabled": true
+  },
+  {
+    "id": "feed-real-9",
+    "name": "Munger University Official Portal",
+    "url": "https://mungeruniversity.ac.in/",
+    "category": "University & Admissions",
+    "type": "scrape",
+    "labels": ["Munger University", "Bihar University", "Exam Notices", "Admission"],
+    "enabled": true
+  },
+  {
+    "id": "feed-real-10",
+    "name": "Bihar University Admissions & Notices",
+    "url": "https://biharhelp.in/category/university/",
+    "category": "University & Admissions",
+    "type": "scrape",
+    "labels": ["Bihar University", "UG PG Admission", "Merit List", "Counselling"],
+    "enabled": true
   }
 ]

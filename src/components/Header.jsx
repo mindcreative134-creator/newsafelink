@@ -105,9 +105,11 @@ export default function Header() {
   };
 
   const navLinks = [
+    { name: 'Live Updates', path: '/category/Live%20Updates', icon: Zap, color: 'text-amber-400', badge: 'LIVE' },
     { name: 'Latest Jobs', path: '/category/Latest%20Jobs', icon: Briefcase, color: 'text-indigo-400' },
     { name: 'Admit Cards', path: '/category/Admit%20Cards', icon: FileCheck, color: 'text-amber-400' },
     { name: 'Results', path: '/category/Results', icon: Award, color: 'text-emerald-400' },
+    { name: 'University (Munger/Bihar)', path: '/category/University%20%26%20Admissions', icon: GraduationCap, color: 'text-purple-400' },
     { name: 'Schemes (योजना)', path: '/category/Govt%20Schemes%20%26%20Yojana', icon: Landmark, color: 'text-cyan-400' },
   ];
 

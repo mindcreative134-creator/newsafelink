@@ -354,6 +354,14 @@ export default function PostDetail() {
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-indigo-500" /> 3 min read
                 </span>
+                {(post.sourceName || post.rawJob?.sourceName) && (
+                  <>
+                    <span>•</span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      🌐 Source: {post.sourceName || post.rawJob?.sourceName}
+                    </span>
+                  </>
+                )}
               </div>
 
               {/* Top Banner Image */}
@@ -504,6 +512,24 @@ export default function PostDetail() {
                           <tr className="border-b border-zinc-200 dark:border-zinc-800">
                             <td className="font-bold bg-zinc-50 dark:bg-zinc-800/70 p-3.5 w-1/3 text-zinc-700 dark:text-zinc-300">Recruitment Authority</td>
                             <td className="p-3.5 text-zinc-900 dark:text-zinc-100 font-semibold">{org}</td>
+                          </tr>
+                          <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                            <td className="font-bold bg-zinc-50 dark:bg-zinc-800/70 p-3.5 w-1/3 text-zinc-700 dark:text-zinc-300">Source Portal / Publisher</td>
+                            <td className="p-3.5 text-zinc-900 dark:text-zinc-100 font-semibold flex items-center gap-2 flex-wrap">
+                              <span className="px-2.5 py-1 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-bold text-xs border border-indigo-200/50 dark:border-indigo-800/40">
+                                🌐 {post.sourceName || post.rawJob?.sourceName || 'Official Portal'}
+                              </span>
+                              {(post.sourceUrl || post.rawJob?.sourceUrl) && (
+                                <a
+                                  href={post.sourceUrl || post.rawJob?.sourceUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-indigo-500 hover:text-indigo-600 underline font-semibold"
+                                >
+                                  Direct Source Portal &rarr;
+                                </a>
+                              )}
+                            </td>
                           </tr>
                           <tr className="border-b border-zinc-200 dark:border-zinc-800">
                             <td className="font-bold bg-zinc-50 dark:bg-zinc-800/70 p-3.5 text-zinc-700 dark:text-zinc-300">Post / Scheme Name</td>

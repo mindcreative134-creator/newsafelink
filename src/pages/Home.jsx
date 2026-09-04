@@ -41,7 +41,7 @@ export default function Home() {
   const [featuredPost, setFeaturedPost] = useState(null);
   const [nextPageToken, setNextPageToken] = useState('');
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('Latest Jobs');
+  const [activeTab, setActiveTab] = useState('All Live Updates');
   const [sarkariUpdates, setSarkariUpdates] = useState([]);
   const [loadingUpdates, setLoadingUpdates] = useState(false);
   const [heroSearch, setHeroSearch] = useState('');
@@ -155,10 +155,11 @@ export default function Home() {
       return (
         item.title?.toLowerCase().includes(q) ||
         item.organization?.toLowerCase().includes(q) ||
+        item.sourceName?.toLowerCase().includes(q) ||
         item.category?.toLowerCase().includes(q)
       );
     }
-    if (activeTab === 'All Updates') return true;
+    if (activeTab === 'All Live Updates' || activeTab === 'All Updates') return true;
     return item.category?.toLowerCase() === activeTab.toLowerCase();
   });
 
@@ -518,12 +519,12 @@ export default function Home() {
               {/* Category Tabs */}
               <div className="flex flex-wrap gap-2">
                 {[
+                  'All Live Updates',
                   'Latest Jobs', 
+                  'University & Admissions',
                   'Admit Cards', 
                   'Results', 
-                  'Govt Schemes & Yojana', 
-                  'University & Admissions', 
-                  'All Updates'
+                  'Govt Schemes & Yojana'
                 ].map((tab) => (
                   <button
                     key={tab}
@@ -531,19 +532,20 @@ export default function Home() {
                       setActiveTab(tab);
                       setHeroSearch('');
                     }}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all ${
+                    className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 ${
                       activeTab === tab && !heroSearch
                         ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
                         : 'bg-zinc-100/90 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-750'
                     }`}
                   >
+                    {tab === 'All Live Updates' && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-radar"></span>}
                     {tab}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Sarkari Grid */}
+            {/* Sarkari Grid with Clear Source Site Attribution */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
               {loadingUpdates ? (
                 <div className="col-span-full text-center py-12 text-zinc-400 font-medium">
@@ -552,25 +554,26 @@ export default function Home() {
                 </div>
               ) : filteredUpdates.length === 0 ? (
                 <div className="col-span-full text-center py-10 text-zinc-400">
-                  No active notifications found for this search. Try browsing all categories.
+                  No active notifications found for this category. Try browsing all live updates.
                 </div>
               ) : (
-                filteredUpdates.slice(0, 9).map((job) => (
+                filteredUpdates.slice(0, 12).map((job) => (
                   <Link
                     key={job.id}
                     to={`/post/${job.id}`}
                     className="p-5 rounded-2xl glass-panel hover-lift flex flex-col justify-between gap-4 group block transition-all shadow-sm"
                   >
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between text-[11px] font-bold">
-                        <span className="text-indigo-600 dark:text-indigo-400 font-extrabold line-clamp-1">
+                    <div className="flex flex-col gap-2.5">
+                      <div className="flex items-center justify-between text-[11px] font-bold flex-wrap gap-1">
+                        <span className="text-indigo-600 dark:text-indigo-400 font-extrabold line-clamp-1 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                           {job.organization}
                         </span>
                         <span
                           className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
                             job.badge === 'HOT' || job.badge === 'YOJANA'
                               ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400'
-                              : job.badge === 'NEW' || job.badge === 'JOB' || job.badge === 'CUET'
+                              : job.badge === 'NEW' || job.badge === 'JOB' || job.badge === 'CUET' || job.badge === 'UNIV'
                               ? 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'
                               : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
                           }`}
@@ -586,6 +589,14 @@ export default function Home() {
                       <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                         {job.summary}
                       </p>
+
+                      {/* Source Site Tag */}
+                      <div className="flex items-center gap-1 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-100/90 dark:bg-zinc-850 px-2.5 py-1 rounded-lg w-fit">
+                        <span>🌐 Source:</span>
+                        <span className="text-zinc-700 dark:text-indigo-300 font-extrabold truncate max-w-[170px]">
+                          {job.sourceName || job.organization}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="pt-3 border-t border-zinc-200/50 dark:border-zinc-800/60 flex items-center justify-between text-xs">
@@ -678,6 +689,11 @@ export default function Home() {
                         {post.labels && (
                           <span className="absolute top-3.5 left-3.5 px-3 py-1 text-[9px] font-black uppercase tracking-wider rounded-xl bg-indigo-600/90 text-white backdrop-blur-md shadow-md shadow-indigo-600/20">
                             {post.labels[0]}
+                          </span>
+                        )}
+                        {(post.sourceName || post.rawJob?.sourceName) && (
+                          <span className="absolute top-3.5 right-3.5 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wider rounded-xl bg-slate-950/80 text-emerald-300 backdrop-blur-md border border-emerald-500/30">
+                            🌐 {post.sourceName || post.rawJob?.sourceName}
                           </span>
                         )}
                       </div>

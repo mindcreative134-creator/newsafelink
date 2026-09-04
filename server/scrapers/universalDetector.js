@@ -68,21 +68,35 @@ export function detectPostCategory(title = '', snippet = '') {
     return { category: 'Govt Schemes & Yojana', badge: 'YOJANA' };
   }
 
-  // 4. University, Admissions & Entrance Exams
+  // 4. University, Admissions & Academic Notices
   if (
     text.includes('admission') || 
     text.includes('counselling') || 
+    text.includes('choice filling') ||
     text.includes('entrance') || 
     text.includes('university') || 
+    text.includes('munger') ||
+    text.includes('lnmu') ||
+    text.includes('patna') ||
+    text.includes('vksu') ||
+    text.includes('magadh') ||
+    text.includes('brabu') ||
+    text.includes('purnea') ||
+    text.includes('tmbu') ||
+    text.includes('semester') ||
+    text.includes('session') ||
     text.includes('b.ed') || 
     text.includes('deled') || 
     text.includes('iti online') || 
     text.includes('polytechnic') || 
     text.includes('cuet') || 
     text.includes('inter admission') ||
+    text.includes('provisional') ||
+    text.includes('migration certificate') ||
+    text.includes('marksheet') ||
     text.includes('नामांकन')
   ) {
-    return { category: 'University & Admissions', badge: 'ADMISSION' };
+    return { category: 'University & Admissions', badge: 'UNIV' };
   }
 
   // 5. Default: Latest Jobs / Recruitment

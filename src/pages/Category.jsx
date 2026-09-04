@@ -162,7 +162,7 @@ export default function Category() {
 
                         <div className="p-6 flex-1 flex flex-col justify-between gap-4">
                           <div className="flex flex-col gap-3">
-                            <div className="flex items-center text-[10px] font-extrabold text-zinc-400 dark:text-zinc-500 gap-3 uppercase tracking-wider">
+                            <div className="flex items-center text-[10px] font-extrabold text-zinc-400 dark:text-zinc-500 gap-2 flex-wrap uppercase tracking-wider">
                               <span className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
                                 <Calendar className="w-3 h-3" />
                                 {new Date(post.published).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
@@ -172,6 +172,14 @@ export default function Category() {
                                 <Clock className="w-3 h-3" />
                                 3 min read
                               </span>
+                              {post.sourceName && (
+                                <>
+                                  <span>•</span>
+                                  <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-extrabold">
+                                    🌐 {post.sourceName}
+                                  </span>
+                                </>
+                              )}
                             </div>
 
                             <h2

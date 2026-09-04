@@ -65,9 +65,17 @@ export function buildClonedHtmlArticle(clonedData, siteCategory = 'Latest Jobs',
             <td style="padding: 9px 4px; font-weight: 700; color: #475569;">Release Date:</td>
             <td style="padding: 9px 4px; color: #0f172a;">${today}</td>
           </tr>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 9px 4px; font-weight: 700; color: #475569;">Source Website:</td>
+            <td style="padding: 9px 4px; color: #4f46e5; font-weight: 800;">
+              <a href="${sourceUrl || applyLink}" target="_blank" rel="noopener noreferrer" style="color: #4f46e5; text-decoration: underline;">
+                🌐 ${sourceName} (${sourceUrl ? new URL(sourceUrl).hostname : 'Official Source'})
+              </a>
+            </td>
+          </tr>
           <tr>
             <td style="padding: 9px 4px; font-weight: 700; color: #475569;">Application Mode:</td>
-            <td style="padding: 9px 4px; color: #059669; font-weight: 800;">Online Registration Form</td>
+            <td style="padding: 9px 4px; color: #059669; font-weight: 800;">Online Registration Form / Official Notice</td>
           </tr>
         </table>
       </div>

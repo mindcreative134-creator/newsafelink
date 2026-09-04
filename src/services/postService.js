@@ -154,6 +154,8 @@ function formatJobAsPost(item) {
     updated: item.publishedDate || new Date().toISOString(),
     labels: [item.category, item.organization || 'Sarkari Update'],
     isSarkariJob: true,
+    sourceName: item.sourceName || item.organization || 'Official Portal',
+    sourceUrl: item.sourceUrl || item.applyUrl || '',
     rawJob: item,
   };
 }
@@ -245,9 +247,18 @@ export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label =
 
   if (label) {
     const l = label.toLowerCase();
-    filteredSarkari = sarkariUpdates.filter(
-      (j) => j.category?.toLowerCase().includes(l) || (j.organization && j.organization.toLowerCase().includes(l))
-    );
+    if (l.includes('live') || l.includes('all')) {
+      // Live Updates category returns all current real-time feeds
+      filteredSarkari = sarkariUpdates;
+    } else {
+      filteredSarkari = sarkariUpdates.filter(
+        (j) => 
+          j.category?.toLowerCase().includes(l) || 
+          (j.organization && j.organization.toLowerCase().includes(l)) ||
+          (j.sourceName && j.sourceName.toLowerCase().includes(l)) ||
+          (j.title && j.title.toLowerCase().includes(l))
+      );
+    }
   }
 
   const formattedSarkari = filteredSarkari.map((item) => formatJobAsPost(item));

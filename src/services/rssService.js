@@ -67,54 +67,33 @@ export function isValidSarkariPost(title) {
   ];
   if (crimeBlacklist.some((word) => t.includes(word))) return false;
 
-  // 4. Must contain genuine government recruitment / exam / scheme keywords
+  // 4. Must contain genuine government recruitment / exam / university / scheme keywords
   const validKeywords = [
-    'recruitment',
-    'bharti',
-    'भर्ती',
-    'vacancy',
-    'vacancies',
-    'posts',
-    'पद',
-    'online form',
-    'apply online',
-    'notification',
-    'admit card',
-    'result',
-    'answer key',
-    'scorecard',
-    'cutoff',
-    'cut off',
-    'apprentice',
-    'officer',
-    'constable',
-    'yojana',
-    'योजना',
-    'scheme',
-    'admission',
-    'exam',
-    'cgl',
-    'chsl',
-    'upsc',
-    'bpsc',
-    'ssc',
-    'rrb',
-    'railway',
-    'gds',
-    'ctet',
-    'tet',
-    'jee',
-    'neet',
-    'police',
-    'army',
-    'navy',
-    'airforce',
-    'agniveer',
-    'bank',
-    'sbi',
-    'ibps',
-    'inter',
-    'matric',
+    // Recruitment & Jobs
+    'recruitment', 'bharti', 'भर्ती', 'vacancy', 'vacancies', 'posts', 'पद', 
+    'online form', 'apply online', 'notification', 'admit card', 'result', 
+    'answer key', 'scorecard', 'cutoff', 'cut off', 'apprentice', 'officer', 
+    'constable', 'cgl', 'chsl', 'upsc', 'bpsc', 'ssc', 'rrb', 'railway', 
+    'gds', 'ctet', 'tet', 'jee', 'neet', 'police', 'army', 'navy', 'airforce', 
+    'agniveer', 'bank', 'sbi', 'ibps', 'inter', 'matric', 'clerk', 'teacher',
+
+    // University & Academic Updates (Munger, Bihar Universities, UG/PG, B.Ed)
+    'university', 'munger', 'patna', 'lnmu', 'vksu', 'magadh', 'brabu', 'purnea', 
+    'tmbu', 'college', 'degree', 'ug', 'pg', 'semester', 'session', 'part 1', 
+    'part 2', 'part 3', 'ba', 'bsc', 'bcom', 'ma', 'msc', 'mcom', 'bed', 'b.ed', 
+    'deled', 'd.el.ed', 'bceceb', 'counselling', 'choice filling', 'provisional', 
+    'migration', 'certificate', 'marksheet', 'merit list', 'timetable', 'routine', 
+    'exam date', 'date sheet', 'syllabus', 'admission', 'entrance', 'iti', 
+    'polytechnic', 'bseb', 'cbse', 'board', 'b.tech', 'diploma', 'registration',
+
+    // Government Schemes & Citizen Welfare
+    'yojana', 'योजना', 'scheme', 'pension', 'subsidy', 'scholarship', 'kisan', 
+    'ration', 'ayushman', 'loan', 'samman nidhi', 'fasal bima', 'udyami', 
+    'beneficiary', 'awas', 'pmaw', 'eshram',
+
+    // General Notices & Important Updates
+    'notice', 'circular', 'order', 'guidelines', 'update', 'alert', 'press note', 
+    'announcement', 'programme', 'schedule'
   ];
 
   return validKeywords.some((k) => t.includes(k));
