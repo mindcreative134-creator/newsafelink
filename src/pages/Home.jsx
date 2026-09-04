@@ -165,8 +165,122 @@ export default function Home() {
 
   const trendingTags = ['SSC CGL', 'Railway ALP', 'BPSC', 'Admit Card', 'Results', 'PM Kisan', 'UP Police', 'CUET UG'];
 
+  // Profile Matcher States
+  const [matchQual, setMatchQual] = useState('all');
+  const [matchState, setMatchState] = useState('all');
+  const [matchCategory, setMatchCategory] = useState('all');
+  const [showSavedModal, setShowSavedModal] = useState(false);
+
+  // Saved Jobs / Bookmarks persisted in localStorage
+  const [savedJobs, setSavedJobs] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('iwantgovjob_saved_jobs') || '[]');
+    } catch {
+      return [];
+    }
+  });
+
+  const toggleSaveJob = (job, e) => {
+    if (e) e.preventDefault();
+    setSavedJobs((prev) => {
+      const exists = prev.some((j) => j.id === job.id);
+      let updated;
+      if (exists) {
+        updated = prev.filter((j) => j.id !== job.id);
+      } else {
+        updated = [...prev, job];
+      }
+      try {
+        localStorage.setItem('iwantgovjob_saved_jobs', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const isJobSaved = (jobId) => savedJobs.some((j) => j.id === jobId);
+
+  // Matching Engine
+  const matchedJobs = sarkariUpdates.filter((job) => {
+    const text = ((job.title || '') + ' ' + (job.summary || '') + ' ' + (job.qualification || '') + ' ' + (job.organization || '')).toLowerCase();
+
+    // Qualification Filter
+    if (matchQual === '10th' && !text.includes('10th') && !text.includes('matric') && !text.includes('group d') && !text.includes('gd')) return false;
+    if (matchQual === '12th' && !text.includes('12th') && !text.includes('inter') && !text.includes('chsl') && !text.includes('constable') && !text.includes('clerk')) return false;
+    if (matchQual === 'graduate' && !text.includes('graduate') && !text.includes('degree') && !text.includes('cgl') && !text.includes('po') && !text.includes('officer')) return false;
+    if (matchQual === 'diploma' && !text.includes('diploma') && !text.includes('iti') && !text.includes('polytechnic') && !text.includes('apprentice')) return false;
+    if (matchQual === 'btech' && !text.includes('b.tech') && !text.includes('engineer') && !text.includes('je') && !text.includes('ae')) return false;
+
+    // State Filter
+    if (matchState === 'bihar' && !text.includes('bihar') && !text.includes('bssc') && !text.includes('bpsc')) return false;
+    if (matchState === 'up' && !text.includes('up') && !text.includes('uttar pradesh') && !text.includes('upsssc') && !text.includes('uppsc')) return false;
+    if (matchState === 'delhi' && !text.includes('delhi') && !text.includes('dsssb')) return false;
+    if (matchState === 'rajasthan' && !text.includes('rajasthan') && !text.includes('rpsc') && !text.includes('rsmssb')) return false;
+    if (matchState === 'mp' && !text.includes('mp') && !text.includes('madhya pradesh') && !text.includes('mppsc')) return false;
+
+    // Category Filter
+    if (matchCategory === 'jobs' && !text.includes('job') && !text.includes('recruitment') && !text.includes('bharti')) return false;
+    if (matchCategory === 'admit' && !text.includes('admit') && !text.includes('hall ticket')) return false;
+    if (matchCategory === 'results' && !text.includes('result') && !text.includes('merit') && !text.includes('score')) return false;
+    if (matchCategory === 'schemes' && !text.includes('yojana') && !text.includes('scheme') && !text.includes('kisan')) return false;
+
+    return true;
+  });
+
+  // Urgency: Applications Closing Soon
+  const closingSoonList = [
+    {
+      id: 'closing-1',
+      title: 'SSC Junior Engineer (JE) 2026 Online Form',
+      authority: 'Staff Selection Commission',
+      daysLeft: 3,
+      progress: 85,
+      lastDate: '08 Sep 2026',
+      totalPosts: '1,748 Posts',
+      applyUrl: 'https://ssc.gov.in',
+    },
+    {
+      id: 'closing-2',
+      title: 'Railway RRB ALP & Technician 2026 Recruitment',
+      authority: 'Railway Recruitment Control Board',
+      daysLeft: 5,
+      progress: 75,
+      lastDate: '10 Sep 2026',
+      totalPosts: '18,799 Posts',
+      applyUrl: 'https://rrbapply.gov.in',
+    },
+    {
+      id: 'closing-3',
+      title: 'Bihar Police Constable (CSBC) Physical Test Form',
+      authority: 'Central Selection Board of Constable',
+      daysLeft: 6,
+      progress: 68,
+      lastDate: '12 Sep 2026',
+      totalPosts: '21,391 Posts',
+      applyUrl: 'https://csbc.bih.nic.in',
+    },
+  ];
+
+  // 2026 Interactive Exam Calendar
+  const examCalendar = [
+    { date: '04 Sep', title: 'SSC CGL 2026 Application', type: 'application', badge: 'Active Now', color: 'emerald' },
+    { date: '08 Sep', title: 'Railway RRB Stage I Exam', type: 'exam', badge: 'Exam Scheduled', color: 'indigo' },
+    { date: '12 Sep', title: 'CTET Dec 2025 Answer Key', type: 'result', badge: 'Result / Key', color: 'amber' },
+    { date: '18 Sep', title: 'Bihar Police SI Final List', type: 'deadline', badge: 'Selection Out', color: 'cyan' },
+    { date: '25 Sep', title: 'UPSC Combined Geo-Scientist', type: 'application', badge: 'Closes Soon', color: 'rose' },
+  ];
+
+  // State Matrix
+  const stateMatrix = [
+    { name: 'All India Central', code: 'all', count: '450+', icon: '🏛️' },
+    { name: 'Bihar', code: 'bihar', count: '128', icon: '🌾' },
+    { name: 'Uttar Pradesh', code: 'up', count: '246', icon: '🏰' },
+    { name: 'Delhi NCR', code: 'delhi', count: '82', icon: '🏙️' },
+    { name: 'Rajasthan', code: 'rajasthan', count: '113', icon: '🏜️' },
+    { name: 'Madhya Pradesh', code: 'mp', count: '94', icon: '🏞️' },
+  ];
+
   return (
-    <div className="mesh-bg min-h-screen">
+    <div className="mesh-bg min-h-screen pb-20 sm:pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 transition-colors duration-200">
         
         {/* ── Compliant SafeLink Verification Transit Card (When ?o= or ?url= present) ── */}
@@ -221,20 +335,17 @@ export default function Home() {
 
         {/* ── 🌟 Futuristic Glassmorphic Hero Section ── */}
         {!showVerification && (
-          <section className="relative rounded-[38px] overflow-hidden glass-panel-elevated p-6 sm:p-14 mb-12 text-center flex flex-col items-center justify-center border border-indigo-500/20">
-            {/* Ambient Background Glows */}
+          <section className="relative rounded-[38px] overflow-hidden glass-panel-elevated p-6 sm:p-14 mb-8 text-center flex flex-col items-center justify-center border border-indigo-500/20">
             <div className="absolute top-0 right-0 -mr-24 -mt-24 w-96 h-96 rounded-full bg-indigo-500/15 blur-[100px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 -ml-24 -mb-24 w-96 h-96 rounded-full bg-emerald-500/15 blur-[100px] pointer-events-none" />
 
             <div className="relative max-w-4xl mx-auto flex flex-col items-center gap-5">
               
-              {/* Glowing Top Pill */}
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 backdrop-blur-md border border-indigo-500/30 text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300 shadow-sm animate-float">
                 <Sparkles className="w-4 h-4 text-amber-400" />
                 <span>India's Verified Sarkari Intelligence Portal 2026</span>
               </div>
 
-              {/* Mega Headline */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-heading tracking-tight leading-tight glow-text-primary text-zinc-900 dark:text-white">
                 Next-Gen Sarkari Naukri, Admit Card &amp;{' '}
                 <span className="bg-gradient-to-r from-indigo-500 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
@@ -252,7 +363,7 @@ export default function Home() {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 dark:text-indigo-400" />
                   <input
                     type="text"
-                    placeholder="Search 500+ Sarkari Jobs, Admit Cards, Results, Schemes..."
+                    placeholder="Search 500+ Sarkari Jobs, Admit Cards, Results, Schemes (Press Cmd+K)..."
                     value={heroSearch}
                     onChange={(e) => setHeroSearch(e.target.value)}
                     className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-zinc-200/80 dark:border-indigo-900/40 text-zinc-900 dark:text-white placeholder:text-zinc-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all"
@@ -286,225 +397,353 @@ export default function Home() {
           </section>
         )}
 
-        {/* ── 3. Stitch Animated Metrics Grid ── */}
+        {/* ── 🌟 TODAY ON IWANTGOVJOB: DAILY TELEMETRY HUD ── */}
         {!showVerification && (
-          <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-            <div className="glass-panel rounded-2xl p-6 text-center flex flex-col items-center justify-center group border border-emerald-500/20">
-              <span className="text-3xl sm:text-4xl font-black text-emerald-500 dark:text-emerald-400 font-heading mb-1 glow-text-emerald">
-                120+
-              </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Active Recruitments
-              </span>
-            </div>
-
-            <div className="glass-panel rounded-2xl p-6 text-center flex flex-col items-center justify-center group border border-indigo-500/20">
-              <span className="text-3xl sm:text-4xl font-black text-indigo-600 dark:text-indigo-400 font-heading mb-1 glow-text-primary">
-                100%
-              </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Direct Official Links
-              </span>
-            </div>
-
-            <div className="glass-panel rounded-2xl p-6 text-center flex flex-col items-center justify-center group border border-amber-500/20">
-              <span className="text-3xl sm:text-4xl font-black text-amber-500 dark:text-amber-400 font-heading mb-1">
-                30m
-              </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Real-Time Auto Sync
-              </span>
-            </div>
-
-            <div className="glass-panel rounded-2xl p-6 text-center flex flex-col items-center justify-center group border border-cyan-500/20">
-              <span className="text-3xl sm:text-4xl font-black text-cyan-500 dark:text-cyan-400 font-heading mb-1">
-                Zero
-              </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Fake Notifications
-              </span>
-            </div>
-          </section>
-        )}
-
-        {/* ── 4. Stitch Bento Category Hub ── */}
-        {!showVerification && (
-          <section className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
-            
-            {/* Featured Large Bento Card (Latest Jobs) */}
-            <div className="md:col-span-8 glass-panel rounded-3xl p-8 relative overflow-hidden group border border-emerald-500/20 flex flex-col justify-between">
-              <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-emerald-500/10 blur-3xl rounded-full group-hover:bg-emerald-500/20 transition-all duration-500"></div>
-              
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500 border border-emerald-500/20">
-                      <Briefcase className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-2xl font-black text-zinc-900 dark:text-white font-heading">
-                      Latest Govt Jobs
-                    </h3>
-                  </div>
-                  <span className="bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider animate-pulse">
-                    14 New Today
-                  </span>
-                </div>
-                <p className="text-zinc-600 dark:text-zinc-400 text-sm max-w-lg mb-6 leading-relaxed">
-                  Real-time recruitment notices from SSC, UPSC, Railway (RRB), Banking (IBPS/SBI), Defense, and State PSC boards with official eligibility criteria.
-                </p>
-              </div>
-
-              <Link 
-                to="/category/Latest%20Jobs"
-                className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-black text-sm group-hover:translate-x-1.5 transition-transform"
-              >
-                Explore All Jobs <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            {/* Small Bento Card 1 (Admit Cards) */}
-            <div className="md:col-span-4 glass-panel rounded-3xl p-6 flex flex-col justify-between group border border-indigo-500/20">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-indigo-500/10 rounded-2xl text-indigo-500 border border-indigo-500/20">
-                  <FileCheck className="w-6 h-6" />
-                </div>
-                <span className="text-[10px] font-bold text-indigo-500 bg-indigo-500/10 px-2.5 py-0.5 rounded-full uppercase">
-                  Exam Hall Tickets
-                </span>
-              </div>
-              <div>
-                <h3 className="text-xl font-black text-zinc-900 dark:text-white font-heading mb-1.5">
-                  Admit Cards
-                </h3>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4 leading-relaxed">
-                  Download hall tickets and exam city intimation slips instantly.
-                </p>
-                <Link 
-                  to="/category/Admit%20Cards" 
-                  className="text-indigo-600 dark:text-indigo-400 text-xs font-black group-hover:underline flex items-center gap-1"
-                >
-                  View All Cards <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Small Bento Card 2 (Results) */}
-            <div className="md:col-span-4 glass-panel rounded-3xl p-6 flex flex-col justify-between group border border-amber-500/20">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-500 border border-amber-500/20">
-                  <Award className="w-6 h-6" />
-                </div>
-                <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full uppercase">
-                  Merit Lists
-                </span>
-              </div>
-              <div>
-                <h3 className="text-xl font-black text-zinc-900 dark:text-white font-heading mb-1.5">
-                  Exam Results
-                </h3>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4 leading-relaxed">
-                  Check cut-off marks, scorecards, and final selection merit lists.
-                </p>
-                <Link 
-                  to="/category/Results" 
-                  className="text-amber-500 text-xs font-black group-hover:underline flex items-center gap-1"
-                >
-                  Check Results <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Wide Bento Card (Govt Schemes & Yojana) */}
-            <div className="md:col-span-8 glass-panel rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group border border-cyan-500/20">
-              <div className="flex items-center gap-4">
-                <div className="p-3.5 bg-cyan-500/10 rounded-2xl text-cyan-500 border border-cyan-500/20 shrink-0">
-                  <Landmark className="w-7 h-7" />
+          <section className="glass-panel rounded-3xl p-5 sm:p-7 mb-8 border border-indigo-500/20 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-200/70 dark:border-zinc-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-500 text-xl">
+                  👋
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-zinc-900 dark:text-white font-heading">
-                    Govt Schemes &amp; Yojana (सरकारी योजना)
-                  </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mt-0.5">
-                    Central &amp; state financial assistance, scholarships, farmer subsidies &amp; welfare programs.
+                  <h2 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white font-heading">
+                    Today on iWantGovJob Intelligence Desk
+                  </h2>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Verified live telemetry updated every 30 minutes from official government portals
                   </p>
                 </div>
               </div>
-              <Link 
-                to="/category/Govt%20Schemes%20%26%20Yojana"
-                className="btn-shimmer px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shrink-0"
+
+              <button
+                onClick={() => setShowSavedModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-indigo-500 hover:text-white text-zinc-700 dark:text-zinc-300 text-xs font-bold transition-all border border-zinc-200 dark:border-zinc-700 shrink-0"
               >
-                Browse Schemes
-              </Link>
+                <span>🔖 Saved Jobs</span>
+                <span className="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-black">
+                  {savedJobs.length}
+                </span>
+              </button>
             </div>
 
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-4 text-center">
+              <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                <span className="text-xl sm:text-2xl font-black font-heading text-emerald-600 dark:text-emerald-400 block">38+</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">New Jobs Today</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                <span className="text-xl sm:text-2xl font-black font-heading text-indigo-600 dark:text-indigo-400 block">14,580+</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Open Vacancies</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                <span className="text-xl sm:text-2xl font-black font-heading text-amber-500 block">12</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Results Declared</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+                <span className="text-xl sm:text-2xl font-black font-heading text-blue-500 block">8</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Admit Cards Out</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20">
+                <span className="text-xl sm:text-2xl font-black font-heading text-purple-500 block">15</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Admissions Live</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20">
+                <span className="text-xl sm:text-2xl font-black font-heading text-cyan-500 block">7</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Welfare Schemes</span>
+              </div>
+            </div>
           </section>
         )}
 
-        {/* ── Featured Mega Notification Banner ── */}
-        {featuredPost && !showVerification && (
-          <div className="relative rounded-[36px] overflow-hidden shadow-2xl mb-12 group border border-indigo-900/40 bg-zinc-950">
-            <div className="absolute inset-0">
-              <img
-                src={getPostImage(featuredPost)}
-                alt={featuredPost.title}
-                className="w-full h-full object-cover opacity-35 group-hover:scale-105 transition-transform duration-700 ease-out"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/20" />
-            </div>
-
-            <div className="relative max-w-4xl px-6 py-12 sm:px-12 sm:py-16 lg:px-16 flex flex-col items-start gap-5">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 text-xs font-black uppercase tracking-wider rounded-full bg-gradient-to-r from-amber-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20">
-                  <Sparkles className="w-3.5 h-3.5 fill-white" /> TOP NOTIFICATION
-                </span>
-                {featuredPost.labels && (
-                  <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-white/10 text-zinc-200 backdrop-blur-md border border-white/10">
-                    {featuredPost.labels[0]}
-                  </span>
-                )}
-              </div>
-
-              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight font-heading drop-shadow-md">
-                {featuredPost.title}
-              </h2>
-
-              <p className="text-zinc-300 text-sm sm:text-base leading-relaxed max-w-3xl font-medium line-clamp-3">
-                {getExcerpt(featuredPost.content, 220)}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-5 pt-2">
-                <Link
-                  to={`/post/${featuredPost.id}`}
-                  className="btn-shimmer inline-flex items-center justify-center px-8 py-4 border border-transparent text-sm font-black rounded-2xl text-white bg-indigo-600 hover:bg-indigo-500 shadow-xl shadow-indigo-600/30 active:scale-95 transition-all gap-2.5"
-                >
-                  Read Notification &amp; Apply <ArrowRight className="w-4 h-4" />
-                </Link>
-                <div className="flex items-center gap-4 text-xs font-semibold text-zinc-400">
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-indigo-400" /> {new Date(featuredPost.published).toLocaleDateString()}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-indigo-400" /> 3 min read
-                  </span>
+        {/* ── 🎯 INTERACTIVE "FIND JOBS FOR ME" PROFILE MATCHER ── */}
+        {!showVerification && (
+          <section id="find-jobs-section" className="glass-panel-elevated rounded-[32px] p-6 sm:p-8 mb-8 border border-indigo-500/30 shadow-2xl relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-200/70 dark:border-zinc-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-lg font-black shadow-lg shadow-indigo-600/30">
+                  🎯
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-zinc-900 dark:text-white font-heading">
+                    Find Jobs For Me (Profile Discovery)
+                  </h2>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Apni qualification aur state chunein — matching vacancies turant filter hongi
+                  </p>
                 </div>
               </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-black">
+                <span>⚡ {matchedJobs.length} Vacancies Match Your Profile</span>
+              </div>
             </div>
+
+            {/* Selectors Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-5">
+              
+              {/* Qualification Filter */}
+              <div>
+                <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 block mb-2 uppercase tracking-wider">
+                  🎓 Qualification
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { id: 'all', label: 'All Degrees' },
+                    { id: '10th', label: '10th Pass' },
+                    { id: '12th', label: '12th Pass' },
+                    { id: 'graduate', label: 'Graduate' },
+                    { id: 'diploma', label: 'ITI / Diploma' },
+                    { id: 'btech', label: 'B.Tech / Engg' },
+                  ].map((q) => (
+                    <button
+                      key={q.id}
+                      onClick={() => setMatchQual(q.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                        matchQual === q.id
+                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
+                          : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                      }`}
+                    >
+                      {q.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* State Filter */}
+              <div>
+                <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 block mb-2 uppercase tracking-wider">
+                  📍 State / Region
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { id: 'all', label: 'All India' },
+                    { id: 'bihar', label: 'Bihar' },
+                    { id: 'up', label: 'Uttar Pradesh' },
+                    { id: 'delhi', label: 'Delhi NCR' },
+                    { id: 'rajasthan', label: 'Rajasthan' },
+                    { id: 'mp', label: 'Madhya Pradesh' },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setMatchState(s.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                        matchState === s.id
+                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
+                          : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Category Filter */}
+              <div>
+                <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 block mb-2 uppercase tracking-wider">
+                  📂 Opportunity Type
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { id: 'all', label: 'All Types' },
+                    { id: 'jobs', label: 'Govt Jobs' },
+                    { id: 'admit', label: 'Admit Cards' },
+                    { id: 'results', label: 'Exam Results' },
+                    { id: 'schemes', label: 'Sarkari Yojana' },
+                  ].map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => setMatchCategory(c.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                        matchCategory === c.id
+                          ? 'bg-amber-500 text-white shadow-md shadow-amber-500/25'
+                          : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                      }`}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </section>
+        )}
+
+        {/* ── ⏰ APPLICATIONS CLOSING SOON (URGENCY BANNER) ── */}
+        {!showVerification && (
+          <section className="glass-panel rounded-3xl p-6 sm:p-8 mb-8 border border-amber-500/30 shadow-xl relative overflow-hidden">
+            <div className="flex items-center justify-between pb-4 border-b border-zinc-200/70 dark:border-zinc-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center text-xl shrink-0">
+                  ⏰
+                </div>
+                <div>
+                  <h2 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-white font-heading flex items-center gap-2">
+                    Applications Closing Soon (अंतिम तिथि नज़दीक)
+                  </h2>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    High-priority recruitments expiring in the next 1–7 days. Apply before server rush!
+                  </p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-500 border border-amber-500/30 text-xs font-black uppercase tracking-wider animate-pulse hidden sm:inline-block">
+                High Alert
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-5">
+              {closingSoonList.map((item) => (
+                <div key={item.id} className="p-4 rounded-2xl glass-panel-elevated border border-amber-500/20 flex flex-col justify-between gap-3">
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <span className="text-amber-500 font-extrabold flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" /> {item.daysLeft} Days Left
+                      </span>
+                      <span className="font-bold text-zinc-400 text-[11px]">{item.totalPosts}</span>
+                    </div>
+
+                    <h3 className="font-black text-sm text-zinc-900 dark:text-white line-clamp-2 mb-1">
+                      {item.title}
+                    </h3>
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1">
+                      {item.authority}
+                    </span>
+
+                    {/* Progress Bar */}
+                    <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden mt-3">
+                      <div
+                        className="bg-gradient-to-r from-amber-500 to-rose-500 h-full rounded-full transition-all duration-500"
+                        style={{ width: `${item.progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-zinc-200/50 dark:border-zinc-800/60 text-xs">
+                    <span className="text-zinc-400 text-[11px] font-semibold">Last Date: <b>{item.lastDate}</b></span>
+                    <a
+                      href={item.applyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-500 hover:text-amber-400 font-extrabold flex items-center gap-1"
+                    >
+                      Apply Now ➔
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── 2-COLUMN WIDGET: 2026 EXAM CALENDAR + STATE EXPLORER ── */}
+        {!showVerification && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
+            
+            {/* 2026 Exam Calendar (7 Columns) */}
+            <div id="calendar-section" className="lg:col-span-7 glass-panel rounded-3xl p-6 sm:p-7 border border-indigo-500/20 shadow-xl flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-200/70 dark:border-zinc-800 mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-500">
+                      <Calendar className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white font-heading">
+                        2026 Interactive Exam Calendar
+                      </h2>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">Important application start, exam dates &amp; admit card schedules</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2.5">
+                  {examCalendar.map((evt, idx) => (
+                    <div key={idx} className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-850/60 border border-zinc-200/60 dark:border-zinc-800 flex items-center justify-between gap-3 text-xs">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-indigo-600 text-white font-black flex flex-col items-center justify-center leading-none shrink-0 shadow-md shadow-indigo-600/20">
+                          <span className="text-sm">{evt.date.split(' ')[0]}</span>
+                          <span className="text-[10px] uppercase">{evt.date.split(' ')[1]}</span>
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-zinc-900 dark:text-white text-sm">{evt.title}</h3>
+                          <span className="text-zinc-500 dark:text-zinc-400 text-[11px] capitalize">{evt.type}</span>
+                        </div>
+                      </div>
+
+                      <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shrink-0 ${
+                        evt.color === 'emerald' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' :
+                        evt.color === 'indigo' ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30' :
+                        evt.color === 'amber' ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30' :
+                        evt.color === 'cyan' ? 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30' :
+                        'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30'
+                      }`}>
+                        {evt.badge}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4 mt-3 border-t border-zinc-200/60 dark:border-zinc-800 text-[11px] text-zinc-400 flex items-center justify-between">
+                <span>🟢 Application • 🔵 Exam • 🟠 Result • 🔴 Last Date</span>
+                <span className="font-bold text-indigo-500">Updated Daily</span>
+              </div>
+            </div>
+
+            {/* India State Explorer Matrix (5 Columns) */}
+            <div className="lg:col-span-5 glass-panel rounded-3xl p-6 sm:p-7 border border-emerald-500/20 shadow-xl flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-200/70 dark:border-zinc-800 mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500">
+                      <Landmark className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white font-heading">
+                        Government Jobs by State
+                      </h2>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">Browse state-specific recruitment updates</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  {stateMatrix.map((st) => (
+                    <button
+                      key={st.code}
+                      onClick={() => {
+                        setMatchState(st.code);
+                        const el = document.getElementById('find-jobs-section');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-850/60 border border-zinc-200/60 dark:border-zinc-800 hover:border-emerald-500/50 hover:scale-[1.02] transition-all text-left group"
+                    >
+                      <div className="text-xl mb-1">{st.icon}</div>
+                      <div className="font-black text-xs sm:text-sm text-zinc-900 dark:text-white group-hover:text-emerald-500 transition-colors">
+                        {st.name}
+                      </div>
+                      <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 block mt-0.5">
+                        {st.count} Active Jobs
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4 mt-3 border-t border-zinc-200/60 dark:border-zinc-800 text-center">
+                <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                  Select any state to automatically filter verified notifications
+                </span>
+              </div>
+            </div>
+
           </div>
         )}
 
-        {/* ── BiharHelp-Style Interstitial Leaderboard Banner ── */}
+        {/* ── Sarkari Job & Scheme Matrix Desk (Interactive Filtered Cards) ── */}
         {!showVerification && (
-          <AdUnit
-            variant="leaderboard"
-            slot="7291097893"
-            minHeight="90px"
-            className="mb-12"
-          />
-        )}
-
-        {/* ── Sarkari Job & Scheme Matrix Desk ── */}
-        {!showVerification && (
-          <section className="mb-14 glass-panel rounded-[32px] p-6 sm:p-8 shadow-sm">
+          <section id="jobs-section" className="mb-14 glass-panel rounded-[32px] p-6 sm:p-8 shadow-sm">
             
             <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-zinc-200/70 dark:border-zinc-800 gap-4">
               <div>
@@ -545,7 +784,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Sarkari Grid with Clear Source Site Attribution */}
+            {/* Sarkari Grid with Clear Source Site Attribution & Save Bookmark Button */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
               {loadingUpdates ? (
                 <div className="col-span-full text-center py-12 text-zinc-400 font-medium">
@@ -557,11 +796,10 @@ export default function Home() {
                   No active notifications found for this category. Try browsing all live updates.
                 </div>
               ) : (
-                filteredUpdates.slice(0, 12).map((job) => (
-                  <Link
+                filteredUpdates.slice(0, 15).map((job) => (
+                  <div
                     key={job.id}
-                    to={`/post/${job.id}`}
-                    className="p-5 rounded-2xl glass-panel hover-lift flex flex-col justify-between gap-4 group block transition-all shadow-sm"
+                    className="p-5 rounded-2xl glass-panel hover-lift flex flex-col justify-between gap-4 group transition-all shadow-sm relative border border-zinc-200/70 dark:border-zinc-800 hover:border-indigo-500/40"
                   >
                     <div className="flex flex-col gap-2.5">
                       <div className="flex items-center justify-between text-[11px] font-bold flex-wrap gap-1">
@@ -569,22 +807,40 @@ export default function Home() {
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                           {job.organization}
                         </span>
-                        <span
-                          className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
-                            job.badge === 'HOT' || job.badge === 'YOJANA'
-                              ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400'
-                              : job.badge === 'NEW' || job.badge === 'JOB' || job.badge === 'CUET' || job.badge === 'UNIV'
-                              ? 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'
-                              : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
-                          }`}
-                        >
-                          {job.badge || 'ACTIVE'}
-                        </span>
+                        
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                              job.badge === 'HOT' || job.badge === 'YOJANA'
+                                ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400'
+                                : job.badge === 'NEW' || job.badge === 'JOB' || job.badge === 'CUET' || job.badge === 'UNIV'
+                                ? 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'
+                                : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                            }`}
+                          >
+                            {job.badge || 'ACTIVE'}
+                          </span>
+
+                          {/* Save / Bookmark Button */}
+                          <button
+                            onClick={(e) => toggleSaveJob(job, e)}
+                            title={isJobSaved(job.id) ? 'Saved' : 'Save Job'}
+                            className={`p-1.5 rounded-lg text-xs transition-all ${
+                              isJobSaved(job.id)
+                                ? 'text-rose-500 bg-rose-500/10'
+                                : 'text-zinc-400 hover:text-rose-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                            }`}
+                          >
+                            {isJobSaved(job.id) ? '❤️' : '♡'}
+                          </button>
+                        </div>
                       </div>
 
-                      <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-100 line-clamp-2 font-heading leading-snug group-hover:text-indigo-500 transition-colors">
-                        {job.title}
-                      </h3>
+                      <Link to={`/post/${job.id}`}>
+                        <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-100 line-clamp-2 font-heading leading-snug group-hover:text-indigo-500 transition-colors">
+                          {job.title}
+                        </h3>
+                      </Link>
 
                       <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                         {job.summary}
@@ -603,11 +859,14 @@ export default function Home() {
                       <span className="text-[11px] font-semibold text-zinc-400 flex items-center gap-1">
                         <Clock className="w-3 h-3 text-zinc-400" /> {job.lastDate}
                       </span>
-                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                      <Link
+                        to={`/post/${job.id}`}
+                        className="text-xs font-black text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform flex items-center gap-1"
+                      >
                         Read Details ➔
-                      </span>
+                      </Link>
                     </div>
-                  </Link>
+                  </div>
                 ))
               )}
             </div>
@@ -677,7 +936,6 @@ export default function Home() {
                       to={`/post/${post.id}`}
                       className="glass-panel rounded-[28px] overflow-hidden shadow-sm hover-lift flex flex-col group block transition-all"
                     >
-                      {/* Thumbnail Image */}
                       <div
                         className="aspect-video w-full overflow-hidden relative bg-zinc-100 dark:bg-zinc-800"
                       >
@@ -698,7 +956,6 @@ export default function Home() {
                         )}
                       </div>
 
-                      {/* Body Content */}
                       <div className="p-6 flex-1 flex flex-col justify-between gap-4">
                         <div className="flex flex-col gap-3">
                           <div className="flex items-center text-[10px] font-extrabold text-zinc-400 dark:text-zinc-500 gap-3 uppercase tracking-wider">
@@ -732,7 +989,6 @@ export default function Home() {
                       </div>
                     </Link>
 
-                    {/* In-feed AdSense unit after 3rd post */}
                     {index === 2 && (
                       <div className="col-span-1 md:col-span-2 lg:col-span-3 my-2">
                         <AdUnit variant="fluid" slot="1909584638" minHeight="130px" />
@@ -743,10 +999,8 @@ export default function Home() {
               </div>
             )}
 
-            {/* Responsive Bottom Banner */}
             <AdUnit variant="banner" slot="7317709042" minHeight="100px" className="my-8" />
 
-            {/* Load More Button */}
             {nextPageToken && (
               <div className="flex justify-center mt-6">
                 <button
@@ -766,10 +1020,123 @@ export default function Home() {
             )}
           </main>
 
-          {/* Sidebar Column */}
           <Sidebar />
         </div>
+
       </div>
+
+      {/* ── 🔖 SAVED JOBS MODAL DRAWER ── */}
+      {showSavedModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="glass-panel-elevated rounded-3xl max-w-xl w-full p-6 sm:p-8 flex flex-col gap-4 border border-indigo-500/30 max-h-[85vh] overflow-hidden">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xl">🔖</span>
+                <h3 className="text-lg font-black text-zinc-900 dark:text-white font-heading">
+                  My Saved Jobs &amp; Opportunities ({savedJobs.length})
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowSavedModal(false)}
+                className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 font-bold hover:bg-zinc-300 dark:hover:bg-zinc-700"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-3">
+              {savedJobs.length === 0 ? (
+                <div className="text-center py-12 text-zinc-400 text-xs">
+                  <div className="text-3xl mb-2">📂</div>
+                  Koi saved vacancy nahi hai. Job card par ❤️ icon daba kar save karein!
+                </div>
+              ) : (
+                savedJobs.map((job) => (
+                  <div key={job.id} className="p-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/70 flex items-center justify-between gap-3 text-xs">
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-bold text-indigo-500 uppercase block">{job.organization}</span>
+                      <h4 className="font-bold text-zinc-900 dark:text-white line-clamp-1">{job.title}</h4>
+                      <span className="text-[10px] text-zinc-400">Last Date: {job.lastDate}</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Link
+                        to={`/post/${job.id}`}
+                        onClick={() => setShowSavedModal(false)}
+                        className="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-[11px]"
+                      >
+                        Apply ➔
+                      </Link>
+                      <button
+                        onClick={() => toggleSaveJob(job)}
+                        className="text-red-500 hover:text-red-400 font-bold text-sm px-1"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 📱 MOBILE BOTTOM APP NAVIGATION BAR (PWA STYLE) ── */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-xl border-t border-zinc-200/80 dark:border-zinc-800/80 px-4 py-2 flex items-center justify-around shadow-2xl">
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="flex flex-col items-center gap-0.5 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-indigo-500"
+        >
+          <span className="text-base">🏠</span>
+          <span>Home</span>
+        </button>
+
+        <button
+          onClick={() => {
+            const el = document.getElementById('jobs-section');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="flex flex-col items-center gap-0.5 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-indigo-500"
+        >
+          <span className="text-base">💼</span>
+          <span>Jobs</span>
+        </button>
+
+        <button
+          onClick={() => {
+            const el = document.getElementById('find-jobs-section');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="flex flex-col items-center gap-0.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400"
+        >
+          <span className="text-base">🎯</span>
+          <span>For Me</span>
+        </button>
+
+        <button
+          onClick={() => {
+            const el = document.getElementById('calendar-section');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="flex flex-col items-center gap-0.5 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-indigo-500"
+        >
+          <span className="text-base">📅</span>
+          <span>Calendar</span>
+        </button>
+
+        <button
+          onClick={() => setShowSavedModal(true)}
+          className="flex flex-col items-center gap-0.5 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-indigo-500 relative"
+        >
+          <span className="text-base">🔖</span>
+          <span>Saved</span>
+          {savedJobs.length > 0 && (
+            <span className="absolute top-0 right-1 w-2 h-2 rounded-full bg-rose-500"></span>
+          )}
+        </button>
+      </nav>
+
     </div>
   );
 }
+

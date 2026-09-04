@@ -148,4 +148,98 @@ router.get('/api/latest-posts', (req, res) => {
   res.json(posts);
 });
 
+// Real-time Blogger Blog Stats & Health Check
+router.get('/api/blogger-stats', async (req, res) => {
+  try {
+    const { fetchAllLiveBloggerPosts } = await import('../services/bloggerPublisher.js');
+    const posts = await fetchAllLiveBloggerPosts();
+    
+    // Check for potential duplicate titles
+    const titleCounts = {};
+    let duplicatesFound = 0;
+    for (const p of posts) {
+      const clean = (p.title || '').trim().toLowerCase();
+      titleCounts[clean] = (titleCounts[clean] || 0) + 1;
+      if (titleCounts[clean] > 1) duplicatesFound++;
+    }
+
+    res.json({
+      success: true,
+      blogId: CONFIG.BLOG_ID,
+      totalLivePosts: posts.length,
+      duplicatesFound,
+      recentPosts: posts.slice(0, 8).map(p => ({
+        id: p.id,
+        title: p.title,
+        url: p.url,
+        published: p.published,
+      })),
+      isOauthConfigured: Boolean(CONFIG.CLIENT_ID && CONFIG.REFRESH_TOKEN),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Automated 1-Click Clean Duplicates on Blogger
+router.post('/api/clean-duplicates', async (req, res) => {
+  try {
+    const { fetchAllLiveBloggerPosts, deleteBloggerPost } = await import('../services/bloggerPublisher.js');
+    logEvent(`[Duplicate Cleanup] Scanning Blogger for duplicate posts...`);
+    const posts = await fetchAllLiveBloggerPosts();
+    
+    const seen = new Map();
+    const toDelete = [];
+
+    for (const p of posts) {
+      const norm = (p.title || '').toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (seen.has(norm)) {
+        toDelete.push({ id: p.id, title: p.title, keepId: seen.get(norm) });
+      } else {
+        seen.set(norm, p.id);
+      }
+    }
+
+    let deletedCount = 0;
+    for (const dup of toDelete) {
+      const ok = await deleteBloggerPost(dup.id);
+      if (ok) {
+        deletedCount++;
+        logEvent(`[Deleted Duplicate] "${dup.title}" (ID: ${dup.id})`);
+      }
+    }
+
+    res.json({
+      success: true,
+      scanned: posts.length,
+      duplicatesIdentified: toDelete.length,
+      deletedCount,
+      message: deletedCount > 0 ? `Successfully deleted ${deletedCount} duplicate posts from Blogger!` : 'Zero duplicates found. Your blog is 100% clean!'
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Full Dashboard Summary Endpoint
+router.get('/api/dashboard-summary', async (req, res) => {
+  const feeds = loadJson(CONFIG.FEEDS_FILE, []);
+  const logs = loadJson(LOGS_FILE, []);
+  const scrapedPosts = loadJson(SCRAPED_POSTS_FILE, []);
+  const keepAlive = getKeepAliveStatus();
+  const isOauthConfigured = Boolean(CONFIG.CLIENT_ID && CONFIG.REFRESH_TOKEN);
+
+  res.json({
+    uptime: Math.round(process.uptime()),
+    blogId: CONFIG.BLOG_ID,
+    cronSchedule: CONFIG.CRON_SCHEDULE,
+    feedsCount: feeds.length,
+    scrapedPostsCount: scrapedPosts.length,
+    isOauthConfigured,
+    keepAlive,
+    recentLogs: logs.slice(-20).reverse(),
+  });
+});
+
 export default router;
+
