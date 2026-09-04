@@ -1,6 +1,9 @@
 import * as cheerio from 'cheerio';
+import https from 'https';
 import axios from 'axios';
 import { logEvent } from '../utils/logger.js';
+
+const ipv4Agent = new https.Agent({ family: 4, keepAlive: true });
 
 /**
  * Dedicated Scraper for OnlineUpdateStm (onlineupdatestm.in.net)
@@ -11,12 +14,13 @@ export async function scrapeOnlineUpdate(siteConfig = {}) {
 
   try {
     const res = await axios.get(url, {
+      httpsAgent: ipv4Agent,
       headers: {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
-      timeout: 15000,
+      timeout: 20000,
     });
 
     const $ = cheerio.load(res.data);

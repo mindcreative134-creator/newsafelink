@@ -55,8 +55,8 @@ export async function runSyncRoutine() {
           }
         }
 
-        // 2. Publish up to 2 newest items to Blogger
-        for (const item of items.slice(0, 2)) {
+        // 2. Publish newest item to Blogger (1 per feed to respect Google Blogger rate quotas)
+        for (const item of items.slice(0, 1)) {
           const cleanTitle = (item.title || '').replace(/\s*-\s*[^-]+$/, '').trim();
           if (!cleanTitle || postedCache.has(cleanTitle)) {
             continue;
@@ -78,9 +78,15 @@ export async function runSyncRoutine() {
               postedCache.add(cleanTitle);
               newPostsCount++;
               logEvent(`✅ Successfully published: "${cleanTitle}" to Blogger!`, 'success');
+              // 5-second interval between posts to respect Google Cloud Blogger write limits
+              await new Promise((res) => setTimeout(res, 5000));
             }
           } catch (postErr) {
             logEvent(`Failed to post "${cleanTitle}": ${postErr.message}`, 'error');
+            if (postErr.message && postErr.message.includes('quota')) {
+              logEvent(`[Blogger Quota] Google Blogger API write quota limit reached. Pausing until next cycle.`, 'warning');
+              break;
+            }
           }
         }
       }
