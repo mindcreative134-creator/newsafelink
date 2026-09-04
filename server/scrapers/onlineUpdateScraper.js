@@ -9,7 +9,7 @@ const ipv4Agent = new https.Agent({ family: 4, keepAlive: true });
  * Dedicated Scraper for OnlineUpdateStm (onlineupdatestm.in.net)
  */
 export async function scrapeOnlineUpdate(siteConfig = {}) {
-  const url = siteConfig.url || 'https://onlineupdatestm.in.net/';
+  const url = (siteConfig.url || 'https://onlineupdatestm.in/').replace('.in.net', '.in');
   logEvent(`[OnlineUpdate Scraper] Scraping portal: ${url}`);
 
   try {
@@ -26,40 +26,47 @@ export async function scrapeOnlineUpdate(siteConfig = {}) {
     const $ = cheerio.load(res.data);
     const items = [];
 
-    // Target article headlines and cards, skipping navigation menus
-    $('h2 a, h3 a, article a').each((_, el) => {
-      const title = $(el).text().trim();
+    // Target article headlines, cards, and content links
+    $('h2 a, h3 a, article a, .entry-title a, .post-title a, .card a, a').each((_, el) => {
+      let title = $(el).text().replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
       let link = $(el).attr('href') || '';
 
       if (link.startsWith('/')) {
-        link = `https://onlineupdatestm.in.net${link}`;
+        link = `https://onlineupdatestm.in${link}`;
       }
 
       const lowerTitle = title.toLowerCase();
+      const lowerLink = link.toLowerCase();
 
       if (
-        title.length >= 20 &&
-        title.length <= 220 &&
+        title.length >= 18 &&
+        title.length <= 250 &&
         link.startsWith('http') &&
-        !link.includes('/category/') &&
-        !link.includes('/tag/')
+        !lowerLink.includes('whatsapp') &&
+        !lowerLink.includes('telegram') &&
+        !lowerLink.includes('youtube') &&
+        !lowerLink.includes('facebook') &&
+        !lowerLink.includes('/category/') &&
+        !lowerLink.includes('/tag/') &&
+        !lowerLink.includes('/page/') &&
+        !lowerLink.includes('/author/')
       ) {
-        if (!items.some((it) => it.title === title)) {
+        if (!items.some((it) => it.title === title || it.link === link)) {
           let category = siteConfig.category || 'Latest Jobs';
-          if (lowerTitle.includes('result') || lowerTitle.includes('merit')) {
+          if (lowerTitle.includes('result') || lowerTitle.includes('merit') || lowerTitle.includes('रिजल्ट')) {
             category = 'Results';
-          } else if (lowerTitle.includes('admit') || lowerTitle.includes('hall ticket')) {
+          } else if (lowerTitle.includes('admit') || lowerTitle.includes('hall ticket') || lowerTitle.includes('city') || lowerTitle.includes('एडमिट')) {
             category = 'Admit Cards';
-          } else if (lowerTitle.includes('admission') || lowerTitle.includes('entrance')) {
+          } else if (lowerTitle.includes('admission') || lowerTitle.includes('entrance') || lowerTitle.includes('university') || lowerTitle.includes('कॉलेज')) {
             category = 'University & Admissions';
-          } else if (lowerTitle.includes('yojana') || lowerTitle.includes('scheme')) {
+          } else if (lowerTitle.includes('yojana') || lowerTitle.includes('scheme') || lowerTitle.includes('योजना') || lowerTitle.includes('कार्ड') || lowerTitle.includes('card') || lowerTitle.includes('scholarship')) {
             category = 'Govt Schemes & Yojana';
           }
 
           items.push({
             title,
             link,
-            contentSnippet: `Verified update from OnlineUpdateSTM: ${title}. Check eligibility criteria, application process, and official direct links.`,
+            contentSnippet: `Verified official update from OnlineUpdateSTM: ${title}. Complete eligibility criteria, steps, and official direct links.`,
             sourceName: 'OnlineUpdate STM',
             category,
           });

@@ -65,7 +65,7 @@
   {
     "id": "feed-real-8",
     "name": "OnlineUpdateSTM Official Jobs & Updates",
-    "url": "https://onlineupdatestm.in.net/",
+    "url": "https://onlineupdatestm.in/",
     "category": "Latest Jobs",
     "type": "scrape",
     "labels": ["OnlineUpdateSTM", "Latest Jobs", "Bihar Jobs"],

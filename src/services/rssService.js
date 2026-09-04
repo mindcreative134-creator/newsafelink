@@ -12,8 +12,8 @@ export function isValidSarkariPost(title) {
   if (!title || typeof title !== 'string') return false;
   const t = title.toLowerCase().trim();
 
-  // 1. Length constraint (Menu links like "Latest Job" or "All India Jobs" are short)
-  if (t.length < 18 || t.length > 220) return false;
+  // 1. Length constraint (allow short titles like "UP Scholarship" or "UPSC CMS 2026")
+  if (t.length < 10 || t.length > 250) return false;
 
   // 2. Reject website navigation & category menu labels
   const menuBlacklist = [
@@ -29,7 +29,6 @@ export function isValidSarkariPost(title) {
     'syllabus',
     'admission',
     'admissions',
-    'scholarship',
     'contact us',
     'about us',
     'privacy policy',
@@ -44,56 +43,70 @@ export function isValidSarkariPost(title) {
   ];
   if (menuBlacklist.includes(t)) return false;
 
-  // 3. Reject Crime / Negative / Non-Job News
-  const crimeBlacklist = [
-    'arrest',
-    'arrested',
-    'rape',
-    'raped',
-    'murder',
-    'crime',
-    'blast',
-    'fraud',
-    'scam',
-    'digital arrest',
-    'jail',
-    'killed',
-    'police custody',
-    'extortion',
-    'assault',
-    'terror',
-    'suicide',
-    'cyber fraud',
-  ];
-  if (crimeBlacklist.some((word) => t.includes(word))) return false;
+  // 3. Reject Crime / Negative / Non-Job News (unless it is a legitimate recruitment / exam term)
+  const isRecruitmentPost = t.includes('recruitment') || t.includes('bharti') || t.includes('result') || 
+                            t.includes('admit card') || t.includes('vacancy') || t.includes('post') || 
+                            t.includes('warder') || t.includes('jailor') || t.includes('exam');
+
+  if (!isRecruitmentPost) {
+    const crimeBlacklist = [
+      'arrest',
+      'arrested',
+      'rape',
+      'raped',
+      'murder',
+      'crime',
+      'blast',
+      'fraud',
+      'scam',
+      'digital arrest',
+      'killed',
+      'police custody',
+      'extortion',
+      'assault',
+      'terror',
+      'suicide',
+      'cyber fraud',
+    ];
+    if (crimeBlacklist.some((word) => t.includes(word))) return false;
+  }
 
   // 4. Must contain genuine government recruitment / exam / university / scheme keywords
   const validKeywords = [
     // Recruitment & Jobs
     'recruitment', 'bharti', 'भर्ती', 'vacancy', 'vacancies', 'posts', 'पद', 
-    'online form', 'apply online', 'notification', 'admit card', 'result', 
-    'answer key', 'scorecard', 'cutoff', 'cut off', 'apprentice', 'officer', 
-    'constable', 'cgl', 'chsl', 'upsc', 'bpsc', 'ssc', 'rrb', 'railway', 
-    'gds', 'ctet', 'tet', 'jee', 'neet', 'police', 'army', 'navy', 'airforce', 
-    'agniveer', 'bank', 'sbi', 'ibps', 'inter', 'matric', 'clerk', 'teacher',
+    'online form', 'apply online', 'online apply', 'notification', 'admit card', 
+    'result', 'रिजल्ट', 'answer key', 'scorecard', 'score card', 'cutoff', 'cut off', 
+    'apprentice', 'officer', 'constable', 'cgl', 'chsl', 'upsc', 'bpsc', 'bssc', 'csbc', 
+    'ssc', 'rrb', 'railway', 'gds', 'ctet', 'tet', 'jee', 'neet', 'police', 'army', 
+    'navy', 'airforce', 'agniveer', 'bank', 'sbi', 'ibps', 'inter', 'matric', 'clerk', 
+    'teacher', 'warder', 'jailor', 'prahari', 'dsssb', 'rpsc', 'oicl', 'lic', 'nabard', 
+    'aiims', 'epfo', 'drdo', 'isro', 'walk-in', 'walk in', 'interview',
 
     // University & Academic Updates (Munger, Bihar Universities, UG/PG, B.Ed)
-    'university', 'munger', 'patna', 'lnmu', 'vksu', 'magadh', 'brabu', 'purnea', 
-    'tmbu', 'college', 'degree', 'ug', 'pg', 'semester', 'session', 'part 1', 
-    'part 2', 'part 3', 'ba', 'bsc', 'bcom', 'ma', 'msc', 'mcom', 'bed', 'b.ed', 
-    'deled', 'd.el.ed', 'bceceb', 'counselling', 'choice filling', 'provisional', 
-    'migration', 'certificate', 'marksheet', 'merit list', 'timetable', 'routine', 
-    'exam date', 'date sheet', 'syllabus', 'admission', 'entrance', 'iti', 
-    'polytechnic', 'bseb', 'cbse', 'board', 'b.tech', 'diploma', 'registration',
+    'university', 'vishwavidyalaya', 'विश्वविद्यालय', 'munger', 'patna', 'lnmu', 'vksu', 
+    'magadh', 'brabu', 'purnea', 'tmbu', 'bnmu', 'ppu', 'ignou', 'du', 'bhu', 'jnu', 
+    'aktu', 'ccsu', 'prsu', 'college', 'degree', 'ug', 'pg', 'semester', 'session', 
+    'part 1', 'part 2', 'part 3', 'ba', 'bsc', 'bcom', 'ma', 'msc', 'mcom', 'bed', 
+    'b.ed', 'deled', 'd.el.ed', 'bceceb', 'counselling', 'counseling', 'choice filling', 
+    'seat allotment', 'allotment', 'provisional', 'migration', 'certificate', 'marksheet', 
+    'merit list', 'merit', 'timetable', 'routine', 'exam date', 'date sheet', 'syllabus', 
+    'admission', 'entrance', 'iti', 'polytechnic', 'bseb', 'cbse', 'board', 'b.tech', 
+    'diploma', 'registration', 'transcript', 'city slip', 'city details', 'city intimation', 
+    'intimation slip', 'slip', 're-exam', 're exam', 'dossier', 'e-dossier', 'panjiyan', 'पंजीयन',
 
-    // Government Schemes & Citizen Welfare
-    'yojana', 'योजना', 'scheme', 'pension', 'subsidy', 'scholarship', 'kisan', 
-    'ration', 'ayushman', 'loan', 'samman nidhi', 'fasal bima', 'udyami', 
-    'beneficiary', 'awas', 'pmaw', 'eshram',
+    // Government Schemes, Portals & Citizen Welfare
+    'yojana', 'योजना', 'scheme', 'pension', 'subsidy', 'scholarship', 'छात्रवृत्ति', 
+    'kisan', 'ration', 'राशन', 'pds', 'ayushman', 'loan', 'samman nidhi', 'fasal bima', 
+    'udyami', 'beneficiary', 'awas', 'pmaw', 'eshram', 'e-shram', 'job card', 'nrega', 
+    'mgnrega', 'card', 'कार्ड', 'voter', 'epic', 'driving licence', 'driving license', 
+    'licence', 'license', 'rojgar', 'रोजगार', 'rojgar mela', 'mela', 'मेला', 'complaint', 
+    'sahyog', 'portal', 'csc', 'rtps', 'caste certificate', 'income certificate', 
+    'निवास', 'जाति', 'आय', 'medhasoft', 'nsp',
 
-    // General Notices & Important Updates
+    // General Exam & News Updates
     'notice', 'circular', 'order', 'guidelines', 'update', 'alert', 'press note', 
-    'announcement', 'programme', 'schedule'
+    'announcement', 'programme', 'schedule', 'exam', 'examination', 'परीक्षा', 'आवेदन', 'फॉर्म'
   ];
 
   return validKeywords.some((k) => t.includes(k));

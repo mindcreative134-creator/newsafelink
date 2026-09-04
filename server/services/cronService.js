@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import cron from 'node-cron';
 import { CONFIG } from '../config/index.js';
 import { scrapeSite } from '../scrapers/index.js';
@@ -6,6 +9,14 @@ import { cloneAuthenticArticle } from '../scrapers/articleCloner.js';
 import { detectPostCategory } from '../scrapers/universalDetector.js';
 import { postToBlogger } from './bloggerPublisher.js';
 import { loadJson, saveJson, logEvent, POSTED_CACHE_FILE, SCRAPED_POSTS_FILE } from '../utils/logger.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.resolve(__dirname, '..');
+
+// Circuit breaker for Google Blogger API write quotas
+let bloggerQuotaExhaustedUntil = 0;
+const MAX_BLOGGER_POSTS_PER_CYCLE = 2; // 2 posts per cycle = ~200 posts/day, avoids triggering Google burst limits
 
 // ── Text & URL Normalizers for 100% Duplicate Prevention ──
 function normalizeText(str) {
@@ -151,79 +162,88 @@ export async function runSyncRoutine() {
           }
         }
 
-        // 2. Publish the FIRST truly unposted item to Blogger (1 per feed to respect Google Cloud write limits)
+        // 2. Publish unposted items to Blogger (guarded against Google Cloud API write quotas)
         let publishedInThisFeed = false;
+        const isBloggerQuotaPaused = Date.now() < bloggerQuotaExhaustedUntil;
 
-        for (const item of items) {
-          const cleanTitle = (item.title || '').replace(/\s*-\s*[^-]+$/, '').trim();
-          if (!cleanTitle) continue;
+        if (isBloggerQuotaPaused) {
+          // Blogger API write quota cooling down - feeds are still scraped and saved to website live feed
+        } else if (newPostsCount >= MAX_BLOGGER_POSTS_PER_CYCLE) {
+          // Reached batch limit for this sync run
+        } else {
+          for (const item of items) {
+            if (newPostsCount >= MAX_BLOGGER_POSTS_PER_CYCLE) break;
+            const cleanTitle = (item.title || '').replace(/\s*-\s*[^-]+$/, '').trim();
+            if (!cleanTitle) continue;
 
-          // Double check deduplication: Skip if already published
-          if (isDuplicatePost(item, cleanTitle)) {
-            continue;
-          }
-
-          const { category: postCat } = detectPostCategory(cleanTitle, item.contentSnippet || '');
-          const finalBloggerCategory = (!feed.category || feed.category.includes('Auto Detect')) ? postCat : (feed.category || postCat);
-
-          logEvent(`Cloning 100% authentic article & media for: "${cleanTitle}" from ${feed.name}...`);
-          const cloned = await cloneAuthenticArticle(item.link || feed.url, finalBloggerCategory);
-
-          let postTitle = cleanTitle;
-          let htmlContent = '';
-
-          if (cloned && cloned.bodyContentHtml) {
-            postTitle = cloned.title || cleanTitle;
-            htmlContent = buildClonedHtmlArticle(cloned, finalBloggerCategory, item.sourceName || feed.name);
-
-            // Update scrapedMap with real media & links for website feed
-            const mapItem = scrapedMap.get(cleanTitle.toLowerCase());
-            if (mapItem) {
-              if (cloned.featuredImage) mapItem.imageUrl = cloned.featuredImage;
-              if (cloned.applyOnlineUrl) mapItem.applyUrl = cloned.applyOnlineUrl;
+            // Double check deduplication: Skip if already published
+            if (isDuplicatePost(item, cleanTitle)) {
+              continue;
             }
-          } else {
-            // Clean authentic fallback
-            htmlContent = `
-              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.8; color: #1e293b; max-width: 800px; margin: 0 auto;">
-                <h2 style="color: #0f172a;">${cleanTitle}</h2>
-                <p style="font-size: 15px; color: #334155;">${item.contentSnippet || cleanTitle}</p>
-                <div style="margin: 24px 0; text-align: center;">
-                  <a href="${item.link || feed.url}" target="_blank" rel="noopener noreferrer" style="background: #2563eb; color: #ffffff; padding: 12px 26px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
-                    🔗 Open Official Notification & Apply Online
-                  </a>
-                </div>
-              </div>
-            `;
-          }
 
-          try {
-            const pubResult = await postToBlogger(postTitle, htmlContent, feed.labels || [finalBloggerCategory]);
-            
-            // Mark as posted in BOTH live mode and preview/simulated mode to guarantee ZERO duplicates
-            markAsPosted(postTitle, cleanTitle, item.link || feed.url, cloned?.title);
-            newPostsCount++;
-            publishedInThisFeed = true;
+            const { category: postCat } = detectPostCategory(cleanTitle, item.contentSnippet || '');
+            const finalBloggerCategory = (!feed.category || feed.category.includes('Auto Detect')) ? postCat : (feed.category || postCat);
 
-            if (pubResult && pubResult.status === 'simulated') {
-              logEvent(`[Blogger Preview] Post prepared & cached: "${postTitle}" (Awaiting Blogger OAuth credentials for live publishing)`, 'info');
+            logEvent(`Cloning 100% authentic article & media for: "${cleanTitle}" from ${feed.name}...`);
+            const cloned = await cloneAuthenticArticle(item.link || feed.url, finalBloggerCategory);
+
+            let postTitle = cleanTitle;
+            let htmlContent = '';
+
+            if (cloned && cloned.bodyContentHtml) {
+              postTitle = cloned.title || cleanTitle;
+              htmlContent = buildClonedHtmlArticle(cloned, finalBloggerCategory, item.sourceName || feed.name);
+
+              // Update scrapedMap with real media & links for website feed
+              const mapItem = scrapedMap.get(cleanTitle.toLowerCase());
+              if (mapItem) {
+                if (cloned.featuredImage) mapItem.imageUrl = cloned.featuredImage;
+                if (cloned.applyOnlineUrl) mapItem.applyUrl = cloned.applyOnlineUrl;
+              }
             } else {
-              logEvent(`✅ Successfully published: "${postTitle}" to Blogger!`, 'success');
+              // Clean authentic fallback
+              htmlContent = `
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.8; color: #1e293b; max-width: 800px; margin: 0 auto;">
+                  <h2 style="color: #0f172a;">${cleanTitle}</h2>
+                  <p style="font-size: 15px; color: #334155;">${item.contentSnippet || cleanTitle}</p>
+                  <div style="margin: 24px 0; text-align: center;">
+                    <a href="${item.link || feed.url}" target="_blank" rel="noopener noreferrer" style="background: #2563eb; color: #ffffff; padding: 12px 26px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                      🔗 Open Official Notification & Apply Online
+                    </a>
+                  </div>
+                </div>
+              `;
             }
 
-            // 4-second interval between posts to respect Google Cloud Blogger write limits
-            await new Promise((res) => setTimeout(res, 4000));
-            break; // Break so only 1 new post is published per feed per sync cycle
-          } catch (postErr) {
-            logEvent(`Failed to post "${postTitle}": ${postErr.message}`, 'error');
-            if (postErr.message && postErr.message.includes('quota')) {
-              logEvent(`[Blogger Quota] Google Blogger API write quota limit reached. Pausing until next cycle.`, 'warning');
-              break;
+            try {
+              const pubResult = await postToBlogger(postTitle, htmlContent, feed.labels || [finalBloggerCategory]);
+              
+              // Mark as posted in BOTH live mode and preview/simulated mode to guarantee ZERO duplicates
+              markAsPosted(postTitle, cleanTitle, item.link || feed.url, cloned?.title);
+              newPostsCount++;
+              publishedInThisFeed = true;
+
+              if (pubResult && pubResult.status === 'simulated') {
+                logEvent(`[Blogger Preview] Post prepared & cached: "${postTitle}" (Awaiting Blogger OAuth credentials for live publishing)`, 'info');
+              } else {
+                logEvent(`✅ Successfully published: "${postTitle}" to Blogger!`, 'success');
+              }
+
+              // 6-second interval between posts to respect Google Cloud Blogger write limits
+              await new Promise((res) => setTimeout(res, 6000));
+              break; // Break so only 1 new post is published per feed per sync cycle
+            } catch (postErr) {
+              logEvent(`Failed to post "${postTitle}": ${postErr.message}`, 'error');
+              if (postErr.message && (postErr.message.includes('quota') || postErr.message.includes('exhausted') || postErr.message.includes('429'))) {
+                bloggerQuotaExhaustedUntil = Date.now() + 30 * 60 * 1000;
+                logEvent(`[Blogger Quota] Google Blogger API write quota limit reached. Pausing Blogger publishing across all feeds for 30 minutes to stay within Google limits. Website live feed remains 100% active.`, 'warning');
+                break;
+              }
             }
           }
         }
 
-        if (!publishedInThisFeed) {
+        if (!publishedInThisFeed && !isBloggerQuotaPaused) {
           logEvent(`[Feed: ${feed.name}] All ${items.length} scraped posts are already synced. Zero duplicate reposts.`);
         }
       }
@@ -236,7 +256,21 @@ export async function runSyncRoutine() {
   const updatedScrapedList = Array.from(scrapedMap.values()).slice(0, 150);
   saveJson(SCRAPED_POSTS_FILE, updatedScrapedList);
 
-  logEvent(`Sync finished. Total new posts published: ${newPostsCount}. Total verified live posts on site: ${updatedScrapedList.length}`);
+  // Synchronize with frontend data files so website immediately displays all newly scraped updates
+  try {
+    const siteLiveJobsPath = path.resolve(ROOT_DIR, '..', 'src', 'data', 'liveJobs.json');
+    const publicLiveJobsPath = path.resolve(ROOT_DIR, '..', 'public', 'data', 'liveJobs.json');
+    if (fs.existsSync(path.dirname(siteLiveJobsPath))) {
+      saveJson(siteLiveJobsPath, updatedScrapedList);
+    }
+    if (fs.existsSync(path.dirname(publicLiveJobsPath))) {
+      saveJson(publicLiveJobsPath, updatedScrapedList);
+    }
+  } catch (syncErr) {
+    // Non-fatal if paths differ
+  }
+
+  logEvent(`Sync finished. Total new Blogger posts published: ${newPostsCount}. Total verified live posts on site: ${updatedScrapedList.length}`);
   return { newPostsCount, totalLiveItems: updatedScrapedList.length };
 }
 
