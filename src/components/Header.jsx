@@ -126,9 +126,11 @@ export default function Header() {
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center gap-3 group" aria-label="SarkariTrend Home">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-heading font-black text-xl shadow-lg shadow-indigo-500/25 group-hover:scale-105 group-hover:rotate-3 transition-transform">
-                  ST
-                </div>
+                <img 
+                  src="/favicon.svg" 
+                  alt="SarkariTrend" 
+                  className="w-10 h-10 rounded-2xl shadow-md shadow-indigo-500/20 group-hover:scale-105 group-hover:rotate-3 transition-transform" 
+                />
                 <div className="flex flex-col leading-none">
                   <div className="flex items-baseline gap-1">
                     <span className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white font-heading leading-none">
@@ -139,7 +141,7 @@ export default function Header() {
                     </span>
                   </div>
                   <span className="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.22em] mt-1">
-                    Official Career & News
+                    Official Career &amp; News
                   </span>
                 </div>
               </Link>

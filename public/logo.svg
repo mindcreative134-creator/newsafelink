@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 70" width="100%" height="100%">
+  <defs>
+    <linearGradient id="logoBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="logoTrendGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="logoGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="logoShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#4F46E5" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Crest Icon -->
+  <g transform="translate(6, 7)" filter="url(#logoShadow)">
+    <rect x="0" y="0" width="56" height="56" rx="16" fill="url(#logoBgGrad)"/>
+    <!-- Inner border -->
+    <rect x="0" y="0" width="56" height="56" rx="16" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.5"/>
+    
+    <!-- Stylized ST Mark -->
+    <path d="M 17 40 C 17 43 20 45 25 45 L 33 45 C 38 45 42 42 42 37 C 42 32 37 30 31 29 L 26 28 C 21 27 18 25 18 21 C 18 16 22 13 29 13 L 37 13" 
+          fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Trend Arrow -->
+    <path d="M 33 19 L 41 11 M 35 11 L 41 11 L 41 17" stroke="url(#logoGoldGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(74, 38)">
+    <text font-family="Outfit, Inter, system-ui, sans-serif" font-weight="900" font-size="28" letter-spacing="-0.03em" fill="#0F172A">
+      Sarkari<tspan fill="url(#logoTrendGrad)">Trend</tspan>
+    </text>
+  </g>
+
+  <!-- Subtitle Tagline -->
+  <g transform="translate(76, 54)">
+    <text font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="8.5" letter-spacing="0.18em" fill="#64748B">
+      OFFICIAL RECRUITMENT &amp; SCHEMES
+    </text>
+  </g>
+</svg>

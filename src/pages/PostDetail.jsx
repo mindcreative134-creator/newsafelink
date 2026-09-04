@@ -78,11 +78,12 @@ export default function PostDetail() {
     getPostById(postId)
       .then((data) => {
         setPost(data);
-        document.title = `${data.title} – SarkariTrend`;
+        // 1. High-CTR SEO Title
+        document.title = `${data.title} – Apply Online, Notification PDF, Eligibility | SarkariTrend`;
 
-        // Update Meta Description for SEO
+        // 2. SEO Meta Description
         const plainText = data.content ? data.content.replace(/<\/?[^>]+(>|$)/g, '') : '';
-        const excerpt = plainText.length > 150 ? plainText.substring(0, 150) + '...' : plainText;
+        const excerpt = plainText.length > 155 ? plainText.substring(0, 155) + '...' : plainText;
         let metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) {
           metaDesc.setAttribute('content', excerpt);
@@ -92,6 +93,85 @@ export default function PostDetail() {
           metaDesc.content = excerpt;
           document.head.appendChild(metaDesc);
         }
+
+        // 3. Dynamic Canonical Tag
+        const canonicalUrl = `https://iwantgovjob.vercel.app/post/${data.id}`;
+        let canonicalEl = document.querySelector('link[rel="canonical"]');
+        if (canonicalEl) {
+          canonicalEl.setAttribute('href', canonicalUrl);
+        }
+
+        // 4. OpenGraph Social & Browser Search Sharing Tags
+        const ogImage = data.imageUrl || data.thumbnail || 'https://iwantgovjob.vercel.app/og-image.jpg';
+        const updateMeta = (prop, val) => {
+          let el = document.querySelector(`meta[property="${prop}"]`) || document.querySelector(`meta[name="${prop}"]`);
+          if (el) el.setAttribute('content', val);
+        };
+        updateMeta('og:title', data.title);
+        updateMeta('og:description', excerpt);
+        updateMeta('og:url', canonicalUrl);
+        updateMeta('og:image', ogImage);
+        updateMeta('twitter:title', data.title);
+        updateMeta('twitter:description', excerpt);
+        updateMeta('twitter:image', ogImage);
+
+        // 5. Dynamic Schema.org JSON-LD Structured Data for Google Jobs / News Indexing
+        const raw = data.rawJob || {};
+        const orgName = raw.organization || (data.labels && data.labels[1]) || 'Government Recruitment Board';
+        const isJob = (raw.category || '').toLowerCase().includes('job') || data.title.toLowerCase().includes('recruitment') || data.title.toLowerCase().includes('vacancy');
+
+        const schemaData = isJob ? {
+          "@context": "https://schema.org",
+          "@type": "JobPosting",
+          "title": data.title,
+          "description": excerpt,
+          "datePosted": data.published ? data.published.split('T')[0] : new Date().toISOString().split('T')[0],
+          "validThrough": raw.lastDate && raw.lastDate.includes('202') ? raw.lastDate : new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          "employmentType": "FULL_TIME",
+          "hiringOrganization": {
+            "@type": "Organization",
+            "name": orgName,
+            "sameAs": raw.applyUrl || "https://biharhelp.in"
+          },
+          "jobLocation": {
+            "@type": "Place",
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": "IN"
+            }
+          },
+          "url": canonicalUrl
+        } : {
+          "@context": "https://schema.org",
+          "@type": "NewsArticle",
+          "headline": data.title,
+          "description": excerpt,
+          "image": [ogImage],
+          "datePublished": data.published || new Date().toISOString(),
+          "dateModified": data.updated || data.published || new Date().toISOString(),
+          "author": {
+            "@type": "Organization",
+            "name": "SarkariTrend Editorial Board"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "SarkariTrend",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://iwantgovjob.vercel.app/logo.svg"
+            }
+          },
+          "mainEntityOfPage": canonicalUrl
+        };
+
+        let schemaScript = document.getElementById('post-json-ld');
+        if (!schemaScript) {
+          schemaScript = document.createElement('script');
+          schemaScript.id = 'post-json-ld';
+          schemaScript.type = 'application/ld+json';
+          document.head.appendChild(schemaScript);
+        }
+        schemaScript.textContent = JSON.stringify(schemaData);
 
         // Fetch related posts for bottom section
         getLiveSarkariUpdates().then((all) => {

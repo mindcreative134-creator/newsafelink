@@ -36,6 +36,40 @@
     <!-- Canonical -->
     <link rel="canonical" href="https://iwantgovjob.vercel.app/" />
 
+    <!-- Structured Data (JSON-LD) for Google Search Console & Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://iwantgovjob.vercel.app/#website",
+          "url": "https://iwantgovjob.vercel.app/",
+          "name": "SarkariTrend",
+          "description": "India's trusted portal for verified government job notifications, admit cards, exam results, and Sarkari Yojana.",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://iwantgovjob.vercel.app/category/{search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://iwantgovjob.vercel.app/#organization",
+          "name": "SarkariTrend",
+          "url": "https://iwantgovjob.vercel.app/",
+          "logo": "https://iwantgovjob.vercel.app/logo.svg",
+          "sameAs": [
+            "https://t.me"
+          ]
+        }
+      ]
+    }
+    </script>
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />

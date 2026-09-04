@@ -7,7 +7,8 @@ import { getPostThumbnail } from '../utils/postThumbnail';
 import Sidebar from '../components/Sidebar';
 import { 
   Calendar, Clock, ArrowRight, ShieldCheck, RefreshCw, Sparkles, 
-  Lock, CheckCircle2, Flame, ArrowUpRight, BookOpen
+  Lock, CheckCircle2, Flame, Search, Send, Briefcase, FileCheck, 
+  Award, TrendingUp, Bell, Check
 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
 
@@ -43,6 +44,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('Latest Jobs');
   const [sarkariUpdates, setSarkariUpdates] = useState([]);
   const [loadingUpdates, setLoadingUpdates] = useState(false);
+  const [heroSearch, setHeroSearch] = useState('');
   const { startSafelink } = useSafelink();
   const navigate = useNavigate();
 
@@ -77,7 +79,7 @@ export default function Home() {
         if (data.items && data.items.length > 0) {
           const randomIndex = Math.floor(Math.random() * data.items.length);
           const randomPost = data.items[randomIndex];
-          window.location.href = `/post/${randomPost.id}`;
+          navigate(`/post/${randomPost.id}`);
         }
       });
     }, 1200);
@@ -140,17 +142,34 @@ export default function Home() {
     return plainText.length > limit ? plainText.substring(0, limit) + '...' : plainText;
   };
 
+  const handleHeroSearchSubmit = (e) => {
+    e.preventDefault();
+    if (heroSearch.trim()) {
+      navigate(`/category/${encodeURIComponent(heroSearch.trim())}`);
+    }
+  };
+
   const filteredUpdates = sarkariUpdates.filter((item) => {
+    if (heroSearch.trim()) {
+      const q = heroSearch.toLowerCase().trim();
+      return (
+        item.title?.toLowerCase().includes(q) ||
+        item.organization?.toLowerCase().includes(q) ||
+        item.category?.toLowerCase().includes(q)
+      );
+    }
     if (activeTab === 'All Updates') return true;
     return item.category?.toLowerCase() === activeTab.toLowerCase();
   });
 
+  const trendingTags = ['SSC CGL', 'Railway ALP', 'BPSC', 'Admit Card', 'Results', 'PM Kisan', 'UP Police'];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 transition-colors duration-200">
       
       {/* ── Compliant SafeLink Verification Transit Card (When ?o= or ?url= present) ── */}
       {showVerification && (
-        <div className="w-full max-w-2xl mx-auto my-8 p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-indigo-200/80 dark:border-indigo-900/50 shadow-2xl flex flex-col items-center text-center">
+        <div className="w-full max-w-2xl mx-auto my-8 p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-indigo-200/80 dark:border-indigo-900/50 shadow-2xl flex flex-col items-center text-center animate-fadeIn">
           <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center mb-4 text-indigo-600 dark:text-indigo-400">
             <Lock className="w-8 h-8" />
           </div>
@@ -195,19 +214,102 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── Featured / Hero Showcase Banner ── */}
+      {/* ── 🌟 Redesigned Modern Landing Hero Section ── */}
+      {!showVerification && (
+        <section className="relative rounded-[36px] overflow-hidden bg-gradient-to-br from-indigo-950 via-slate-900 to-zinc-950 border border-indigo-900/60 shadow-2xl p-6 sm:p-12 mb-12 text-white">
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-indigo-600/20 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-violet-600/20 blur-3xl pointer-events-none" />
+
+          <div className="relative max-w-4xl mx-auto text-center flex flex-col items-center gap-5">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-black uppercase tracking-wider text-amber-300 shadow-sm">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>India's #1 Verified Government Portal 2026</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-heading tracking-tight text-white leading-tight">
+              Sarkari Naukri, Admit Card &amp;{' '}
+              <span className="bg-gradient-to-r from-amber-300 via-indigo-300 to-violet-400 bg-clip-text text-transparent">
+                Yojana Updates
+              </span>
+            </h1>
+
+            <p className="text-zinc-300 text-sm sm:text-base max-w-2xl leading-relaxed font-medium">
+              Access 100% authentic government job notifications, direct application portals, official answer keys, and central/state schemes with zero fake news.
+            </p>
+
+            {/* Instant Search Bar */}
+            <form onSubmit={handleHeroSearchSubmit} className="w-full max-w-2xl mt-2 flex flex-col sm:flex-row gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
+                <input
+                  type="text"
+                  placeholder="Search 500+ Sarkari Jobs, Admit Cards, Results, Schemes..."
+                  value={heroSearch}
+                  onChange={(e) => setHeroSearch(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-zinc-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-inner"
+                />
+              </div>
+              <button
+                type="submit"
+                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2"
+              >
+                Search <ArrowRight className="w-4 h-4" />
+              </button>
+            </form>
+
+            {/* Trending Quick Filter Pills */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-xs">
+              <span className="text-zinc-400 font-bold flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5 text-indigo-400" /> Trending:
+              </span>
+              {trendingTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setHeroSearch(tag)}
+                  className="px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-zinc-200 text-xs font-semibold backdrop-blur-sm border border-white/10 transition-all hover:scale-105"
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+
+            {/* Verified Statistics Counter */}
+            <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-white/10 text-left">
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 block">Active Notices</span>
+                <strong className="text-xl sm:text-2xl font-black text-white font-heading">120+ Live</strong>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 block">Direct Links</span>
+                <strong className="text-xl sm:text-2xl font-black text-emerald-400 font-heading">100% Verified</strong>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 block">Auto Sync</span>
+                <strong className="text-xl sm:text-2xl font-black text-amber-300 font-heading">30-Min Real-time</strong>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 block">Board Coverage</span>
+                <strong className="text-xl sm:text-2xl font-black text-indigo-300 font-heading">All India</strong>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      )}
+
+      {/* ── Featured Mega Notification Card ── */}
       {featuredPost && !showVerification && (
         <div className="relative bg-zinc-950 rounded-[36px] overflow-hidden shadow-2xl mb-12 group border border-zinc-800/80">
           <div className="absolute inset-0">
             <img
               src={getPostImage(featuredPost)}
               alt={featuredPost.title}
-              className="w-full h-full object-cover opacity-45 group-hover:scale-105 transition-transform duration-700 ease-out"
+              className="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700 ease-out"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/20" />
           </div>
 
-          <div className="relative max-w-4xl px-6 py-14 sm:px-12 sm:py-20 lg:px-16 flex flex-col items-start gap-5">
+          <div className="relative max-w-4xl px-6 py-12 sm:px-12 sm:py-16 lg:px-16 flex flex-col items-start gap-5">
             <div className="flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center gap-1.5 px-3.5 py-1 text-xs font-black uppercase tracking-wider rounded-full bg-gradient-to-r from-amber-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20">
                 <Sparkles className="w-3.5 h-3.5 fill-white" /> TOP NOTIFICATION
@@ -219,9 +321,9 @@ export default function Home() {
               )}
             </div>
 
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight font-heading drop-shadow-md">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight font-heading drop-shadow-md">
               {featuredPost.title}
-            </h1>
+            </h2>
 
             <p className="text-zinc-300 text-sm sm:text-base leading-relaxed max-w-3xl font-medium line-clamp-3">
               {getExcerpt(featuredPost.content, 220)}
@@ -230,16 +332,16 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-5 pt-2">
               <Link
                 to={`/post/${featuredPost.id}`}
-                className="inline-flex items-center justify-center px-7 py-3.5 border border-transparent text-sm font-black rounded-2xl text-white bg-indigo-600 hover:bg-indigo-500 shadow-xl shadow-indigo-600/30 active:scale-95 transition-all gap-2.5"
+                className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-sm font-black rounded-2xl text-white bg-indigo-600 hover:bg-indigo-500 shadow-xl shadow-indigo-600/30 active:scale-95 transition-all gap-2.5"
               >
-                Read Full Notification <ArrowRight className="w-4 h-4" />
+                Read Notification &amp; Apply <ArrowRight className="w-4 h-4" />
               </Link>
               <div className="flex items-center gap-4 text-xs font-semibold text-zinc-400">
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-indigo-400" /> {new Date(featuredPost.published).toLocaleDateString()}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-indigo-400" /> 4 min read
+                  <Clock className="w-3.5 h-3.5 text-indigo-400" /> 3 min read
                 </span>
               </div>
             </div>
@@ -247,45 +349,48 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── BiharHelp-Style Homepage Interstitial Banner ── */}
+      {/* ── BiharHelp-Style Homepage Interstitial Leaderboard Banner ── */}
       {!showVerification && (
         <AdUnit
           variant="leaderboard"
           slot="7291097893"
           minHeight="90px"
-          className="mb-10"
+          className="mb-12"
         />
       )}
 
       {/* ── Sarkari Job, Yojana & University Quick Matrix Section ── */}
       {!showVerification && (
-        <section className="mb-14 bg-white dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[32px] p-6 sm:p-8 shadow-sm">
+        <section className="mb-14 bg-white dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[32px] p-6 sm:p-8 shadow-sm backdrop-blur-sm">
           
           <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-zinc-200/70 dark:border-zinc-800 gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
-                <Flame className="w-4 h-4 text-red-500" /> Live Sarkari &amp; Yojana Desk 2026
+                <Flame className="w-4 h-4 text-red-500 animate-pulse" /> Live Sarkari &amp; Yojana Matrix 2026
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-heading mt-1">
-                Sarkari Jobs, Schemes &amp; Admission Matrix
+                Recruitment, Admit Cards &amp; Schemes Desk
               </h2>
             </div>
 
-            {/* Interactive Tabs across all categories */}
+            {/* Category Tabs */}
             <div className="flex flex-wrap gap-2">
               {[
                 'Latest Jobs', 
-                'Govt Schemes & Yojana', 
                 'Admit Cards', 
                 'Results', 
+                'Govt Schemes & Yojana', 
                 'University & Admissions', 
                 'All Updates'
               ].map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    setHeroSearch('');
+                  }}
                   className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all ${
-                    activeTab === tab
+                    activeTab === tab && !heroSearch
                       ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
                       : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                   }`}
@@ -296,23 +401,23 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Sarkari Grid (All cards route ON-SITE to /post/:id) */}
+          {/* Sarkari Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
             {loadingUpdates ? (
-              <div className="col-span-full text-center py-10 text-zinc-400 font-medium">
-                <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500" />
-                Loading latest notifications...
+              <div className="col-span-full text-center py-12 text-zinc-400 font-medium">
+                <RefreshCw className="w-7 h-7 animate-spin mx-auto mb-2 text-indigo-500" />
+                Loading latest verified notifications...
               </div>
             ) : filteredUpdates.length === 0 ? (
-              <div className="col-span-full text-center py-8 text-zinc-400">
-                No active notifications found under this tab.
+              <div className="col-span-full text-center py-10 text-zinc-400">
+                No active notifications found for this search. Try browsing all categories.
               </div>
             ) : (
-              filteredUpdates.slice(0, 6).map((job) => (
+              filteredUpdates.slice(0, 9).map((job) => (
                 <Link
                   key={job.id}
                   to={`/post/${job.id}`}
-                  className="p-5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 hover-lift flex flex-col justify-between gap-4 group block transition-all"
+                  className="p-5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 hover:border-indigo-500/70 dark:hover:border-indigo-500/70 hover-lift flex flex-col justify-between gap-4 group block transition-all shadow-sm"
                 >
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between text-[11px] font-bold">
@@ -328,7 +433,7 @@ export default function Home() {
                             : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600'
                         }`}
                       >
-                        {job.badge}
+                        {job.badge || 'ACTIVE'}
                       </span>
                     </div>
 
@@ -342,11 +447,11 @@ export default function Home() {
                   </div>
 
                   <div className="pt-3 border-t border-zinc-200/50 dark:border-zinc-800/60 flex items-center justify-between text-xs">
-                    <span className="text-[11px] font-semibold text-zinc-400">
-                      {job.lastDate}
+                    <span className="text-[11px] font-semibold text-zinc-400 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-zinc-400" /> {job.lastDate}
                     </span>
                     <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                      Read Details &amp; Apply ➔
+                      Read Details ➔
                     </span>
                   </div>
                 </Link>
@@ -354,6 +459,35 @@ export default function Home() {
             )}
           </div>
 
+        </section>
+      )}
+
+      {/* ── Community Alert Banner (Telegram & WhatsApp) ── */}
+      {!showVerification && (
+        <section className="mb-14 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-950 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-indigo-800/40">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-amber-400/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
+              <Bell className="w-7 h-7 animate-bounce" />
+            </div>
+            <div>
+              <h3 className="text-lg sm:text-xl font-black font-heading text-white">
+                Never Miss a Sarkari Naukri or Yojana Deadline!
+              </h3>
+              <p className="text-xs sm:text-sm text-indigo-200 mt-1">
+                Join 250,000+ aspirants getting instant updates on Telegram &amp; WhatsApp.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <a
+              href="https://t.me"
+              target="_blank"
+              rel="noreferrer"
+              className="px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg flex items-center gap-2"
+            >
+              <Send className="w-4 h-4 text-amber-300" /> Join Telegram
+            </a>
+          </div>
         </section>
       )}
 
@@ -459,7 +593,7 @@ export default function Home() {
               <button
                 onClick={loadMore}
                 disabled={loading}
-                className="px-7 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider rounded-2xl transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-indigo-600/20 active:scale-95"
+                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-black uppercase tracking-wider rounded-2xl transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-indigo-600/20"
               >
                 {loading ? (
                   <>
@@ -476,7 +610,6 @@ export default function Home() {
         {/* Sidebar Column */}
         <Sidebar />
       </div>
-
     </div>
   );
 }
