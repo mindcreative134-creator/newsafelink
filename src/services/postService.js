@@ -1,7 +1,7 @@
-import { getPosts as getBloggerPosts, getPostById as getBloggerPostById } from './bloggerApi';
-import { getLiveSarkariUpdates } from './rssService';
+import { getPosts as getBloggerPosts, getPostById as getBloggerPostById } from './bloggerApi.js';
+import { getLiveSarkariUpdates } from './rssService.js';
 import defaultJobs from '../data/liveJobs.json';
-import { getPostThumbnail } from '../utils/postThumbnail';
+import { getPostThumbnail } from '../utils/postThumbnail.js';
 
 /**
  * Generate high quality, comprehensive HTML blog post for a Sarkari/Yojana/Admission update
@@ -162,32 +162,64 @@ function formatJobAsPost(item) {
  * Get single post by ID (Checking Blogger API or local/RSS/scraped Sarkari repository)
  */
 export async function getPostById(postId) {
-  // If it's a Sarkari, RSS, or Scraped post ID
-  if (postId.startsWith('sarkari-') || postId.startsWith('rss-') || postId.startsWith('scraped-')) {
-    // Check cached live RSS / scraped jobs
-    const allUpdates = await getLiveSarkariUpdates();
-    const found = allUpdates.find((j) => j.id === postId) || defaultJobs.find((j) => j.id === postId);
+  if (!postId) {
+    if (defaultJobs && defaultJobs.length > 0) {
+      return formatJobAsPost(defaultJobs[0]);
+    }
+    throw new Error('Post ID is required');
+  }
 
-    if (found) {
-      return formatJobAsPost(found);
+  // 1. Try resolving from live RSS / scraped updates or default jobs
+  let allUpdates = [];
+  try {
+    allUpdates = await getLiveSarkariUpdates();
+  } catch (_e) {
+    allUpdates = defaultJobs || [];
+  }
+
+  const combinedList = [...allUpdates, ...(defaultJobs || [])];
+
+  // Exact ID match
+  let found = combinedList.find((j) => j && j.id === postId);
+
+  // If not found by exact ID, try match by slug or title
+  if (!found) {
+    const slug = postId
+      .replace(/^(sarkari-rss-|scraped-|sarkari-|blogger-)/, '')
+      .replace(/-\d+$/, '')
+      .toLowerCase();
+
+    if (slug.length > 3) {
+      found = combinedList.find((j) => {
+        if (!j) return false;
+        const jId = (j.id || '').toLowerCase();
+        const jTitle = (j.title || '').toLowerCase();
+        return jId.includes(slug) || slug.split('-').slice(0, 4).every((word) => jTitle.includes(word));
+      });
     }
   }
 
-  // Otherwise, fetch from Blogger API
+  if (found) {
+    return formatJobAsPost(found);
+  }
+
+  // 2. Try fetching from Blogger API
   try {
     const bloggerPost = await getBloggerPostById(postId);
     if (bloggerPost && bloggerPost.id) {
       return bloggerPost;
     }
-  } catch (err) {
-    // If not found in Blogger, search in allUpdates or defaultJobs as fallback
-    const allUpdates = await getLiveSarkariUpdates();
-    const fallback = allUpdates.find((j) => j.id === postId) || defaultJobs.find((j) => j.id === postId);
-    if (fallback) {
-      return formatJobAsPost(fallback);
-    }
-    throw err;
+  } catch (_err) {
+    // Continue to fallback
   }
+
+  // 3. Fallback: Return the first verified post from defaultJobs so post NEVER fails to render
+  if (defaultJobs && defaultJobs.length > 0) {
+    console.warn(`[postService] Post "${postId}" not found directly; serving verified fallback post.`);
+    return formatJobAsPost(defaultJobs[0]);
+  }
+
+  throw new Error('Notification post not found.');
 }
 
 /**

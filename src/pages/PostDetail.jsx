@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getPostById } from '../services/postService';
 import { getPosts } from '../services/bloggerApi';
+import { getLiveSarkariUpdates } from '../services/rssService';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import StepHeader from '../components/StepHeader';
 import { 
   Calendar, Clock, User, ArrowRight, ShieldCheck, 
-  CheckCircle2, Lock 
+  CheckCircle2, Lock, Building2, FileText, ExternalLink,
+  ChevronRight, Sparkles, Share2
 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
 
@@ -54,6 +56,8 @@ export default function PostDetail() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [relatedPosts, setRelatedPosts] = useState([]);
+  const [copied, setCopied] = useState(false);
 
   // SafeLink countdown timer state
   const TOTAL_SECONDS = 15;
@@ -89,9 +93,20 @@ export default function PostDetail() {
           document.head.appendChild(metaDesc);
         }
 
+        // Fetch related posts for bottom section
+        getLiveSarkariUpdates().then((all) => {
+          if (Array.isArray(all)) {
+            const filtered = all
+              .filter((item) => item.id !== data.id)
+              .slice(0, 3);
+            setRelatedPosts(filtered);
+          }
+        }).catch(() => {});
+
         setLoading(false);
       })
       .catch((err) => {
+        console.error('PostDetail fetch error:', err);
         setError(err.message || 'Failed to load article.');
         setLoading(false);
       });
@@ -138,7 +153,7 @@ export default function PostDetail() {
           const randomNext = pool[Math.floor(Math.random() * pool.length)];
 
           nextStep();
-          window.location.href = `/post/${randomNext.id}`;
+          navigate(`/post/${randomNext.id}`);
         } else {
           nextStep();
           setLoading(false);
@@ -155,6 +170,19 @@ export default function PostDetail() {
     if (targetUrl) {
       clearSafelink();
       window.location.href = targetUrl;
+    }
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: post?.title,
+        url: window.location.href,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -177,108 +205,24 @@ export default function PostDetail() {
     );
   }
 
-  const CLIENT_ID = import.meta.env?.VITE_ADSENSE_CLIENT_ID || 'ca-pub-9543073887536718';
-
-  // 1:1 BiharHelp In-Article AdSense injection
-  const injectArticleAds = (html) => {
-    if (!html) return '';
-
-    // BiharHelp Advt 2 (In-Article Fluid)
-    const inArticleAd = `
-      <div class="my-6 w-full flex flex-col items-center justify-center clear-both">
-        <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1 select-none flex items-center gap-1">
-          <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-          <span>Advertisement</span>
-        </div>
-        <div class="w-full max-w-3xl overflow-hidden rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/70 dark:border-zinc-800/70 p-2 shadow-sm">
-          <ins class="adsbygoogle"
-               style="display:block; text-align:center;"
-               data-ad-layout="in-article"
-               data-ad-format="fluid"
-               data-ad-client="${CLIENT_ID}"
-               data-ad-slot="4392273015"></ins>
-        </div>
-      </div>
-    `;
-
-    // BiharHelp Advt 3 (Pre-Action Links Banner)
-    const preLinkAd = `
-      <div class="my-6 w-full flex flex-col items-center justify-center clear-both">
-        <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1 select-none flex items-center gap-1">
-          <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-          <span>Advertisement</span>
-        </div>
-        <div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/70 dark:border-zinc-800/70 p-2 shadow-sm">
-          <ins class="adsbygoogle"
-               style="display:block;"
-               data-ad-client="${CLIENT_ID}"
-               data-ad-slot="1362664078"
-               data-ad-format="auto"
-               data-full-width-responsive="true"></ins>
-        </div>
-      </div>
-    `;
-
-    let modified = html;
-
-    // Inject Pre-Link Ad right above Official Links box if present
-    const linkBoxMarkers = [
-      '⚡ Official Direct Links',
-      'Official Direct Links',
-      'Important Links',
-      'class="article-real-tables"',
-      'Key Information'
-    ];
-
-    let injectedPreLink = false;
-    for (const marker of linkBoxMarkers) {
-      if (modified.includes(marker)) {
-        modified = modified.replace(marker, `${preLinkAd}\n${marker}`);
-        injectedPreLink = true;
-        break;
-      }
-    }
-
-    // Inject In-Article Ad after 2nd paragraph (matching BiharHelp Ad #2)
-    const paras = modified.split('</p>');
-    if (paras.length > 3) {
-      let result = '';
-      for (let i = 0; i < paras.length; i++) {
-        result += paras[i];
-        if (i < paras.length - 1) result += '</p>';
-        if (i === 1) {
-          result += inArticleAd;
-        }
-        if (!injectedPreLink && i === paras.length - 3) {
-          result += preLinkAd;
-          injectedPreLink = true;
-        }
-      }
-      return result;
-    }
-
-    return modified + (injectedPreLink ? '' : preLinkAd);
-  };
-
-  // Trigger AdSense push for all newly injected in-article ad units
-  useEffect(() => {
-    if (!post || loading) return;
-    const timer = setTimeout(() => {
-      try {
-        if (typeof window !== 'undefined') {
-          const ads = document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])');
-          ads.forEach(() => {
-            (window.adsbygoogle = window.adsbygoogle || []).push({});
-          });
-        }
-      } catch (e) {
-        // Ignored
-      }
-    }, 250);
-    return () => clearTimeout(timer);
-  }, [post, loading]);
-
   const progressCircleOffset = ((TOTAL_SECONDS - timeLeft) / TOTAL_SECONDS) * 282.7;
+
+  // Extract structured data if available
+  const rawJob = post.rawJob || {};
+  const org = rawJob.organization || 'Official Recruitment Board';
+  const category = rawJob.category || (post.labels && post.labels[0]) || 'Government Update';
+  const totalPosts = rawJob.totalPosts || 'Refer to Notification';
+  const qualification = rawJob.qualification || '10th / 12th / Graduate / Diploma (As per notification)';
+  const ageLimit = rawJob.ageLimit || 'As per central / state government recruitment norms';
+  const lastDate = rawJob.lastDate || 'Active Online';
+  const pubDate = post.published ? new Date(post.published).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }) : 'Recently Updated';
+  const applyUrl = rawJob.applyUrl || 'https://biharhelp.in';
+  const summary = rawJob.summary || post.title;
+  const postImage = post.imageUrl || post.thumbnail;
 
   return (
     <>
@@ -287,58 +231,83 @@ export default function PostDetail() {
         <StepHeader timerActive={timerActive} timeLeft={timeLeft} totalTime={TOTAL_SECONDS} />
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
-        <div className="flex flex-col lg:flex-row gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 transition-colors duration-200">
+        
+        {/* Breadcrumb Navigation */}
+        <nav className="flex items-center gap-2 text-xs font-semibold text-zinc-400 dark:text-zinc-500 mb-6 overflow-x-auto whitespace-nowrap">
+          <Link to="/" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Home</Link>
+          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+          <Link to={`/category/${encodeURIComponent(category)}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+            {category}
+          </Link>
+          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+          <span className="text-zinc-600 dark:text-zinc-300 truncate max-w-xs">{post.title}</span>
+        </nav>
+
+        <div className="flex flex-col lg:flex-row gap-10">
           
           {/* Main Article Content */}
           <main className="flex-1 min-w-0">
-            <article className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[32px] overflow-hidden shadow-sm p-6 sm:p-10 flex flex-col gap-6 backdrop-blur-sm">
+            <article className="bg-white dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[32px] overflow-hidden shadow-sm p-6 sm:p-10 flex flex-col gap-6 backdrop-blur-sm">
               
-              {/* Category Badges */}
-              {post.labels && post.labels.length > 0 && (
+              {/* Category Badges & Share */}
+              <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex flex-wrap gap-2">
-                  {post.labels.map((label) => (
-                    <span
-                      key={label}
-                      className="px-3.5 py-1 text-[11px] font-black uppercase tracking-wider rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50"
-                    >
-                      {label}
-                    </span>
-                  ))}
+                  <span className="px-3.5 py-1 text-[11px] font-black uppercase tracking-wider rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50">
+                    {category}
+                  </span>
+                  <span className="px-3.5 py-1 text-[11px] font-black uppercase tracking-wider rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    {org}
+                  </span>
                 </div>
-              )}
+
+                <button
+                  onClick={handleShare}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-bold transition-all"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  {copied ? 'Link Copied!' : 'Share'}
+                </button>
+              </div>
 
               {/* Title */}
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-zinc-900 dark:text-white leading-tight font-heading m-0 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-900 dark:text-white leading-tight font-heading m-0 tracking-tight">
                 {post.title}
               </h1>
 
               {/* Meta information */}
-              <div className="flex flex-wrap items-center text-xs font-semibold text-zinc-400 dark:text-zinc-500 gap-4 pb-6 border-b border-zinc-200/70 dark:border-zinc-800/70">
+              <div className="flex flex-wrap items-center text-xs font-semibold text-zinc-400 dark:text-zinc-500 gap-4 pb-4 border-b border-zinc-200/70 dark:border-zinc-800/70">
                 <span className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-300">
-                  <User className="w-4 h-4 text-indigo-500" /> Editorial Desk
+                  <User className="w-4 h-4 text-indigo-500" /> Editorial Board
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-indigo-500" />
-                  {new Date(post.published).toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
+                  {pubDate}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-indigo-500" /> 4 min read
+                  <Clock className="w-4 h-4 text-indigo-500" /> 3 min read
                 </span>
               </div>
 
-              {/* Top Ad Unit (BiharHelp Advt #1 - Fluid Native Placement) */}
-              <AdUnit variant="fluid" slot="9320506924" minHeight="120px" className="my-2" />
+              {/* Top Banner Image */}
+              {postImage && (
+                <div className="w-full aspect-video sm:max-h-[380px] overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800">
+                  <img
+                    src={postImage}
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+
+              {/* Top Native Ad Unit (BiharHelp Advt #1) */}
+              <AdUnit variant="fluid" slot="9320506924" minHeight="120px" className="my-1" />
 
               {/* ── SafeLink Security Transit Card ── */}
               {currentStep > 0 && (
-                <div className="my-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-indigo-50/80 via-white to-slate-50/80 dark:from-indigo-950/30 dark:via-zinc-900 dark:to-zinc-950/30 border border-indigo-200/80 dark:border-indigo-900/50 shadow-md flex flex-col items-center text-center">
+                <div className="my-4 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-indigo-50/90 via-white to-slate-50/90 dark:from-indigo-950/40 dark:via-zinc-900 dark:to-zinc-950/40 border-2 border-indigo-300/80 dark:border-indigo-800/80 shadow-lg flex flex-col items-center text-center">
                   
                   <div className="flex items-center gap-2 mb-2">
                     <span className="px-3 py-1 rounded-full bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider shadow-sm">
@@ -360,7 +329,7 @@ export default function PostDetail() {
 
                   {/* Circular SVG Countdown Timer */}
                   {timerActive ? (
-                    <div className="relative w-32 h-32 flex items-center justify-center mb-4">
+                    <div className="relative w-28 h-28 flex items-center justify-center mb-4">
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                         <circle
                           cx="50"
@@ -392,13 +361,11 @@ export default function PostDetail() {
                       </div>
                     </div>
                   ) : (
-                    /* Verified Icon */
                     <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-4 animate-bounce">
                       <CheckCircle2 className="w-8 h-8" />
                     </div>
                   )}
 
-                  {/* Action Button: Displayed with 32px safe spacing from any ad */}
                   {!timerActive && (
                     <div className="mt-4 mb-2 w-full flex justify-center">
                       {currentStep < 3 ? (
@@ -425,17 +392,159 @@ export default function PostDetail() {
                 </div>
               )}
 
-              {/* Dynamic Post Body HTML */}
-              <div
-                className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed font-sans text-base sm:text-lg space-y-6 break-words"
-                dangerouslySetInnerHTML={{ __html: injectArticleAds(post.content) }}
-              />
+              {/* ── Native Structured Post Content ── */}
+              {post.isSarkariJob || rawJob.title ? (
+                <div className="space-y-6">
+                  {/* Quick Overview Highlight Box */}
+                  <div className="bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900/60 rounded-2xl p-5 sm:p-6">
+                    <h3 className="text-base font-black text-indigo-900 dark:text-indigo-200 mb-2 font-heading flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-indigo-500" /> Quick Notification Summary
+                    </h3>
+                    <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+                      {summary}
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                      <div className="bg-white dark:bg-zinc-900 p-3 rounded-xl border border-indigo-100 dark:border-zinc-800 shadow-sm">
+                        <span className="text-zinc-400 block text-[10px] font-bold uppercase">Authority</span>
+                        <strong className="text-zinc-900 dark:text-zinc-100 font-extrabold line-clamp-1">{org}</strong>
+                      </div>
+                      <div className="bg-white dark:bg-zinc-900 p-3 rounded-xl border border-indigo-100 dark:border-zinc-800 shadow-sm">
+                        <span className="text-zinc-400 block text-[10px] font-bold uppercase">Total Posts</span>
+                        <strong className="text-zinc-900 dark:text-zinc-100 font-extrabold">{totalPosts}</strong>
+                      </div>
+                      <div className="bg-white dark:bg-zinc-900 p-3 rounded-xl border border-indigo-100 dark:border-zinc-800 shadow-sm">
+                        <span className="text-zinc-400 block text-[10px] font-bold uppercase">Category</span>
+                        <strong className="text-indigo-600 dark:text-indigo-400 font-extrabold line-clamp-1">{category}</strong>
+                      </div>
+                      <div className="bg-white dark:bg-zinc-900 p-3 rounded-xl border border-indigo-100 dark:border-zinc-800 shadow-sm">
+                        <span className="text-zinc-400 block text-[10px] font-bold uppercase">Application Status</span>
+                        <strong className="text-emerald-600 dark:text-emerald-400 font-extrabold">{lastDate}</strong>
+                      </div>
+                    </div>
+                  </div>
 
-              {/* Bottom Safe Transit Action (For smooth user experience if scrolled to bottom) */}
+                  {/* Overview Table */}
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-heading mt-6 mb-3">
+                      {post.title} – Detailed Overview
+                    </h2>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4">
+                      Candidates seeking official details regarding <strong>{post.title}</strong> issued by <strong>{org}</strong> can find all verified information below, including qualifications, step-by-step instructions, and official portal links.
+                    </p>
+
+                    <div className="overflow-x-auto rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                      <table className="w-full text-xs sm:text-sm border-collapse">
+                        <tbody>
+                          <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                            <td className="font-bold bg-zinc-50 dark:bg-zinc-800/70 p-3.5 w-1/3 text-zinc-700 dark:text-zinc-300">Recruitment Authority</td>
+                            <td className="p-3.5 text-zinc-900 dark:text-zinc-100 font-semibold">{org}</td>
+                          </tr>
+                          <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                            <td className="font-bold bg-zinc-50 dark:bg-zinc-800/70 p-3.5 text-zinc-700 dark:text-zinc-300">Post / Scheme Name</td>
+                            <td className="p-3.5 text-zinc-900 dark:text-zinc-100 font-semibold">{post.title}</td>
+                          </tr>
+                          <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                            <td className="font-bold bg-zinc-50 dark:bg-zinc-800/70 p-3.5 text-zinc-700 dark:text-zinc-300">Total Vacancies / Scope</td>
+                            <td className="p-3.5 text-zinc-900 dark:text-zinc-100 font-semibold">{totalPosts}</td>
+                          </tr>
+                          <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                            <td className="font-bold bg-zinc-50 dark:bg-zinc-800/70 p-3.5 text-zinc-700 dark:text-zinc-300">Application Mode</td>
+                            <td className="p-3.5 text-zinc-900 dark:text-zinc-100 font-semibold">Online (Official Portal)</td>
+                          </tr>
+                          <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                            <td className="font-bold bg-zinc-50 dark:bg-zinc-800/70 p-3.5 text-zinc-700 dark:text-zinc-300">Notification Released</td>
+                            <td className="p-3.5 text-zinc-900 dark:text-zinc-100 font-semibold">{pubDate}</td>
+                          </tr>
+                          <tr>
+                            <td className="font-bold bg-zinc-50 dark:bg-zinc-800/70 p-3.5 text-zinc-700 dark:text-zinc-300">Current Status</td>
+                            <td className="p-3.5 text-emerald-600 font-extrabold flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Active Online
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Mid-Article Ad (BiharHelp Advt #2) */}
+                  <AdUnit variant="in-article" slot="4392273015" minHeight="140px" className="my-6" />
+
+                  {/* Eligibility & Criteria */}
+                  <div className="bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/70 dark:border-zinc-800/70 rounded-2xl p-5 sm:p-6">
+                    <h3 className="text-lg font-black text-zinc-900 dark:text-white font-heading mb-3 flex items-center gap-2">
+                      🎯 Eligibility &amp; Selection Criteria
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
+                      <li><strong>Educational Qualification:</strong> {qualification}.</li>
+                      <li><strong>Age Limit:</strong> {ageLimit}. Age relaxation is applicable as per government reservation rules.</li>
+                      <li><strong>Nationality:</strong> Candidate must be a citizen of India.</li>
+                    </ul>
+                  </div>
+
+                  {/* Step-by-Step Instructions */}
+                  <div>
+                    <h3 className="text-lg font-black text-zinc-900 dark:text-white font-heading mb-3 flex items-center gap-2">
+                      📝 How to Apply / Check Status Online
+                    </h3>
+                    <ol className="list-decimal pl-5 space-y-2.5 text-sm text-zinc-700 dark:text-zinc-300">
+                      <li>Click on the direct official link provided below to open the authentic portal.</li>
+                      <li>Locate the notification advertisement for <strong>{post.title}</strong>.</li>
+                      <li>Review the brochure guidelines thoroughly before filling out details.</li>
+                      <li>Complete online registration, upload required certificates/photographs, and pay the fee if applicable.</li>
+                      <li>Download and retain a printout of the confirmation page for future reference.</li>
+                    </ol>
+                  </div>
+
+                  {/* Pre-Link Ad Placement (BiharHelp Advt #3) */}
+                  <AdUnit variant="pre-link" slot="1362664078" minHeight="120px" className="my-6" />
+
+                  {/* Important Official Direct Links Box */}
+                  <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-indigo-950 via-slate-900 to-zinc-950 text-white shadow-2xl border border-indigo-900/50">
+                    <h4 className="text-base sm:text-lg font-black uppercase tracking-wider mb-2 text-amber-400 font-heading flex items-center gap-2">
+                      ⚡ Official Direct Links &amp; Actions
+                    </h4>
+                    <p className="text-xs text-zinc-300 mb-6">
+                      Click below to access verified direct portals for <strong>{post.title}</strong>:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <a
+                        href={applyUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-black text-xs uppercase tracking-wider text-center transition-all shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2"
+                      >
+                        <ExternalLink className="w-4 h-4" /> Apply Online / Direct Portal ➔
+                      </a>
+                      <a
+                        href={applyUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-4 rounded-2xl bg-white/10 hover:bg-white/20 active:scale-95 text-white font-black text-xs uppercase tracking-wider text-center transition-all border border-white/20 flex items-center justify-center gap-2"
+                      >
+                        <FileText className="w-4 h-4" /> Official Notification PDF
+                      </a>
+                    </div>
+                    <p className="text-[11px] text-zinc-400 text-center mt-4">
+                      Notice: Always verify details with the official recruitment release before submitting credentials.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                /* Fallback for pure HTML Blogger posts */
+                <div className="space-y-6">
+                  <div
+                    className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed font-sans text-base sm:text-lg space-y-6 break-words"
+                    dangerouslySetInnerHTML={{ __html: post.content }}
+                  />
+                  <AdUnit variant="pre-link" slot="1362664078" minHeight="120px" className="my-6" />
+                </div>
+              )}
+
+              {/* Bottom SafeLink Action (if scrolled down) */}
               {currentStep > 0 && timerDone && (
-                <div className="mt-10 p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center gap-3">
+                <div className="mt-8 p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center gap-3">
                   <div className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                    Finished reviewing? Proceed with your verified destination:
+                    Finished reviewing? Proceed to your secured link:
                   </div>
                   {currentStep < 3 ? (
                     <button
@@ -456,9 +565,45 @@ export default function PostDetail() {
               )}
 
               {/* Bottom Ad Unit (BiharHelp Bottom Placement) */}
-              <AdUnit variant="banner" slot="1909584638" minHeight="120px" className="mt-8" />
+              <AdUnit variant="banner" slot="1909584638" minHeight="100px" className="mt-8" />
 
             </article>
+
+            {/* ── Related Notifications Grid ── */}
+            {relatedPosts.length > 0 && (
+              <section className="mt-10 bg-white dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[32px] p-6 sm:p-8 shadow-sm">
+                <div className="flex items-center justify-between mb-6 pb-3 border-b border-zinc-200/70 dark:border-zinc-800">
+                  <h3 className="text-lg font-black text-zinc-900 dark:text-white font-heading flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-indigo-500" /> Related Recruitment &amp; Notifications
+                  </h3>
+                  <Link to="/" className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                    View All ➔
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {relatedPosts.map((rel) => (
+                    <Link
+                      key={rel.id}
+                      to={`/post/${rel.id}`}
+                      className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200/70 dark:border-zinc-800 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all flex flex-col justify-between gap-3 group"
+                    >
+                      <div>
+                        <span className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 block mb-1">
+                          {rel.organization || rel.category}
+                        </span>
+                        <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-2 leading-snug">
+                          {rel.title}
+                        </h4>
+                      </div>
+                      <span className="text-[11px] font-semibold text-zinc-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        Read Details ➔
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
           </main>
 
           {/* Sidebar */}

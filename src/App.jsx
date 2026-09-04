@@ -18,7 +18,7 @@ export default function App() {
   const isStaticPage = ['/privacy-policy', '/disclaimer', '/terms-conditions', '/contact'].includes(location.pathname);
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200 pb-14 sm:pb-16">
+    <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200 pb-28 sm:pb-32">
       {/* Dynamic Navigation Header */}
       <Header />
 
@@ -27,7 +27,7 @@ export default function App() {
         <div className="w-full bg-white/70 dark:bg-zinc-900/70 border-b border-zinc-200/70 dark:border-zinc-800/70 py-2 transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
             <AdUnit
-              key={`header-leaderboard-${location.pathname}-${currentStep}`}
+              key="header-leaderboard"
               variant="leaderboard"
               slot="7317709042"
               className="!my-1"

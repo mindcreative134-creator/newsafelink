@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getUnifiedPosts } from '../services/postService';
 import { getPostThumbnail } from '../utils/postThumbnail';
 import Sidebar from '../components/Sidebar';
@@ -140,12 +140,12 @@ export default function Category() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {posts.map((post, index) => (
                   <React.Fragment key={post.id}>
-                    <article
-                      className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] overflow-hidden shadow-sm hover-lift flex flex-col group"
+                    <Link
+                      to={`/post/${post.id}`}
+                      className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] overflow-hidden shadow-sm hover-lift flex flex-col group block transition-all"
                     >
                       <div
-                        onClick={() => navigate(`/post/${post.id}`)}
-                        className="aspect-video w-full overflow-hidden cursor-pointer relative bg-zinc-100 dark:bg-zinc-800"
+                        className="aspect-video w-full overflow-hidden relative bg-zinc-100 dark:bg-zinc-800"
                       >
                         <img
                           src={getPostImage(post)}
@@ -173,8 +173,7 @@ export default function Category() {
                           </div>
 
                           <h3
-                            onClick={() => navigate(`/post/${post.id}`)}
-                            className="text-base sm:text-lg font-black text-zinc-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug cursor-pointer font-heading transition-colors"
+                            className="text-base sm:text-lg font-black text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-2 leading-snug font-heading transition-colors"
                           >
                             {post.title}
                           </h3>
@@ -184,14 +183,13 @@ export default function Category() {
                           </p>
                         </div>
 
-                        <button
-                          onClick={() => navigate(`/post/${post.id}`)}
+                        <span
                           className="inline-flex items-center text-indigo-600 dark:text-indigo-400 font-extrabold text-xs gap-1.5 self-start group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors pt-1"
                         >
                           Read Full Story <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                        </button>
+                        </span>
                       </div>
-                    </article>
+                    </Link>
 
                     {index === 2 && (
                       <div className="col-span-1 md:col-span-2 lg:col-span-3 my-2">

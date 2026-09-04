@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { getUnifiedPosts } from '../services/postService';
 import { getLiveSarkariUpdates } from '../services/rssService';
 import { useSafelink } from '../context/SafelinkContext';
@@ -228,12 +228,12 @@ export default function Home() {
             </p>
 
             <div className="flex flex-wrap items-center gap-5 pt-2">
-              <button
-                onClick={() => navigate(`/post/${featuredPost.id}`)}
+              <Link
+                to={`/post/${featuredPost.id}`}
                 className="inline-flex items-center justify-center px-7 py-3.5 border border-transparent text-sm font-black rounded-2xl text-white bg-indigo-600 hover:bg-indigo-500 shadow-xl shadow-indigo-600/30 active:scale-95 transition-all gap-2.5"
               >
                 Read Full Notification <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
               <div className="flex items-center gap-4 text-xs font-semibold text-zinc-400">
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-indigo-400" /> {new Date(featuredPost.published).toLocaleDateString()}
@@ -309,10 +309,10 @@ export default function Home() {
               </div>
             ) : (
               filteredUpdates.slice(0, 6).map((job) => (
-                <div
+                <Link
                   key={job.id}
-                  onClick={() => navigate(`/post/${job.id}`)}
-                  className="p-5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 hover-lift flex flex-col justify-between gap-4 cursor-pointer group"
+                  to={`/post/${job.id}`}
+                  className="p-5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 hover-lift flex flex-col justify-between gap-4 group block transition-all"
                 >
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between text-[11px] font-bold">
@@ -349,7 +349,7 @@ export default function Home() {
                       Read Details &amp; Apply ➔
                     </span>
                   </div>
-                </div>
+                </Link>
               ))
             )}
           </div>
@@ -385,9 +385,9 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {posts.map((post, index) => (
                 <React.Fragment key={post.id}>
-                  <article
-                    className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] overflow-hidden shadow-sm hover-lift flex flex-col group cursor-pointer"
-                    onClick={() => navigate(`/post/${post.id}`)}
+                  <Link
+                    to={`/post/${post.id}`}
+                    className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] overflow-hidden shadow-sm hover-lift flex flex-col group block transition-all"
                   >
                     {/* Thumbnail Image */}
                     <div
@@ -437,7 +437,7 @@ export default function Home() {
                         Read Full Article <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                       </span>
                     </div>
-                  </article>
+                  </Link>
 
                   {/* BiharHelp-Style Fluid in-feed AdSense unit after 3rd post */}
                   {index === 2 && (

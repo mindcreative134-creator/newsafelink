@@ -9,9 +9,22 @@ const DEFAULT_CLIENT = import.meta.env?.VITE_ADSENSE_CLIENT_ID || 'ca-pub-954307
  * Increases mobile and desktop CTR significantly while remaining compliant.
  */
 export default function StickyAnchorAd({ slot = '7317709042', client = DEFAULT_CLIENT }) {
-  const [closed, setClosed] = useState(false);
+  const [closed, setClosed] = useState(() => {
+    try {
+      return sessionStorage.getItem('hide_anchor_ad') === '1';
+    } catch {
+      return false;
+    }
+  });
   const insRef = useRef(null);
   const pushed = useRef(false);
+
+  const handleClose = () => {
+    setClosed(true);
+    try {
+      sessionStorage.setItem('hide_anchor_ad', '1');
+    } catch {}
+  };
 
   useEffect(() => {
     let active = true;
@@ -44,7 +57,7 @@ export default function StickyAnchorAd({ slot = '7317709042', client = DEFAULT_C
           <span>Advertisement</span>
         </div>
         <button
-          onClick={() => setClosed(true)}
+          onClick={handleClose}
           aria-label="Close Advertisement"
           className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
         >
