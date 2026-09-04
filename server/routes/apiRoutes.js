@@ -1,7 +1,7 @@
 import express from 'express';
 import { CONFIG } from '../config/index.js';
 import { runSyncRoutine } from '../services/cronService.js';
-import { loadJson, saveJson, logEvent, LOGS_FILE } from '../utils/logger.js';
+import { loadJson, saveJson, logEvent, LOGS_FILE, SCRAPED_POSTS_FILE } from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -66,6 +66,12 @@ router.post('/api/sync-now', async (req, res) => {
 // Get logs
 router.get('/api/logs', (req, res) => {
   res.json(loadJson(LOGS_FILE, []));
+});
+
+// Get latest verified scraped posts for instant frontend display
+router.get('/api/latest-posts', (req, res) => {
+  const posts = loadJson(SCRAPED_POSTS_FILE, []);
+  res.json(posts);
 });
 
 export default router;

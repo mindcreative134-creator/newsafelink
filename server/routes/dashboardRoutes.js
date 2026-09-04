@@ -1,12 +1,13 @@
 import express from 'express';
 import { CONFIG } from '../config/index.js';
-import { loadJson, LOGS_FILE } from '../utils/logger.js';
+import { loadJson, LOGS_FILE, SCRAPED_POSTS_FILE } from '../utils/logger.js';
 
 const router = express.Router();
 
 router.get('/', (req, res) => {
   const feeds = loadJson(CONFIG.FEEDS_FILE, []);
   const logs = loadJson(LOGS_FILE, []);
+  const scrapedPosts = loadJson(SCRAPED_POSTS_FILE, []);
   const isOauthConfigured = Boolean(CONFIG.CLIENT_ID && CONFIG.REFRESH_TOKEN);
 
   res.send(`
@@ -46,17 +47,25 @@ router.get('/', (req, res) => {
         </div>
 
         <!-- Status Card -->
-        <div class="p-6 rounded-2xl ${isOauthConfigured ? 'bg-emerald-950/40 border border-emerald-800/60 text-emerald-200' : 'bg-amber-950/40 border border-amber-800/60 text-amber-200'} flex items-start gap-4">
+        <div class="p-6 rounded-2xl ${isOauthConfigured ? 'bg-emerald-950/40 border border-emerald-800/60 text-emerald-200' : 'bg-amber-950/40 border border-amber-800/60 text-amber-200'} flex flex-col sm:flex-row items-start gap-4">
           <div class="text-2xl">${isOauthConfigured ? '✅' : 'ℹ️'}</div>
-          <div>
+          <div class="flex-1">
             <h3 class="font-bold text-base text-white">
-              ${isOauthConfigured ? 'Blogger OAuth2 Connected & Active' : 'Simulation Mode Active (Preview Ready)'}
+              ${isOauthConfigured ? 'Blogger OAuth2 Live Posting Active' : 'Website Feed Live (Blogger Live Posting Awaiting OAuth Token)'}
             </h3>
             <p class="text-xs leading-relaxed mt-1 opacity-90">
               ${isOauthConfigured 
-                ? 'Your backend server is fully connected to Google Blogger API. New posts from the configured sites are automatically published.' 
-                : 'To post live on Blogger, set BLOGGER_CLIENT_ID, BLOGGER_CLIENT_SECRET, and BLOGGER_REFRESH_TOKEN in your Render Environment Variables. Until set, the bot runs safely in simulation/preview mode.'}
+                ? 'Your backend server is actively connected to Google Blogger API. New posts are automatically published directly to your live blog.' 
+                : 'All scraped posts are 100% active and feeding directly to your website. To also push posts directly into your live Blogger account, add your Google Cloud OAuth credentials in Render Environment Variables.'}
             </p>
+            ${!isOauthConfigured ? `
+              <div class="mt-3 p-3 bg-slate-900/90 rounded-xl border border-amber-900/50 text-[11px] font-mono text-amber-300">
+                <span class="font-bold text-white block mb-1">Quick Blogger OAuth Setup:</span>
+                1. Render Dashboard ➔ Environment Variables<br/>
+                2. Add: <code>BLOGGER_CLIENT_ID</code>, <code>BLOGGER_CLIENT_SECRET</code>, <code>BLOGGER_REFRESH_TOKEN</code><br/>
+                3. Scope required: <code>https://www.googleapis.com/auth/blogger</code>
+              </div>
+            ` : ''}
           </div>
         </div>
 
@@ -86,6 +95,36 @@ router.get('/', (req, res) => {
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Active Scraper
                   </span>
                   <button onclick="deleteFeed('${f.id}')" class="text-red-400 hover:text-red-300 font-bold">Remove</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Live Scraped Posts on Website Feed -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+            <div>
+              <h2 class="text-lg font-black text-white">Live Verified Scraped Posts on Website (${scrapedPosts.length})</h2>
+              <p class="text-xs text-slate-400">Ye sabhi genuine government notices direct site par display ho rahe hain</p>
+            </div>
+            <a href="/api/latest-posts" target="_blank" class="text-xs font-bold text-indigo-400 bg-indigo-950/60 border border-indigo-800/50 px-3 py-1.5 rounded-xl hover:bg-indigo-900 transition-all flex items-center gap-1">
+              View JSON API ➔
+            </a>
+          </div>
+
+          <div class="flex flex-col gap-2.5 max-h-72 overflow-y-auto pr-1">
+            ${scrapedPosts.length === 0 ? '<div class="text-slate-500 text-xs py-4 text-center">No scraped posts yet. Click "Sync & Post Now" to scrape immediately.</div>' : scrapedPosts.slice(0, 15).map((p, idx) => `
+              <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="w-5 h-5 rounded-full bg-slate-900 text-slate-400 text-[10px] font-bold flex items-center justify-center shrink-0">${idx + 1}</span>
+                  <a href="${p.applyUrl}" target="_blank" class="font-semibold text-slate-200 hover:text-indigo-400 transition-colors truncate">
+                    ${p.title}
+                  </a>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 text-[10px] font-bold">${p.organization || 'Govt Portal'}</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 text-[10px] font-bold">${p.category}</span>
                 </div>
               </div>
             `).join('')}

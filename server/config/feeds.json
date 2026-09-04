@@ -61,5 +61,14 @@
     "type": "scrape",
     "labels": ["Bihar Help", "Latest Jobs", "BPSC"],
     "enabled": true
+  },
+  {
+    "id": "feed-real-8",
+    "name": "OnlineUpdateSTM Official Jobs & Updates",
+    "url": "https://onlineupdatestm.in.net/",
+    "category": "Latest Jobs",
+    "type": "scrape",
+    "labels": ["OnlineUpdateSTM", "Latest Jobs", "Bihar Jobs"],
+    "enabled": true
   }
 ]

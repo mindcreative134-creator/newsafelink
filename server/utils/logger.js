@@ -14,6 +14,7 @@ if (!fs.existsSync(DATA_DIR)) {
 
 export const LOGS_FILE = path.join(DATA_DIR, 'logs.json');
 export const POSTED_CACHE_FILE = path.join(DATA_DIR, 'posted_cache.json');
+export const SCRAPED_POSTS_FILE = path.join(DATA_DIR, 'latest_scraped_posts.json');
 
 export function loadJson(filePath, defaultValue) {
   try {

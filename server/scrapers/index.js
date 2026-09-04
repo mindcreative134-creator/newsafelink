@@ -3,6 +3,7 @@ import { scrapeHtmlPage } from './cheerioScraper.js';
 import { scrapeSarkariResult } from './sarkariResultScraper.js';
 import { scrapeFreeJobAlert } from './freeJobAlertScraper.js';
 import { scrapeBiharHelp } from './biharHelpScraper.js';
+import { scrapeOnlineUpdate } from './onlineUpdateScraper.js';
 import { logEvent } from '../utils/logger.js';
 
 /**
@@ -132,6 +133,8 @@ export async function scrapeSite(siteConfig) {
     // 1. Specialized scrapers
     if (url.includes('biharhelp.in')) {
       rawItems = await scrapeBiharHelp(siteConfig);
+    } else if (url.includes('onlineupdatestm')) {
+      rawItems = await scrapeOnlineUpdate(siteConfig);
     } else if (url.includes('sarkariresult.com')) {
       rawItems = await scrapeSarkariResult(siteConfig);
     } else if (url.includes('freejobalert.com')) {

@@ -188,12 +188,12 @@ function formatJobAsPost(item) {
 }
 
 /**
- * Get single post by ID (Checking Blogger API or local/RSS Sarkari repository)
+ * Get single post by ID (Checking Blogger API or local/RSS/scraped Sarkari repository)
  */
 export async function getPostById(postId) {
-  // If it's a Sarkari or RSS post ID
-  if (postId.startsWith('sarkari-') || postId.startsWith('rss-')) {
-    // Check cached live RSS jobs
+  // If it's a Sarkari, RSS, or Scraped post ID
+  if (postId.startsWith('sarkari-') || postId.startsWith('rss-') || postId.startsWith('scraped-')) {
+    // Check cached live RSS / scraped jobs
     const allUpdates = await getLiveSarkariUpdates();
     const found = allUpdates.find((j) => j.id === postId) || defaultJobs.find((j) => j.id === postId);
 
@@ -209,8 +209,9 @@ export async function getPostById(postId) {
       return bloggerPost;
     }
   } catch (err) {
-    // If not found in Blogger, search in defaultJobs as fallback
-    const fallback = defaultJobs.find((j) => j.id === postId);
+    // If not found in Blogger, search in allUpdates or defaultJobs as fallback
+    const allUpdates = await getLiveSarkariUpdates();
+    const fallback = allUpdates.find((j) => j.id === postId) || defaultJobs.find((j) => j.id === postId);
     if (fallback) {
       return formatJobAsPost(fallback);
     }
@@ -227,15 +228,15 @@ export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label =
 
   try {
     const bloggerData = await getBloggerPosts({ pageToken, maxResults, label });
-    if (bloggerData.items) {
+    if (bloggerData.items && bloggerData.items.length > 0) {
       bloggerItems = bloggerData.items;
       bloggerNextToken = bloggerData.nextPageToken || '';
     }
   } catch (e) {
-    // Blogger failed or empty
+    // Blogger API failed or empty
   }
 
-  // Get Sarkari / RSS updates
+  // Get live verified Sarkari / Scraped updates
   const sarkariUpdates = await getLiveSarkariUpdates();
   let filteredSarkari = sarkariUpdates;
 
@@ -248,8 +249,13 @@ export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label =
 
   const formattedSarkari = filteredSarkari.map((item) => formatJobAsPost(item));
 
-  // Merge items: mix Blogger posts with Sarkari posts
-  const merged = [...formattedSarkari.slice(0, 8), ...bloggerItems];
+  // Merge items: if Blogger has posts, combine both; otherwise show all real Sarkari posts
+  let merged = [];
+  if (bloggerItems.length > 0) {
+    merged = [...bloggerItems, ...formattedSarkari];
+  } else {
+    merged = formattedSarkari;
+  }
 
   return {
     items: merged.slice(0, maxResults),
