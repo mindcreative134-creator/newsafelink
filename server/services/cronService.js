@@ -3,6 +3,7 @@ import { CONFIG } from '../config/index.js';
 import { scrapeSite } from '../scrapers/index.js';
 import { buildClonedHtmlArticle } from './articleTemplate.js';
 import { cloneAuthenticArticle } from '../scrapers/articleCloner.js';
+import { detectPostCategory } from '../scrapers/universalDetector.js';
 import { postToBlogger } from './bloggerPublisher.js';
 import { loadJson, saveJson, logEvent, POSTED_CACHE_FILE, SCRAPED_POSTS_FILE } from '../utils/logger.js';
 
@@ -35,18 +36,22 @@ export async function runSyncRoutine() {
           const key = cleanTitle.toLowerCase();
           if (!scrapedMap.has(key)) {
             const cleanSlug = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 35);
+            const { category: detectedCat, badge: detectedBadge } = detectPostCategory(cleanTitle, item.contentSnippet || '');
+            const postCategory = (!feed.category || feed.category.includes('Auto Detect')) ? detectedCat : (item.category || feed.category || detectedCat);
+            const postBadge = item.badge || detectedBadge;
+
             scrapedMap.set(key, {
               id: `scraped-${cleanSlug}`,
               title: cleanTitle,
-              category: item.category || feed.category || 'Latest Jobs',
+              category: postCategory,
               organization: item.sourceName || feed.name,
               totalPosts: 'Refer to Notification',
               qualification: 'As per Official Notice',
               lastDate: 'Online Application Active',
               status: 'Active',
-              badge: (feed.category || '').toUpperCase().includes('RESULT') ? 'RESULT' : (feed.category || '').toUpperCase().includes('ADMIT') ? 'ADMIT' : 'JOB',
+              badge: postBadge,
               applyUrl: item.link || feed.url,
-              summary: item.contentSnippet || `Latest recruitment update from ${feed.name}: ${cleanTitle}`,
+              summary: item.contentSnippet || `${postCategory} update from ${feed.name}: ${cleanTitle}`,
               publishedDate: new Date().toISOString().split('T')[0],
               ageLimit: 'As per official recruitment rules',
               imageUrl: item.imageUrl || '',
@@ -63,15 +68,18 @@ export async function runSyncRoutine() {
             continue;
           }
 
+          const { category: postCat } = detectPostCategory(cleanTitle, item.contentSnippet || '');
+          const finalBloggerCategory = (!feed.category || feed.category.includes('Auto Detect')) ? postCat : (feed.category || postCat);
+
           logEvent(`Cloning 100% authentic article & media for: "${cleanTitle}"...`);
-          const cloned = await cloneAuthenticArticle(item.link || feed.url, feed.category);
+          const cloned = await cloneAuthenticArticle(item.link || feed.url, finalBloggerCategory);
 
           let postTitle = cleanTitle;
           let htmlContent = '';
 
           if (cloned && cloned.bodyContentHtml) {
             postTitle = cloned.title || cleanTitle;
-            htmlContent = buildClonedHtmlArticle(cloned, feed.category, item.sourceName || feed.name);
+            htmlContent = buildClonedHtmlArticle(cloned, finalBloggerCategory, item.sourceName || feed.name);
 
             // Update scrapedMap with real media & links for website feed
             const mapItem = scrapedMap.get(cleanTitle.toLowerCase());

@@ -1,6 +1,7 @@
 import express from 'express';
 import { CONFIG } from '../config/index.js';
 import { loadJson, LOGS_FILE, SCRAPED_POSTS_FILE } from '../utils/logger.js';
+import { getKeepAliveStatus } from '../services/keepAliveService.js';
 
 const router = express.Router();
 
@@ -9,6 +10,7 @@ router.get('/', (req, res) => {
   const logs = loadJson(LOGS_FILE, []);
   const scrapedPosts = loadJson(SCRAPED_POSTS_FILE, []);
   const isOauthConfigured = Boolean(CONFIG.CLIENT_ID && CONFIG.REFRESH_TOKEN);
+  const keepAlive = getKeepAliveStatus();
 
   res.send(`
     <!DOCTYPE html>
@@ -16,7 +18,7 @@ router.get('/', (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Sarkari Blogger Auto-Publisher &amp; Multi-Site Web Scraper</title>
+      <title>Sarkari Blogger Auto-Publisher &amp; Universal Web Scraper</title>
       <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-8 font-sans">
@@ -27,10 +29,10 @@ router.get('/', (req, res) => {
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-400 text-xs font-black uppercase tracking-wider">
-                Render Backend Worker
+                Render 24/7 Worker
               </span>
               <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-black uppercase tracking-wider">
-                Modular Architecture
+                Universal Auto-Scraper
               </span>
             </div>
             <h1 class="text-3xl font-black text-white mt-1">Sarkari Blogger Auto-Publisher Bot</h1>
@@ -46,7 +48,49 @@ router.get('/', (req, res) => {
           </div>
         </div>
 
-        <!-- Status Card -->
+        <!-- Render 24/7 Anti-Sleep Keep-Alive Monitor Card -->
+        <div class="p-6 rounded-3xl bg-slate-900/80 border border-indigo-900/40 shadow-xl flex flex-col gap-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+            <div class="flex items-center gap-2.5">
+              <span class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
+              <h2 class="text-base font-black text-white">Render 24/7 Anti-Sleep Keep-Alive Engine</h2>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800/50 text-[10px] font-black uppercase">
+                Active 24/7
+              </span>
+            </div>
+            <div class="text-xs text-slate-400 font-mono">
+              Auto-Ping Interval: <span class="text-indigo-400 font-bold">Every 10 Minutes</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
+              <span class="text-slate-400 block mb-1">Target Keep-Alive Endpoint</span>
+              <span class="font-mono text-indigo-300 font-bold break-all">${keepAlive.externalUrl}/ping</span>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
+              <span class="text-slate-400 block mb-1">Total Keep-Alive Pings Sent</span>
+              <span class="text-emerald-400 font-bold text-sm">${keepAlive.totalPings} pings</span>
+              <span class="text-slate-500 text-[10px] block mt-0.5">${keepAlive.lastPingTime ? 'Last: ' + new Date(keepAlive.lastPingTime).toLocaleTimeString() : 'Starting...'}</span>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
+              <span class="text-slate-400 block mb-1">Render Container State</span>
+              <span class="text-emerald-400 font-bold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Always Awake (Zero Sleep)
+              </span>
+              <span class="text-slate-500 text-[10px] block mt-0.5">${keepAlive.lastStatus}</span>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-950/40 border border-slate-800/60 text-[11px] text-slate-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <span>💡 <b>Tip for Render:</b> If deployed on Render, your web service URL is auto-detected. You can also add <code class="text-indigo-300">RENDER_EXTERNAL_URL</code> to Render Environment Variables.</span>
+            <button onclick="copyPingUrl('${keepAlive.externalUrl}/ping')" class="text-indigo-400 hover:text-indigo-300 font-bold shrink-0 underline">
+              Copy /ping URL
+            </button>
+          </div>
+        </div>
+
+        <!-- Blogger OAuth Status Card -->
         <div class="p-6 rounded-2xl ${isOauthConfigured ? 'bg-emerald-950/40 border border-emerald-800/60 text-emerald-200' : 'bg-amber-950/40 border border-amber-800/60 text-amber-200'} flex flex-col sm:flex-row items-start gap-4">
           <div class="text-2xl">${isOauthConfigured ? '✅' : 'ℹ️'}</div>
           <div class="flex-1">
@@ -55,28 +99,90 @@ router.get('/', (req, res) => {
             </h3>
             <p class="text-xs leading-relaxed mt-1 opacity-90">
               ${isOauthConfigured 
-                ? 'Your backend server is actively connected to Google Blogger API. New posts are automatically published directly to your live blog.' 
-                : 'All scraped posts are 100% active and feeding directly to your website. To also push posts directly into your live Blogger account, add your Google Cloud OAuth credentials in Render Environment Variables.'}
+                ? 'Your backend server is actively connected to Google Blogger API. New posts are automatically cloned with real media & published directly to your live blog.' 
+                : 'All scraped posts are 100% active and feeding directly to your website. To also push posts directly into your live Blogger account, ensure Google Cloud OAuth credentials are set.'}
             </p>
-            ${!isOauthConfigured ? `
-              <div class="mt-3 p-3 bg-slate-900/90 rounded-xl border border-amber-900/50 text-[11px] font-mono text-amber-300">
-                <span class="font-bold text-white block mb-1">Quick Blogger OAuth Setup:</span>
-                1. Render Dashboard ➔ Environment Variables<br/>
-                2. Add: <code>BLOGGER_CLIENT_ID</code>, <code>BLOGGER_CLIENT_SECRET</code>, <code>BLOGGER_REFRESH_TOKEN</code><br/>
-                3. Scope required: <code>https://www.googleapis.com/auth/blogger</code>
-              </div>
-            ` : ''}
           </div>
         </div>
 
-        <!-- Feeds List -->
+        <!-- ── ⚡ 1-Click Universal Site Auto-Detector & Adder ── -->
+        <div class="bg-gradient-to-br from-indigo-950/30 via-slate-900 to-slate-900 border border-indigo-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-[11px] font-black uppercase tracking-wider">
+              ⚡ 1-Click Universal Auto-Detector
+            </span>
+            <span class="text-xs text-slate-400">Zero Configuration Needed</span>
+          </div>
+
+          <h2 class="text-xl sm:text-2xl font-black text-white font-heading mb-1">
+            Connect Any Target Website
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400 mb-6 leading-relaxed">
+            Sirf website ka link daalein (jaise <code class="text-indigo-300">https://biharhelp.in/</code> ya <code class="text-indigo-300">https://sarkariresult.com</code>). 
+            System automatically Site Name, RSS vs HTML Scraper, aur har post ki Category (Jobs, Admit Card, Result, Yojana) detect kar lega!
+          </p>
+
+          <form onsubmit="autoDetectAndAdd(event)" class="flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+              <input
+                id="autoSiteUrl"
+                type="url"
+                placeholder="Paste Website URL (e.g. https://biharhelp.in/ or https://sarkariresult.com)"
+                required
+                class="w-full px-5 py-4 rounded-2xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+              />
+            </div>
+            <button
+              id="autoDetectBtn"
+              type="submit"
+              class="px-8 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-black text-xs uppercase tracking-wider shadow-xl shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 shrink-0"
+            >
+              <span>⚡ Auto-Detect &amp; Connect Site</span>
+            </button>
+          </form>
+
+          <!-- Notification feedback banner -->
+          <div id="autoDetectBanner" class="hidden mt-4 p-4 rounded-2xl text-xs flex items-center gap-3"></div>
+
+          <!-- Optional Advanced Settings (Manual Overrides) -->
+          <details class="mt-4 pt-3 border-t border-slate-800/80 group">
+            <summary class="text-xs text-slate-400 hover:text-indigo-400 cursor-pointer font-bold select-none list-none flex items-center gap-1.5">
+              <span>⚙️ Optional Advanced Settings (Custom Overrides)</span>
+              <span class="text-[10px] text-slate-600 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 pt-2">
+              <div>
+                <label class="text-[11px] text-slate-400 block mb-1 font-semibold">Custom Site Name (Optional)</label>
+                <input id="customName" type="text" placeholder="Auto-detected if blank" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white" />
+              </div>
+              <div>
+                <label class="text-[11px] text-slate-400 block mb-1 font-semibold">Fixed Category Override</label>
+                <select id="customCategory" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white">
+                  <option value="Auto Detect (Multi-Category)">Auto Detect (Multi-Category per post)</option>
+                  <option value="Latest Jobs">Force: Latest Jobs</option>
+                  <option value="Admit Cards">Force: Admit Cards</option>
+                  <option value="Results">Force: Results</option>
+                  <option value="Govt Schemes & Yojana">Force: Govt Schemes &amp; Yojana</option>
+                  <option value="University & Admissions">Force: University &amp; Admissions</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                  Default settings auto-detect RSS feeds and categorize each recruitment post dynamically.
+                </p>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Connected Feeds & Scrapers List -->
         <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 flex flex-col gap-4">
           <div class="flex items-center justify-between pb-4 border-b border-slate-800">
             <div>
               <h2 class="text-lg font-black text-white">Connected Target Sites &amp; Scrapers (${feeds.length})</h2>
-              <p class="text-xs text-slate-400">Har site ka alag module/scraper banaya gaya hai</p>
+              <p class="text-xs text-slate-400">Ye sabhi sources 24/7 background me monitor ho rahe hain</p>
             </div>
-            <span class="text-xs font-bold text-indigo-400 bg-indigo-950 px-3 py-1 rounded-full">Automated</span>
+            <span class="text-xs font-bold text-indigo-400 bg-indigo-950 px-3 py-1 rounded-full">Automated 24/7</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -85,8 +191,8 @@ router.get('/', (req, res) => {
                 <div class="flex items-center justify-between">
                   <span class="font-bold text-sm text-white">${f.name}</span>
                   <div class="flex items-center gap-1.5">
-                    <span class="px-2 py-0.5 rounded-full ${f.type === 'scrape' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/50' : 'bg-blue-950 text-blue-400 border border-blue-800/50'} text-[9px] font-bold uppercase">${f.type || 'rss'}</span>
-                    <span class="px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 text-[9px] font-bold uppercase">${f.category}</span>
+                    <span class="px-2 py-0.5 rounded-full ${f.type === 'scrape' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/50' : 'bg-blue-950 text-blue-400 border border-blue-800/50'} text-[9px] font-bold uppercase">${f.type || 'universal'}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 text-[9px] font-bold uppercase">${f.category || 'Multi-Category'}</span>
                   </div>
                 </div>
                 <div class="text-xs text-slate-400 truncate font-mono">${f.url}</div>
@@ -106,7 +212,7 @@ router.get('/', (req, res) => {
           <div class="flex items-center justify-between pb-4 border-b border-slate-800">
             <div>
               <h2 class="text-lg font-black text-white">Live Verified Scraped Posts on Website (${scrapedPosts.length})</h2>
-              <p class="text-xs text-slate-400">Ye sabhi genuine government notices direct site par display ho rahe hain</p>
+              <p class="text-xs text-slate-400">Har post ka authentic title, category, aur link auto-detect hua hai</p>
             </div>
             <a href="/api/latest-posts" target="_blank" class="text-xs font-bold text-indigo-400 bg-indigo-950/60 border border-indigo-800/50 px-3 py-1.5 rounded-xl hover:bg-indigo-900 transition-all flex items-center gap-1">
               View JSON API ➔
@@ -129,32 +235,6 @@ router.get('/', (req, res) => {
               </div>
             `).join('')}
           </div>
-        </div>
-
-        <!-- Add Feed / Scraper Form -->
-        <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6">
-          <h2 class="text-lg font-black text-white mb-1">Add Another Target Website / Scraper</h2>
-          <p class="text-xs text-slate-400 mb-4">Koi bhi RSS feed URL ya direct website link daalein (Cheerio parser automatically scrape karega).</p>
-          <form onsubmit="addFeed(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <input id="feedName" type="text" placeholder="Site Name (e.g. FreeJobAlert)" required class="px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-            <input id="feedUrl" type="url" placeholder="URL (RSS or Webpage)" required class="px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-            <select id="feedType" class="px-3 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white">
-              <option value="rss">Type: RSS Feed (Auto)</option>
-              <option value="scrape">Type: HTML Web Scraper</option>
-            </select>
-            <div class="flex gap-2">
-              <select id="feedCategory" class="px-3 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white flex-1">
-                <option value="Latest Jobs">Latest Jobs</option>
-                <option value="Govt Schemes & Yojana">Govt Schemes &amp; Yojana</option>
-                <option value="University & Admissions">University &amp; Admissions</option>
-                <option value="Admit Cards">Admit Cards</option>
-                <option value="Results">Results</option>
-              </select>
-              <button type="submit" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider">
-                Add
-              </button>
-            </div>
-          </form>
         </div>
 
         <!-- Live Activity Logs -->
@@ -193,25 +273,60 @@ router.get('/', (req, res) => {
           }
         }
 
-        async function addFeed(e) {
+        async function autoDetectAndAdd(e) {
           e.preventDefault();
-          const name = document.getElementById('feedName').value;
-          const url = document.getElementById('feedUrl').value;
-          const type = document.getElementById('feedType').value;
-          const category = document.getElementById('feedCategory').value;
-          await fetch('/api/feeds', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, url, type, category })
-          });
-          location.reload();
+          const urlInput = document.getElementById('autoSiteUrl');
+          const btn = document.getElementById('autoDetectBtn');
+          const banner = document.getElementById('autoDetectBanner');
+          const customName = document.getElementById('customName').value;
+          const customCategory = document.getElementById('customCategory').value;
+
+          const url = urlInput.value.trim();
+          if (!url) return;
+
+          btn.disabled = true;
+          btn.innerHTML = '<span class="animate-spin">⏳</span> Detecting Site &amp; Feeds...';
+          banner.className = 'mt-4 p-4 rounded-2xl text-xs bg-indigo-950/60 border border-indigo-800 text-indigo-200 flex items-center gap-2';
+          banner.innerHTML = '<span>⚡ Analyzing site, checking RSS vs HTML scraper, extracting post links...</span>';
+          banner.classList.remove('hidden');
+
+          try {
+            const res = await fetch('/api/feeds/auto-detect', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url, name: customName, category: customCategory })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+              banner.className = 'mt-4 p-4 rounded-2xl text-xs bg-emerald-950/80 border border-emerald-800 text-emerald-200';
+              banner.innerHTML = '<b>✅ ' + (data.message || 'Site Connected Successfully!') + '</b> Auto-detected: ' + (data.detected?.samplePostsFound || 0) + ' initial posts.';
+              urlInput.value = '';
+              setTimeout(() => location.reload(), 1500);
+            } else {
+              banner.className = 'mt-4 p-4 rounded-2xl text-xs bg-red-950/80 border border-red-800 text-red-200';
+              banner.innerHTML = '<b>❌ Error:</b> ' + (data.error || 'Failed to detect site.');
+              btn.disabled = false;
+              btn.innerHTML = '⚡ Auto-Detect &amp; Connect Site';
+            }
+          } catch (err) {
+            banner.className = 'mt-4 p-4 rounded-2xl text-xs bg-red-950/80 border border-red-800 text-red-200';
+            banner.innerHTML = '<b>❌ Network Error:</b> ' + err.message;
+            btn.disabled = false;
+            btn.innerHTML = '⚡ Auto-Detect &amp; Connect Site';
+          }
         }
 
         async function deleteFeed(id) {
-          if (confirm('Delete this source?')) {
+          if (confirm('Delete this target source?')) {
             await fetch('/api/feeds/' + id, { method: 'DELETE' });
             location.reload();
           }
+        }
+
+        function copyPingUrl(url) {
+          navigator.clipboard.writeText(url);
+          alert('Copied keep-alive ping URL: ' + url + '\\nYou can use this in Cron-Job.org or UptimeRobot to ping every 10 minutes.');
         }
       </script>
     </body>

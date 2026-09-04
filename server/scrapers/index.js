@@ -4,6 +4,7 @@ import { scrapeSarkariResult } from './sarkariResultScraper.js';
 import { scrapeFreeJobAlert } from './freeJobAlertScraper.js';
 import { scrapeBiharHelp } from './biharHelpScraper.js';
 import { scrapeOnlineUpdate } from './onlineUpdateScraper.js';
+import { scrapeGenericHtml, detectPostCategory } from './universalDetector.js';
 import { logEvent } from '../utils/logger.js';
 
 /**
@@ -130,7 +131,7 @@ export async function scrapeSite(siteConfig) {
   let rawItems = [];
 
   try {
-    // 1. Specialized scrapers
+    // 1. Specialized or Universal Scrapers
     if (url.includes('biharhelp.in')) {
       rawItems = await scrapeBiharHelp(siteConfig);
     } else if (url.includes('onlineupdatestm')) {
@@ -139,25 +140,41 @@ export async function scrapeSite(siteConfig) {
       rawItems = await scrapeSarkariResult(siteConfig);
     } else if (url.includes('freejobalert.com')) {
       rawItems = await scrapeFreeJobAlert(siteConfig);
-    } else if (type === 'scrape') {
-      rawItems = await scrapeHtmlPage(siteConfig);
-    } else {
+    } else if (type === 'rss') {
       try {
         rawItems = await scrapeRssFeed(siteConfig);
+        if (!rawItems || rawItems.length === 0) {
+          logEvent(`RSS returned 0 items for "${siteConfig.name}", seamlessly falling back to Universal HTML Scraper...`, 'info');
+          rawItems = await scrapeGenericHtml(siteConfig);
+        }
       } catch (rssErr) {
-        logEvent(`RSS failed for "${siteConfig.name}" (${rssErr.message}), falling back to Cheerio HTML scraper...`, 'warning');
-        rawItems = await scrapeHtmlPage(siteConfig);
+        logEvent(`RSS failed for "${siteConfig.name}" (${rssErr.message}), falling back to Universal HTML Scraper...`, 'warning');
+        rawItems = await scrapeGenericHtml(siteConfig);
       }
+    } else {
+      rawItems = await scrapeGenericHtml(siteConfig);
     }
 
-    // 2. Strict Quality & Authenticity Filter
-    const verifiedItems = rawItems.filter((item) => {
-      const isValid = isValidSarkariPost(item.title);
-      if (!isValid) {
-        logEvent(`Filtered out non-recruitment or menu item: "${item.title}"`, 'info');
-      }
-      return isValid;
-    });
+    // 2. Strict Quality & Authenticity Filter + Dynamic Category Assignment
+    const verifiedItems = rawItems
+      .filter((item) => {
+        const isValid = isValidSarkariPost(item.title);
+        if (!isValid) {
+          logEvent(`Filtered out non-recruitment or menu item: "${item.title}"`, 'info');
+        }
+        return isValid;
+      })
+      .map((item) => {
+        // Automatically determine per-post category & badge from title/snippet
+        const detected = detectPostCategory(item.title, item.contentSnippet || '');
+        return {
+          ...item,
+          category: (!siteConfig.category || siteConfig.category.includes('Auto Detect')) 
+            ? detected.category 
+            : (item.category || siteConfig.category || detected.category),
+          badge: item.badge || detected.badge,
+        };
+      });
 
     logEvent(`[Quality Filter] ${verifiedItems.length} of ${rawItems.length} items verified as genuine recruitment posts for ${siteConfig.name}`);
     return verifiedItems;
