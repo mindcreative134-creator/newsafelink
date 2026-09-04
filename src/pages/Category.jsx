@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getPosts } from '../services/bloggerApi';
+import { getUnifiedPosts } from '../services/postService';
 import Sidebar from '../components/Sidebar';
 import { Calendar, ArrowRight, Folder, RefreshCw, Clock } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
@@ -53,7 +53,7 @@ export default function Category() {
       document.head.appendChild(metaDesc);
     }
 
-    getPosts({ maxResults: 12, label })
+    getUnifiedPosts({ maxResults: 12, label })
       .then((data) => {
         if (data.items) {
           setPosts(data.items);
@@ -73,7 +73,7 @@ export default function Category() {
   const loadMore = () => {
     if (!nextPageToken) return;
     setLoading(true);
-    getPosts({ pageToken: nextPageToken, maxResults: 9, label })
+    getUnifiedPosts({ pageToken: nextPageToken, maxResults: 9, label })
       .then((data) => {
         if (data.items) {
           setPosts((prev) => [...prev, ...data.items]);

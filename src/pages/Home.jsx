@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPosts } from '../services/bloggerApi';
+import { getUnifiedPosts } from '../services/postService';
 import { getLiveSarkariUpdates } from '../services/rssService';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import { 
   Calendar, Clock, ArrowRight, ShieldCheck, RefreshCw, Sparkles, 
-  Lock, CheckCircle2, ArrowUpRight, Flame
+  Lock, CheckCircle2, Flame, ArrowUpRight, BookOpen
 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
 
@@ -72,7 +72,7 @@ export default function Home() {
       
       startSafelink(safelinkTarget);
       
-      getPosts({ maxResults: 15 }).then((data) => {
+      getUnifiedPosts({ maxResults: 15 }).then((data) => {
         if (data.items && data.items.length > 0) {
           const randomIndex = Math.floor(Math.random() * data.items.length);
           const randomPost = data.items[randomIndex];
@@ -82,11 +82,11 @@ export default function Home() {
     }, 1200);
   };
 
-  // Fetch Blogger articles
+  // Fetch Unified articles (Blogger posts + Sarkari/Yojana posts)
   useEffect(() => {
-    document.title = "SarkariTrend – India's Leading Govt Job & Career News Portal 2026";
+    document.title = "SarkariTrend – Latest Govt Jobs, Admit Cards, Results & Schemes 2026";
     
-    getPosts({ maxResults: 13 })
+    getUnifiedPosts({ maxResults: 13 })
       .then((data) => {
         if (data.items && data.items.length > 0) {
           setFeaturedPost(data.items[0]);
@@ -100,7 +100,7 @@ export default function Home() {
       });
   }, []);
 
-  // Fetch Sarkari / RSS Live Updates
+  // Fetch Sarkari / RSS Live Updates for the Quick Matrix
   useEffect(() => {
     setLoadingUpdates(true);
     getLiveSarkariUpdates()
@@ -116,7 +116,7 @@ export default function Home() {
   const loadMore = () => {
     if (!nextPageToken) return;
     setLoading(true);
-    getPosts({ pageToken: nextPageToken, maxResults: 9 })
+    getUnifiedPosts({ pageToken: nextPageToken, maxResults: 9 })
       .then((data) => {
         if (data.items) {
           setPosts((prev) => [...prev, ...data.items]);
@@ -168,10 +168,8 @@ export default function Home() {
             Please verify security credentials to proceed to your requested destination. This ensures a safe, authenticated connection.
           </p>
 
-          {/* Clean, official AdSense placement with compliant spacing */}
           <AdUnit slot="7317709042" format="auto" minHeight="120px" className="my-4" />
 
-          {/* Verification Action Button */}
           <button
             onClick={handleSafeTransitStart}
             disabled={verifying || verified}
@@ -213,7 +211,7 @@ export default function Home() {
           <div className="relative max-w-4xl px-6 py-14 sm:px-12 sm:py-20 lg:px-16 flex flex-col items-start gap-5">
             <div className="flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center gap-1.5 px-3.5 py-1 text-xs font-black uppercase tracking-wider rounded-full bg-gradient-to-r from-amber-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20">
-                <Sparkles className="w-3.5 h-3.5 fill-white" /> TOP STORY
+                <Sparkles className="w-3.5 h-3.5 fill-white" /> TOP NOTIFICATION
               </span>
               {featuredPost.labels && (
                 <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-white/10 text-zinc-200 backdrop-blur-md border border-white/10">
@@ -235,7 +233,7 @@ export default function Home() {
                 onClick={() => navigate(`/post/${featuredPost.id}`)}
                 className="inline-flex items-center justify-center px-7 py-3.5 border border-transparent text-sm font-black rounded-2xl text-white bg-indigo-600 hover:bg-indigo-500 shadow-xl shadow-indigo-600/30 active:scale-95 transition-all gap-2.5"
               >
-                Read Full Article <ArrowRight className="w-4 h-4" />
+                Read Full Notification <ArrowRight className="w-4 h-4" />
               </button>
               <div className="flex items-center gap-4 text-xs font-semibold text-zinc-400">
                 <span className="flex items-center gap-1.5">
@@ -250,27 +248,34 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── Sarkari Job Quick Matrix Section (Automated Real-Time Job Board) ── */}
+      {/* ── Sarkari Job, Yojana & University Quick Matrix Section ── */}
       {!showVerification && (
         <section className="mb-14 bg-white dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[32px] p-6 sm:p-8 shadow-sm">
           
           <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-zinc-200/70 dark:border-zinc-800 gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
-                <Flame className="w-4 h-4 text-red-500" /> Live Recruitment Desk 2026
+                <Flame className="w-4 h-4 text-red-500" /> Live Sarkari &amp; Yojana Desk 2026
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-heading mt-1">
-                Sarkari Job Updates Matrix
+                Sarkari Jobs, Schemes &amp; Admission Matrix
               </h2>
             </div>
 
-            {/* Interactive Tabs */}
+            {/* Interactive Tabs across all categories */}
             <div className="flex flex-wrap gap-2">
-              {['Latest Jobs', 'Admit Cards', 'Results', 'All Updates'].map((tab) => (
+              {[
+                'Latest Jobs', 
+                'Govt Schemes & Yojana', 
+                'Admit Cards', 
+                'Results', 
+                'University & Admissions', 
+                'All Updates'
+              ].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all ${
                     activeTab === tab
                       ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
                       : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
@@ -282,22 +287,23 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Sarkari Grid Table */}
+          {/* Sarkari Grid (All cards route ON-SITE to /post/:id) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
             {loadingUpdates ? (
               <div className="col-span-full text-center py-10 text-zinc-400 font-medium">
                 <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500" />
-                Loading latest Sarkari updates...
+                Loading latest notifications...
               </div>
             ) : filteredUpdates.length === 0 ? (
               <div className="col-span-full text-center py-8 text-zinc-400">
-                No active notifications found in this category.
+                No active notifications found under this tab.
               </div>
             ) : (
               filteredUpdates.slice(0, 6).map((job) => (
                 <div
                   key={job.id}
-                  className="p-5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 hover-lift flex flex-col justify-between gap-4"
+                  onClick={() => navigate(`/post/${job.id}`)}
+                  className="p-5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 hover-lift flex flex-col justify-between gap-4 cursor-pointer group"
                 >
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between text-[11px] font-bold">
@@ -306,10 +312,10 @@ export default function Home() {
                       </span>
                       <span
                         className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
-                          job.badge === 'HOT'
-                            ? 'bg-red-100 dark:bg-red-950/60 text-red-600'
-                            : job.badge === 'NEW'
-                            ? 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600'
+                          job.badge === 'HOT' || job.badge === 'YOJANA'
+                            ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400'
+                            : job.badge === 'NEW' || job.badge === 'JOB' || job.badge === 'CUET'
+                            ? 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'
                             : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600'
                         }`}
                       >
@@ -317,7 +323,7 @@ export default function Home() {
                       </span>
                     </div>
 
-                    <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-100 line-clamp-2 font-heading leading-snug">
+                    <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-100 line-clamp-2 font-heading leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {job.title}
                     </h3>
 
@@ -330,14 +336,9 @@ export default function Home() {
                     <span className="text-[11px] font-semibold text-zinc-400">
                       {job.lastDate}
                     </span>
-                    <a
-                      href={job.applyUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-xs font-black text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 flex items-center gap-1"
-                    >
-                      View Notice <ArrowUpRight className="w-3.5 h-3.5" />
-                    </a>
+                    <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                      Read Details &amp; Apply ➔
+                    </span>
                   </div>
                 </div>
               ))
@@ -354,10 +355,10 @@ export default function Home() {
         <main className="flex-1 flex flex-col gap-8">
           <div className="flex items-center justify-between pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
             <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-heading tracking-tight flex items-center gap-2.5">
-              <span className="w-2 h-7 bg-indigo-600 rounded-full"></span> Latest News & Guides
+              <span className="w-2 h-7 bg-indigo-600 rounded-full"></span> All Latest Articles &amp; Updates
             </h2>
             <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-              Updated Daily
+              Updated Live
             </span>
           </div>
 
@@ -376,12 +377,12 @@ export default function Home() {
               {posts.map((post, index) => (
                 <React.Fragment key={post.id}>
                   <article
-                    className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] overflow-hidden shadow-sm hover-lift flex flex-col group"
+                    className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[28px] overflow-hidden shadow-sm hover-lift flex flex-col group cursor-pointer"
+                    onClick={() => navigate(`/post/${post.id}`)}
                   >
                     {/* Thumbnail Image */}
                     <div
-                      onClick={() => navigate(`/post/${post.id}`)}
-                      className="aspect-video w-full overflow-hidden cursor-pointer relative bg-zinc-100 dark:bg-zinc-800"
+                      className="aspect-video w-full overflow-hidden relative bg-zinc-100 dark:bg-zinc-800"
                     >
                       <img
                         src={getPostImage(post)}
@@ -411,8 +412,7 @@ export default function Home() {
                         </div>
 
                         <h3
-                          onClick={() => navigate(`/post/${post.id}`)}
-                          className="text-base sm:text-lg font-black text-zinc-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug cursor-pointer font-heading transition-colors"
+                          className="text-base sm:text-lg font-black text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-2 leading-snug font-heading transition-colors"
                         >
                           {post.title}
                         </h3>
@@ -422,12 +422,11 @@ export default function Home() {
                         </p>
                       </div>
 
-                      <button
-                        onClick={() => navigate(`/post/${post.id}`)}
+                      <span
                         className="inline-flex items-center text-indigo-600 dark:text-indigo-400 font-extrabold text-xs gap-1.5 self-start group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors pt-1"
                       >
-                        Read Full Story <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                      </button>
+                        Read Full Article <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                      </span>
                     </div>
                   </article>
 

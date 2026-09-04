@@ -1,40 +1,49 @@
 import defaultJobs from '../data/liveJobs.json';
 
-const CACHE_KEY = 'SARKARI_RSS_CACHE_V1';
-const CACHE_TIME_KEY = 'SARKARI_RSS_CACHE_TIME';
+const CACHE_KEY = 'SARKARI_RSS_CACHE_V2';
+const CACHE_TIME_KEY = 'SARKARI_RSS_CACHE_TIME_V2';
 const CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour
 
-// Curated RSS feeds for Government Jobs and News in India
+// Curated RSS feeds across Government Jobs, Schemes (योजना), and University Admissions
 const RSS_FEEDS = [
   {
     name: 'Google News - Sarkari Naukri',
-    url: 'https://news.google.com/rss/search?q=sarkari+naukri+when:2d&hl=en-IN&gl=IN&ceid=IN:en',
+    url: 'https://news.google.com/rss/search?q=sarkari+naukri+recruitment+when:2d&hl=en-IN&gl=IN&ceid=IN:en',
     category: 'Latest Jobs',
+    defaultBadge: 'JOB',
+  },
+  {
+    name: 'Google News - Sarkari Yojana Schemes',
+    url: 'https://news.google.com/rss/search?q=sarkari+yojana+when:3d&hl=en-IN&gl=IN&ceid=IN:en',
+    category: 'Govt Schemes & Yojana',
+    defaultBadge: 'YOJANA',
+  },
+  {
+    name: 'Google News - University Admissions & CUET',
+    url: 'https://news.google.com/rss/search?q=university+admission+cuet+when:3d&hl=en-IN&gl=IN&ceid=IN:en',
+    category: 'University & Admissions',
+    defaultBadge: 'ADMISSION',
   },
   {
     name: 'Google News - Govt Exam Admit Card',
     url: 'https://news.google.com/rss/search?q=admit+card+exam+when:2d&hl=en-IN&gl=IN&ceid=IN:en',
     category: 'Admit Cards',
+    defaultBadge: 'ADMIT',
   },
   {
     name: 'Google News - Sarkari Result',
     url: 'https://news.google.com/rss/search?q=exam+result+declared+when:2d&hl=en-IN&gl=IN&ceid=IN:en',
     category: 'Results',
+    defaultBadge: 'RESULT',
   },
 ];
 
-/**
- * Clean HTML strings from RSS feed descriptions
- */
 function cleanText(html) {
   if (!html) return '';
   const text = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
-  return text.length > 180 ? text.substring(0, 180) + '...' : text;
+  return text.length > 200 ? text.substring(0, 200) + '...' : text;
 }
 
-/**
- * Fetch a single RSS feed via rss2json API
- */
 async function fetchRssFeed(feedObj) {
   try {
     const endpoint = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedObj.url)}`;
@@ -44,23 +53,27 @@ async function fetchRssFeed(feedObj) {
     if (data.status !== 'ok' || !Array.isArray(data.items)) return [];
 
     return data.items.map((item, index) => {
-      const cleanTitle = item.title ? item.title.replace(/\s*-\s*[^-]+$/, '').trim() : 'Govt Update';
-      const sourceName = item.author || (item.title && item.title.includes('-') ? item.title.split('-').pop().trim() : 'Govt Portal');
+      const cleanTitle = item.title ? item.title.replace(/\s*-\s*[^-]+$/, '').trim() : 'Official Update';
+      const sourceName = item.author || (item.title && item.title.includes('-') ? item.title.split('-').pop().trim() : 'Official Board');
       
+      // Hash-like ID for on-site post routing
+      const cleanSlug = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30);
+      const uniqueId = `sarkari-rss-${cleanSlug}-${index}`;
+
       return {
-        id: `rss-${feedObj.category.toLowerCase().replace(/\s+/g, '-')}-${index}-${Date.parse(item.pubDate) || Date.now()}`,
+        id: uniqueId,
         title: cleanTitle,
         category: feedObj.category,
         organization: sourceName,
-        totalPosts: 'Latest Update',
-        qualification: 'See Notification',
-        lastDate: 'Check Official Link',
+        totalPosts: 'Refer to Notification Details',
+        qualification: 'See Detailed Educational Eligibility Below',
+        lastDate: 'Online Application Window Active',
         status: 'Active',
-        badge: 'LIVE',
-        applyUrl: item.link || '#',
+        badge: feedObj.defaultBadge,
+        applyUrl: item.link || 'https://sarkariresult.com',
         summary: cleanText(item.description) || cleanTitle,
         publishedDate: item.pubDate ? new Date(item.pubDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        ageLimit: 'As per rules',
+        ageLimit: 'As per Central / State Government Guidelines',
         isRss: true,
       };
     });
@@ -69,11 +82,7 @@ async function fetchRssFeed(feedObj) {
   }
 }
 
-/**
- * Get all Sarkari updates (Combining cached jobs + live RSS updates)
- */
 export async function getLiveSarkariUpdates(forceRefresh = false) {
-  // Check localStorage cache
   if (!forceRefresh) {
     try {
       const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
@@ -81,12 +90,9 @@ export async function getLiveSarkariUpdates(forceRefresh = false) {
       if (cachedTime && cachedData && Date.now() - Number(cachedTime) < CACHE_DURATION_MS) {
         return JSON.parse(cachedData);
       }
-    } catch (_e) {
-      // ignore storage errors
-    }
+    } catch (_e) {}
   }
 
-  // Attempt live RSS fetch
   try {
     const feedPromises = RSS_FEEDS.map((f) => fetchRssFeed(f));
     const feedResults = await Promise.allSettled(feedPromises);
@@ -98,36 +104,19 @@ export async function getLiveSarkariUpdates(forceRefresh = false) {
       }
     });
 
-    // Merge live items with default verified jobs
-    const merged = [...liveItems.slice(0, 15), ...defaultJobs];
+    const merged = [...liveItems.slice(0, 20), ...defaultJobs];
 
-    // Cache merged results
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify(merged));
       localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
-    } catch (_e) {
-      // ignore storage quotas
-    }
+    } catch (_e) {}
 
     return merged;
   } catch (_err) {
-    // If network fails, return high quality fallback
     return defaultJobs;
   }
 }
 
-/**
- * Filter updates by category
- */
-export async function getUpdatesByCategory(category) {
-  const all = await getLiveSarkariUpdates();
-  if (!category || category === 'All') return all;
-  return all.filter((item) => item.category?.toLowerCase() === category.toLowerCase());
-}
-
-/**
- * Search updates by keyword
- */
 export async function searchUpdates(query) {
   const all = await getLiveSarkariUpdates();
   if (!query) return all;

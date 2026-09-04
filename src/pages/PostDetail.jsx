@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getPostById, getPosts } from '../services/bloggerApi';
+import { getPostById } from '../services/postService';
+import { getPosts } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import StepHeader from '../components/StepHeader';

@@ -174,6 +174,13 @@ export default function Header() {
               >
                 <Award className="w-4 h-4 text-emerald-500" /> Results
               </Link>
+
+              <Link 
+                to="/category/Govt%20Schemes%20%26%20Yojana" 
+                className="text-zinc-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold text-sm transition-colors duration-200 flex items-center gap-1.5"
+              >
+                🏛️ Schemes (योजना)
+              </Link>
               
               {/* Category Dropdown */}
               <div className="relative group">
@@ -266,9 +273,23 @@ export default function Header() {
                 <Briefcase className="w-3.5 h-3.5" /> Latest Jobs
               </Link>
               <Link
-                to="/category/Admit%20Cards"
+                to="/category/Govt%20Schemes%20%26%20Yojana"
                 onClick={() => setIsOpen(false)}
                 className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center gap-1.5"
+              >
+                🏛️ Schemes (योजना)
+              </Link>
+              <Link
+                to="/category/University%20%26%20Admissions"
+                onClick={() => setIsOpen(false)}
+                className="px-3 py-2 rounded-xl text-xs font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center gap-1.5"
+              >
+                🎓 Admissions &amp; CUET
+              </Link>
+              <Link
+                to="/category/Admit%20Cards"
+                onClick={() => setIsOpen(false)}
+                className="px-3 py-2 rounded-xl text-xs font-bold bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center gap-1.5"
               >
                 <FileCheck className="w-3.5 h-3.5" /> Admit Cards
               </Link>
@@ -362,12 +383,14 @@ export default function Header() {
               <div className="flex flex-col gap-2 mt-2 max-h-72 overflow-y-auto pr-1">
                 <div className="text-[11px] font-bold uppercase text-zinc-400 tracking-wider">Matching Notifications:</div>
                 {searchResults.map((item) => (
-                  <a
+                  <div
                     key={item.id}
-                    href={item.applyUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-zinc-200/60 dark:border-zinc-800 flex flex-col gap-1 transition-all"
+                    onClick={() => {
+                      navigate(`/post/${item.id}`);
+                      setShowSearchModal(false);
+                      setSearchQuery('');
+                    }}
+                    className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-zinc-200/60 dark:border-zinc-800 flex flex-col gap-1 transition-all cursor-pointer"
                   >
                     <div className="flex items-center justify-between text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
                       <span>{item.organization}</span>
@@ -376,7 +399,7 @@ export default function Header() {
                       </span>
                     </div>
                     <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 line-clamp-1">{item.title}</div>
-                  </a>
+                  </div>
                 ))}
               </div>
             )}
