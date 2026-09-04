@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPosts } from '../services/bloggerApi';
-import { Rss, Folder, Star, ShieldCheck, Sparkles, Send, ArrowUpRight, Flame } from 'lucide-react';
+import { Folder, ShieldCheck, Send, ArrowUpRight, Flame } from 'lucide-react';
 import AdUnit from './AdUnit';
 
 export default function Sidebar({ hideAds = false }) {
@@ -29,7 +29,7 @@ export default function Sidebar({ hideAds = false }) {
     <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8">
       
       {/* ── Official Trust & Portal Info Widget ── */}
-      <div className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-purple-950 border border-indigo-700/40 rounded-[28px] p-6 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 border border-indigo-700/40 rounded-[28px] p-6 text-white shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
         
         <div className="flex items-center gap-2 mb-3">
@@ -44,28 +44,28 @@ export default function Sidebar({ hideAds = false }) {
         </h3>
         
         <p className="text-xs text-indigo-200/90 leading-relaxed mb-4 font-medium">
-          India's trusted destination for genuine government job vacancy updates, admit cards, exam answer keys, and education news.
+          India's verified career destination for official government job vacancy notices, exam dates, admit cards, answer keys, and education updates.
         </p>
 
         <div className="flex items-center gap-4 pt-2 border-t border-indigo-800/60 text-[11px] font-bold text-indigo-300">
-          <span className="flex items-center gap-1">✅ Verified Source</span>
+          <span className="flex items-center gap-1">✅ 100% Genuine</span>
           <span className="flex items-center gap-1">⚡ Daily Updates</span>
         </div>
       </div>
 
-      {/* ── Instant Telegram / Social Join Banner Widget ── */}
+      {/* ── Instant Telegram Join Widget ── */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[28px] p-6 text-white shadow-lg shadow-blue-600/20 flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <span className="px-3 py-1 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-wider">
-            FREE JOB ALERTS
+            FREE JOB NOTIFICATIONS
           </span>
           <Send className="w-5 h-5 text-blue-200" />
         </div>
         <h4 className="text-base font-black font-heading leading-tight">
-          Get Instant Govt Job Updates on Telegram
+          Get Instant Sarkari Alerts on Telegram
         </h4>
         <p className="text-xs text-blue-100 font-medium">
-          Never miss an application deadline! Join 50,000+ job seekers.
+          Never miss an application deadline! Join 50,000+ candidates today.
         </p>
         <a
           href="https://t.me"
@@ -87,7 +87,7 @@ export default function Sidebar({ hideAds = false }) {
             <Link
               key={cat}
               to={`/category/${encodeURIComponent(cat)}`}
-              className="inline-block px-3.5 py-1.5 text-xs font-extrabold rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+              className="inline-block px-3 py-1.5 text-xs font-extrabold rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
             >
               {cat}
             </Link>
@@ -95,11 +95,9 @@ export default function Sidebar({ hideAds = false }) {
         </div>
       </div>
 
-      {/* ── Ad Unit Slot ── */}
+      {/* ── Compliant Ad Unit Slot ── */}
       {!hideAds && (
-        <div className="adsense-container w-full overflow-hidden flex items-center justify-center p-2 rounded-[28px]">
-          <AdUnit slot="7317709042" format="auto" minHeight="250px" />
-        </div>
+        <AdUnit slot="7317709042" format="auto" minHeight="250px" />
       )}
 
       {/* ── Recent Articles Widget ── */}
@@ -109,7 +107,9 @@ export default function Sidebar({ hideAds = false }) {
         </h3>
         <ul className="flex flex-col gap-4">
           {recentPosts.map((post) => {
-            const postImg = post.content?.match(/<img[^>]+src="([^">]+)"/) ? post.content.match(/<img[^>]+src="([^">]+)"/)[1] : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=200&auto=format&fit=crop&q=80';
+            const postImg = post.content?.match(/<img[^>]+src="([^">]+)"/) 
+              ? post.content.match(/<img[^>]+src="([^">]+)"/)[1] 
+              : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=200&auto=format&fit=crop&q=80';
             return (
               <li key={post.id} className="flex gap-3.5 group items-center">
                 <Link to={`/post/${post.id}`} className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 border border-zinc-200/60 dark:border-zinc-800 shadow-sm relative block bg-zinc-100 dark:bg-zinc-800">

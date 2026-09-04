@@ -1,15 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 
 /**
- * Universal AdSense Ad Unit
- * Works reliably on mobile, tablet, and desktop.
- *
- * Props:
- *   slot     — AdSense ad-slot ID (string)
- *   format   — 'auto' | 'fluid' | 'autorelaxed'
- *   layout   — for fluid: 'in-article' (optional)
- *   layoutKey— for fluid in-feed: '-6t+ed+2i-1n-4w' (optional)
- *   style    — extra inline styles for outer wrapper (optional)
+ * Google AdSense Compliant AdUnit
+ * 
+ * Features:
+ * - Clear, compliant "ADVERTISEMENT" header label (as permitted by AdSense policy)
+ * - Safe margins (at least 24px) ensuring zero accidental clicks with surrounding interactive elements
+ * - Responsive container with proper centering
+ * - Graceful execution and error handling
  */
 const AD_CLIENT = 'ca-pub-9543073887536718';
 
@@ -19,8 +17,10 @@ export default function AdUnit({
   layout = '',
   layoutKey = '',
   style = {},
-  minHeight = 'auto',
-  fullWidthResponsive = 'false',
+  minHeight = '120px',
+  fullWidthResponsive = 'true',
+  showLabel = true,
+  className = '',
 }) {
   const insRef = useRef(null);
   const pushed = useRef(false);
@@ -30,13 +30,13 @@ export default function AdUnit({
     if (pushed.current) return;
     pushed.current = true;
 
-    // Use rAF to ensure the DOM has painted and the element has real dimensions
+    // Use requestAnimationFrame so the container has accurate bounding width before AdSense renders
     requestAnimationFrame(() => {
       if (!active) return;
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (err) {
-        console.error('AdSense push error:', err);
+        // Adsbygoogle push error or adblocker detected
       }
     });
 
@@ -47,7 +47,7 @@ export default function AdUnit({
 
   const insProps = {
     className: 'adsbygoogle',
-    style: { display: 'block', minWidth: 0, width: '100%' },
+    style: { display: 'block', minWidth: 0, width: '100%', margin: '0 auto' },
     'data-ad-client': AD_CLIENT,
     'data-ad-slot': slot,
     'data-ad-format': format,
@@ -59,19 +59,17 @@ export default function AdUnit({
 
   return (
     <div
-      className="ad-unit-wrapper"
-      style={{
-        display: 'block',
-        width: '100%',
-        minWidth: 0,
-        minHeight: minHeight,
-        overflow: 'hidden',
-        lineHeight: 0,
-        fontSize: 0,
-        ...style,
-      }}
+      className={`ad-container-outer my-6 w-full flex flex-col items-center justify-center ${className}`}
+      style={{ minHeight, ...style }}
     >
-      <ins ref={insRef} {...insProps} />
+      {showLabel && (
+        <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1.5 select-none flex items-center gap-1">
+          <span>Advertisement</span>
+        </div>
+      )}
+      <div className="ad-unit-inner w-full max-w-4xl overflow-hidden rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 p-2 flex items-center justify-center transition-colors">
+        <ins ref={insRef} {...insProps} />
+      </div>
     </div>
   );
 }

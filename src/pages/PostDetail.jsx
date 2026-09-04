@@ -3,42 +3,23 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getPostById, getPosts } from '../services/bloggerApi';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
-import { Calendar, User, ArrowRight, ShieldCheck, AlertCircle, Clock } from 'lucide-react';
+import StepHeader from '../components/StepHeader';
+import { 
+  Calendar, Clock, User, ArrowRight, ShieldCheck, 
+  CheckCircle2, Lock 
+} from 'lucide-react';
 import AdUnit from '../components/AdUnit';
 
-// Ad slot component to reuse easily and ensure standard execution (no label)
-function AdSlot() {
-  useEffect(() => {
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (e) {
-      // ignore adsbygoogle push errors
-    }
-  }, []);
-
-  return (
-    <div className="adsense-container w-full overflow-hidden flex items-center justify-center">
-      <ins className="adsbygoogle"
-           style={{ display: "block" }}
-           data-ad-client="ca-pub-9543073887536718"
-           data-ad-slot="7317709042"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-    </div>
-  );
-}
-
-// Shimmer skeleton screen for Post Detail
+// Post detail skeleton loader
 function PostDetailSkeleton() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-pulse">
       <div className="flex flex-col lg:flex-row gap-12">
-        {/* Article Column Skeleton */}
         <div className="flex-1 min-w-0">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-6 sm:p-8 flex flex-col gap-6">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-6 sm:p-10 flex flex-col gap-6">
             <div className="flex gap-2">
-              <div className="h-5 w-16 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
               <div className="h-5 w-20 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
+              <div className="h-5 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
             </div>
             <div className="h-10 w-5/6 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
             <div className="flex gap-4">
@@ -54,7 +35,6 @@ function PostDetailSkeleton() {
           </div>
         </div>
 
-        {/* Sidebar Skeleton */}
         <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8">
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
             <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 rounded mb-4" />
@@ -62,101 +42,6 @@ function PostDetailSkeleton() {
         </aside>
       </div>
     </div>
-  );
-}
-
-// Living Text Banner Mascot Character Component
-function LivingBanner() {
-  return (
-    <a
-      href="https://www.effectivecpmnetwork.com/a68j5jmk?key=c8c5452b8453670bac43efdd5523db83"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="living-banner-container block no-underline"
-    >
-      <div className="living-banner-body">
-        {/* Mascot Face */}
-        <div className="living-eyes">
-          <div className="living-eye"></div>
-          <div className="living-eye"></div>
-          <div className="living-mouth"></div>
-        </div>
-        
-        {/* Mascot Arms */}
-        <div className="living-arm-left"></div>
-        <div className="living-arm-right"></div>
-        
-        {/* Banner Text Content */}
-        <div className="flex flex-col items-center">
-          <div className="text-yellow-300 dark:text-yellow-400 text-xs sm:text-sm font-black uppercase tracking-widest flex items-center justify-center gap-1.5 animate-pulse">
-            🚨 CLICK THIS BANNER OR ANY ADS 🚨
-          </div>
-          <div className="text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider mt-1 px-4">
-            👇 To Confirm & Activate Your Download Link 👇
-          </div>
-        </div>
-
-        {/* Clicking Hand Pointer SVG */}
-        <svg 
-          className="living-hand-pointer text-yellow-400" 
-          viewBox="0 0 24 24" 
-          fill="currentColor"
-        >
-          <path d="M9 11.24V7.5a2.5 2.5 0 0 1 5 0v3.74l.84-.28a2.5 2.5 0 0 1 3.2 1.6l.46 1.38a5.5 5.5 0 0 1-5.2 7.06H9a5 5 0 0 1-5-5v-1.74a2.5 2.5 0 0 1 3.2-2.4l1.8.6z" />
-        </svg>
-
-        {/* Mascot Legs */}
-        <div className="living-legs">
-          <div className="living-leg living-leg-left"></div>
-          <div className="living-leg living-leg-right"></div>
-        </div>
-      </div>
-    </a>
-  );
-}
-
-// Direct Link Banner component for popup modal
-const POPUP_DIRECT_LINK = "https://www.effectivecpmnetwork.com/a68j5jmk?key=c8c5452b8453670bac43efdd5523db83";
-
-function PopupDirectLinkBanner({ onClick }) {
-  return (
-    <a
-      href={POPUP_DIRECT_LINK}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={onClick}
-      className="w-full max-w-sm block no-underline overflow-hidden rounded-[24px] border border-indigo-500/30 bg-gradient-to-br from-indigo-900/40 to-slate-900/60 backdrop-blur-xl shadow-[0_0_40px_rgba(99,102,241,0.15)] hover:shadow-[0_0_50px_rgba(99,102,241,0.3)] transition-all duration-300 transform hover:-translate-y-1 animate-fadeIn"
-    >
-      <div className="p-6 flex flex-col items-center gap-4 relative">
-        {/* Glow effect */}
-        <div className="absolute -top-10 -left-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
-        
-        {/* Animated Icon */}
-        <div className="relative w-16 h-16 flex items-center justify-center bg-indigo-500/10 border border-indigo-500/20 rounded-2xl animate-pulse">
-          <ShieldCheck className="w-8 h-8 text-indigo-400" />
-        </div>
-
-        {/* Text */}
-        <div className="text-center space-y-1">
-          <div className="text-white text-xs font-black uppercase tracking-widest text-indigo-300">
-            🛡️ Secure SafeLink Gateway
-          </div>
-          <h4 className="text-lg font-black text-white leading-tight font-heading">
-            HUMAN VERIFICATION
-          </h4>
-          <p className="text-zinc-350 dark:text-zinc-300 text-xs px-2 leading-relaxed">
-            Click this banner to complete security verification and unlock your download.
-          </p>
-        </div>
-
-        {/* Action Button */}
-        <div className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 group-hover:scale-[1.02] transition-transform">
-          Verify & Continue
-          <ArrowRight className="w-4 h-4" />
-        </div>
-      </div>
-    </a>
   );
 }
 
@@ -169,103 +54,29 @@ export default function PostDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Timer logic for Safelink
-  const [timeLeft, setTimeLeft] = useState(15);
+  // SafeLink countdown timer state
+  const TOTAL_SECONDS = 15;
+  const [timeLeft, setTimeLeft] = useState(TOTAL_SECONDS);
   const [timerActive, setTimerActive] = useState(false);
   const [timerDone, setTimerDone] = useState(false);
   const timerRef = useRef(null);
 
-  // Force Click Popup state
-  const [showPopup, setShowPopup] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Verification state
-  const [isVerified, setIsVerified] = useState(false);
-
-  // Reset verification state on step change
+  // Scroll to top on navigation
   useEffect(() => {
-    setIsVerified(false);
-  }, [postId, currentStep]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [postId]);
 
-  // Show popup on redirect land
-  useEffect(() => {
-    const hasClicked = sessionStorage.getItem('SAFELINK_AD_CLICKED');
-    if (hasClicked === 'true') {
-      sessionStorage.setItem('SAFELINK_POPUP_SHOWN', 'true');
-      sessionStorage.removeItem('SAFELINK_AD_CLICKED');
-      setShowPopup(false);
-      return;
-    }
-
-    const hasShown = sessionStorage.getItem('SAFELINK_POPUP_SHOWN');
-    if (currentStep > 0 && !hasShown) {
-      setShowPopup(true);
-    }
-  }, [currentStep]);
-
-  // Click detection through window blur/focus events
-  useEffect(() => {
-    if (!showPopup) return;
-
-    const handleBlur = () => {
-      if (isHovered) {
-        sessionStorage.setItem('SAFELINK_AD_CLICKED', 'true');
-      }
-    };
-
-    const handleFocus = () => {
-      const hasClicked = sessionStorage.getItem('SAFELINK_AD_CLICKED');
-      if (hasClicked === 'true') {
-        setShowPopup(false);
-        sessionStorage.setItem('SAFELINK_POPUP_SHOWN', 'true');
-        sessionStorage.removeItem('SAFELINK_AD_CLICKED');
-      }
-    };
-
-    window.addEventListener('blur', handleBlur);
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      window.removeEventListener('blur', handleBlur);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [showPopup, isHovered]);
-
-  // Disable body scroll when popup is active
-  useEffect(() => {
-    if (showPopup) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [showPopup]);
-
-  // Scroll to top when post changes or loading finishes to override browser scroll restoration
-  useEffect(() => {
-    if (!loading) {
-      window.scrollTo(0, 0);
-      const timer = setTimeout(() => {
-        window.scrollTo(0, 0);
-        document.body.style.overflow = ''; // Ensure body scroll is unlocked
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [postId, loading]);
-
-  // Fetch post details
+  // Fetch article data
   useEffect(() => {
     setLoading(true);
     setError('');
     getPostById(postId)
       .then((data) => {
         setPost(data);
-        document.title = `${data.title} - SarkariTrend`;
-        
-        // Update Meta Description
-        const plainText = data.content ? data.content.replace(/<\/?[^>]+(>|$)/g, "") : '';
+        document.title = `${data.title} – SarkariTrend`;
+
+        // Update Meta Description for SEO
+        const plainText = data.content ? data.content.replace(/<\/?[^>]+(>|$)/g, '') : '';
         const excerpt = plainText.length > 150 ? plainText.substring(0, 150) + '...' : plainText;
         let metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) {
@@ -277,147 +88,18 @@ export default function PostDetail() {
           document.head.appendChild(metaDesc);
         }
 
-        // Update Canonical URL
-        let canonical = document.querySelector('link[rel="canonical"]');
-        if (canonical) {
-          canonical.setAttribute('href', window.location.href);
-        } else {
-          canonical = document.createElement('link');
-          canonical.rel = 'canonical';
-          canonical.href = window.location.href;
-          document.head.appendChild(canonical);
-        }
-
-        // ── Open Graph per-post ──
-        const postImage = (data.content?.match(/<img[^>]+src="([^">]+)"/) || [])[1]
-          || `https://picsum.photos/seed/${data.id}/1200/630`;
-        const ogTags = {
-          'og:type': 'article',
-          'og:title': `${data.title} - SarkariTrend`,
-          'og:description': excerpt,
-          'og:url': window.location.href,
-          'og:image': postImage,
-          'article:published_time': data.published,
-          'article:modified_time': data.updated || data.published,
-          'article:section': (data.labels && data.labels[0]) || 'General',
-        };
-        Object.entries(ogTags).forEach(([prop, content]) => {
-          let tag = document.querySelector(`meta[property="${prop}"]`);
-          if (tag) tag.setAttribute('content', content);
-          else {
-            tag = document.createElement('meta');
-            tag.setAttribute('property', prop);
-            tag.setAttribute('content', content);
-            document.head.appendChild(tag);
-          }
-        });
-        if (data.labels) {
-          data.labels.forEach((label) => {
-            const tag = document.createElement('meta');
-            tag.setAttribute('property', 'article:tag');
-            tag.setAttribute('content', label);
-            tag.setAttribute('data-dynamic-og-tag', 'true');
-            document.head.appendChild(tag);
-          });
-        }
-
-        // ── JSON-LD Article Schema (AI SEO) ──
-        const existingSchemas = document.querySelectorAll('script[data-post-schema]');
-        existingSchemas.forEach((s) => s.remove());
-
-        const articleSchema = {
-          '@context': 'https://schema.org',
-          '@graph': [
-            {
-              '@type': 'Article',
-              '@id': `${window.location.href}#article`,
-              'headline': data.title,
-              'description': excerpt,
-              'image': {
-                '@type': 'ImageObject',
-                'url': postImage,
-                'width': 1200,
-                'height': 630,
-              },
-              'datePublished': data.published,
-              'dateModified': data.updated || data.published,
-              'author': {
-                '@type': 'Person',
-                'name': 'SarkariTrend Editorial Team',
-                'url': 'https://iwantgovjob.vercel.app/about',
-              },
-              'publisher': {
-                '@id': 'https://iwantgovjob.vercel.app/#organization',
-              },
-              'isPartOf': { '@id': 'https://iwantgovjob.vercel.app/#website' },
-              'url': window.location.href,
-              'mainEntityOfPage': window.location.href,
-              'keywords': data.labels ? data.labels.join(', ') : 'sarkari job, government job, India',
-              'articleSection': (data.labels && data.labels[0]) || 'Career',
-              'inLanguage': 'en-IN',
-              'about': [
-                { '@type': 'Thing', 'name': 'Government Jobs India' },
-                { '@type': 'Thing', 'name': 'Sarkari Naukri' },
-              ],
-            },
-            {
-              '@type': 'BreadcrumbList',
-              '@id': `${window.location.href}#breadcrumb`,
-              'itemListElement': [
-                {
-                  '@type': 'ListItem',
-                  'position': 1,
-                  'name': 'Home',
-                  'item': 'https://iwantgovjob.vercel.app/',
-                },
-                ...(data.labels && data.labels[0] ? [{
-                  '@type': 'ListItem',
-                  'position': 2,
-                  'name': data.labels[0],
-                  'item': `https://iwantgovjob.vercel.app/category/${encodeURIComponent(data.labels[0])}`,
-                }] : []),
-                {
-                  '@type': 'ListItem',
-                  'position': data.labels && data.labels[0] ? 3 : 2,
-                  'name': data.title,
-                  'item': window.location.href,
-                },
-              ],
-            },
-          ],
-        };
-
-        const schemaScript = document.createElement('script');
-        schemaScript.type = 'application/ld+json';
-        schemaScript.setAttribute('data-post-schema', 'true');
-        schemaScript.textContent = JSON.stringify(articleSchema);
-        document.head.appendChild(schemaScript);
-
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message || 'Failed to fetch article details.');
+        setError(err.message || 'Failed to load article.');
         setLoading(false);
       });
-
-    // Cleanup schemas and tags on unmount
-    return () => {
-      document.querySelectorAll('script[data-post-schema]').forEach((s) => s.remove());
-      document.querySelectorAll('meta[data-dynamic-og-tag]').forEach((t) => t.remove());
-    };
   }, [postId]);
 
-  // Handle safelink timer initialization
+  // SafeLink countdown timer execution
   useEffect(() => {
-    if (showPopup) {
-      setTimerActive(false);
-      setTimerDone(false);
-      if (timerRef.current) clearInterval(timerRef.current);
-      return;
-    }
-
     if (currentStep > 0 && post) {
-      setTimeLeft(15);
+      setTimeLeft(TOTAL_SECONDS);
       setTimerActive(true);
       setTimerDone(false);
 
@@ -442,36 +124,20 @@ export default function PostDetail() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [currentStep, post, postId, showPopup]);
+  }, [currentStep, post, postId]);
 
-  // Load AdSense ads dynamically once content is rendered
-  useEffect(() => {
-    if (post) {
-      try {
-        const ads = document.querySelectorAll('.adsense-container ins.adsbygoogle');
-        ads.forEach(() => {
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-        });
-      } catch (e) {
-        // ignore adsbygoogle push errors
-      }
-    }
-  }, [post]);
-
-  // Safelink navigation step transition (Steps 1 & 2)
-  const handleStepTransition = () => {
+  // Step transition (Steps 1 & 2)
+  const handleNextStepTransition = () => {
     setLoading(true);
     getPosts({ maxResults: 20 })
       .then((data) => {
         if (data.items && data.items.length > 0) {
-          // Exclude current post
           const filtered = data.items.filter((item) => item.id !== postId);
-          const postsList = filtered.length > 0 ? filtered : data.items;
-          const randomIndex = Math.floor(Math.random() * postsList.length);
-          const nextPost = postsList[randomIndex];
-          
+          const pool = filtered.length > 0 ? filtered : data.items;
+          const randomNext = pool[Math.floor(Math.random() * pool.length)];
+
           nextStep();
-          window.location.href = `/post/${nextPost.id}`;
+          window.location.href = `/post/${randomNext.id}`;
         } else {
           nextStep();
           setLoading(false);
@@ -483,7 +149,7 @@ export default function PostDetail() {
       });
   };
 
-  // Final redirection (Step 3)
+  // Final destination redirect (Step 3)
   const handleFinalRedirect = () => {
     if (targetUrl) {
       clearSafelink();
@@ -497,358 +163,238 @@ export default function PostDetail() {
 
   if (error || !post) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-2xl font-bold text-red-600 mb-4 font-heading">Error</h2>
-        <p className="text-zinc-500 dark:text-zinc-400 mb-8">{error || 'Article not found.'}</p>
+      <div className="max-w-4xl mx-auto px-4 py-20 text-center">
+        <h2 className="text-2xl font-black text-red-600 mb-3 font-heading">Unable to Load Article</h2>
+        <p className="text-zinc-500 dark:text-zinc-400 mb-6 text-sm">{error || 'Article not found.'}</p>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold uppercase tracking-wider text-xs shadow-md"
+          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold uppercase text-xs shadow-lg shadow-indigo-600/20"
         >
-          Return Home
+          Return to Home
         </button>
       </div>
     );
   }
 
-  // Parse and inject Ads into the blogger content (no Advertisement label text)
-  const injectAds = (html) => {
+  // Safe In-Article AdSense injection respecting policy
+  const injectArticleAds = (html) => {
     if (!html) return '';
-    if (showPopup) return html;
     const paras = html.split('</p>');
-    
-    if (paras.length <= 3) {
-      return html;
-    }
+    if (paras.length <= 4) return html;
 
-    const adUnit = `
-      <div class="adsense-container w-full overflow-hidden flex items-center justify-center py-2">
-        <ins class="adsbygoogle"
-             style="display:block; text-align:center;"
-             data-ad-layout="in-article"
-             data-ad-format="fluid"
-             data-ad-client="ca-pub-9543073887536718"
-             data-ad-slot="1641433819"></ins>
+    const inArticleAd = `
+      <div class="my-8 w-full flex flex-col items-center justify-center">
+        <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Advertisement</div>
+        <div class="w-full max-w-2xl overflow-hidden rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-2">
+          <ins class="adsbygoogle"
+               style="display:block; text-align:center;"
+               data-ad-layout="in-article"
+               data-ad-format="fluid"
+               data-ad-client="ca-pub-9543073887536718"
+               data-ad-slot="1641433819"></ins>
+        </div>
       </div>
     `;
 
-    let finalHtml = '';
+    let result = '';
     for (let i = 0; i < paras.length; i++) {
-      finalHtml += paras[i];
-      if (i < paras.length - 1) {
-        finalHtml += '</p>';
-      }
-      
-      // Inject after 2nd paragraph
-      if (i === 1) {
-        finalHtml += adUnit;
-      }
-      // Inject before the last paragraph
-      if (i === paras.length - 3) {
-        finalHtml += adUnit;
+      result += paras[i];
+      if (i < paras.length - 1) result += '</p>';
+      // Inject after 3rd paragraph
+      if (i === 2) {
+        result += inArticleAd;
       }
     }
-    return finalHtml;
+    return result;
   };
 
-  // Helper to extract first image
-  const getPostImage = (post) => {
-    if (!post.content) return 'https://picsum.photos/1200/600';
-    const match = post.content.match(/<img[^>]+src="([^">]+)"/);
-    return match ? match[1] : 'https://picsum.photos/1200/600';
-  };
+  const progressCircleOffset = ((TOTAL_SECONDS - timeLeft) / TOTAL_SECONDS) * 282.7;
 
   return (
     <>
-      {/* Force Click AdSense Redirect Popup Modal */}
-      {showPopup && (
-        <div className="fixed inset-0 z-50 bg-black/45 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center select-none overflow-y-auto">
-          {/* Animated Mascot Header */}
-          <div className="mb-8 flex flex-col items-center text-center max-w-sm pointer-events-none drop-shadow-md">
-            <div className="relative w-20 h-20 mb-4 animate-bounce">
-              <svg viewBox="0 0 100 100" className="w-full h-full text-indigo-400 fill-current">
-                <circle cx="50" cy="50" r="40" className="text-indigo-900/60" />
-                <circle cx="38" cy="45" r="6" fill="#fff" />
-                <circle cx="38" cy="45" r="2.5" fill="#000" />
-                <circle cx="62" cy="45" r="6" fill="#fff" />
-                <circle cx="62" cy="45" r="2.5" fill="#000" />
-                <path d="M40 65 Q50 75 60 65" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" />
-              </svg>
-            </div>
-            
-            <h3 className="text-2xl font-black text-white mb-3 font-heading tracking-wide uppercase">
-              🔓 Unlock Download Link
-            </h3>
-            <p className="text-sm font-extrabold text-zinc-100 font-hindi leading-relaxed px-2">
-              आगे बढ़ने के लिए कृपया नीचे दिए गए <span className="text-yellow-400 font-black">विज्ञापन (Ad)</span> पर क्लिक करें। <br/>
-              <span className="text-green-400 font-bold text-xs sm:text-sm mt-1 block">(क्लिक करने के बाद वापस आएं, लिंक अनलॉक हो जाएगा)</span>
-            </p>
-            <p className="text-xs font-semibold text-zinc-300 mt-2 px-4 leading-normal">
-              Please click the advertisement below to verify and unlock your destination link.
-            </p>
-          </div>
-
-          {/* The Popup Ad Unit Wrapper with Hover detection - Completely transparent, no box container, borders, or lines */}
-          <div 
-            className="w-full max-w-md flex items-center justify-center relative my-4 p-0 bg-transparent border-0 outline-none"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            <PopupDirectLinkBanner 
-              onClick={() => {
-                sessionStorage.setItem('SAFELINK_POPUP_SHOWN', 'true');
-                setShowPopup(false);
-              }}
-            />
-          </div>
-
-          {/* Footer indicator */}
-          <div className="mt-8 flex flex-col items-center pointer-events-none drop-shadow-md">
-            <div className="text-xs font-black text-yellow-400 uppercase tracking-widest animate-pulse flex items-center gap-1.5">
-              ⏳ Waiting for Ad click to unlock...
-            </div>
-            <div className="text-[10px] font-bold text-zinc-350 mt-1 max-w-xs leading-normal">
-              Popup cannot be closed manually. It will auto-close when you return from the ad link.
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* Step Header for SafeLink Transit */}
       {currentStep > 0 && (
-        <div className="sticky top-[64px] z-30 w-full border-b border-blue-200 dark:border-blue-900/50 bg-blue-50/90 dark:bg-blue-950/90 text-blue-900 dark:text-blue-100 text-center font-bold text-xs sm:text-sm py-2.5 px-4 shadow-sm font-sans backdrop-blur-md">
-          You are Currently On Step ({currentStep}/3) From Destination.
-        </div>
+        <StepHeader timerActive={timerActive} timeLeft={timeLeft} totalTime={TOTAL_SECONDS} />
       )}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
-          <div className="flex flex-col lg:flex-row gap-12">
-            {/* Article Column */}
-            <main className="flex-1 min-w-0">
-              <article className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-[32px] overflow-hidden shadow-sm p-6 sm:p-10 flex flex-col gap-6 backdrop-blur-sm">
-                
-                {/* Labels / Categories */}
-                {post.labels && post.labels.length > 0 && (
-                  <div className="flex flex-wrap gap-2.5">
-                    {post.labels.map((label) => (
-                      <span
-                        key={label}
-                        className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-650 dark:text-indigo-400 border border-indigo-100/50 dark:border-indigo-900/40"
-                      >
-                        {label}
-                      </span>
-                    ))}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-200">
+        <div className="flex flex-col lg:flex-row gap-12">
+          
+          {/* Main Article Content */}
+          <main className="flex-1 min-w-0">
+            <article className="bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[32px] overflow-hidden shadow-sm p-6 sm:p-10 flex flex-col gap-6 backdrop-blur-sm">
+              
+              {/* Category Badges */}
+              {post.labels && post.labels.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {post.labels.map((label) => (
+                    <span
+                      key={label}
+                      className="px-3.5 py-1 text-[11px] font-black uppercase tracking-wider rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Title */}
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-zinc-900 dark:text-white leading-tight font-heading m-0 tracking-tight">
+                {post.title}
+              </h1>
+
+              {/* Meta information */}
+              <div className="flex flex-wrap items-center text-xs font-semibold text-zinc-400 dark:text-zinc-500 gap-4 pb-6 border-b border-zinc-200/70 dark:border-zinc-800/70">
+                <span className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-300">
+                  <User className="w-4 h-4 text-indigo-500" /> Editorial Desk
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-indigo-500" />
+                  {new Date(post.published).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-indigo-500" /> 4 min read
+                </span>
+              </div>
+
+              {/* Top Ad Unit (Compliant Placement) */}
+              <AdUnit slot="7317709042" format="auto" minHeight="100px" className="my-2" />
+
+              {/* ── SafeLink Security Transit Card ── */}
+              {currentStep > 0 && (
+                <div className="my-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-indigo-50/80 via-white to-slate-50/80 dark:from-indigo-950/30 dark:via-zinc-900 dark:to-zinc-950/30 border border-indigo-200/80 dark:border-indigo-900/50 shadow-md flex flex-col items-center text-center">
+                  
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="px-3 py-1 rounded-full bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider shadow-sm">
+                      Security Phase {currentStep}/3
+                    </span>
                   </div>
-                )}
 
-                {/* Title */}
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-900 dark:text-white leading-tight font-heading m-0 tracking-tight">
-                  {post.title}
-                </h1>
+                  <h3 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-white font-heading mb-1">
+                    {currentStep === 1 && 'Checking Link Safety & Threat Diagnostics'}
+                    {currentStep === 2 && 'Verifying SSL Certificates & Gateway Protocol'}
+                    {currentStep === 3 && 'Generating Encrypted Destination Link'}
+                  </h3>
 
-                {/* Meta */}
-                <div className="flex flex-wrap items-center text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 gap-4 pb-6 border-b border-zinc-200/60 dark:border-zinc-800/60">
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-indigo-500" />
-                    {new Date(post.published).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <User className="w-4 h-4 text-indigo-500" />
-                    Staff Writer
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mb-6 leading-relaxed">
+                    {timerActive 
+                      ? 'Our automated security transit protocol is running diagnostics. Please wait a moment.'
+                      : 'Security verification complete! You may now proceed.'}
+                  </p>
+
+                  {/* Circular SVG Countdown Timer */}
+                  {timerActive ? (
+                    <div className="relative w-32 h-32 flex items-center justify-center mb-4">
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          fill="transparent"
+                          stroke="#e2e8f0"
+                          className="dark:stroke-zinc-800"
+                          strokeWidth="8"
+                        />
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          fill="transparent"
+                          stroke="#4f46e5"
+                          strokeWidth="8"
+                          strokeDasharray={282.7}
+                          strokeDashoffset={282.7 - progressCircleOffset}
+                          strokeLinecap="round"
+                          className="transition-all duration-1000 ease-linear"
+                        />
+                      </svg>
+                      <div className="absolute flex flex-col items-center justify-center">
+                        <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-heading">
+                          {timeLeft}s
+                        </span>
+                        <span className="text-[9px] uppercase font-bold text-zinc-400">Verifying</span>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Verified Icon */
+                    <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-4 animate-bounce">
+                      <CheckCircle2 className="w-8 h-8" />
+                    </div>
+                  )}
+
+                  {/* Action Button: Displayed with 32px safe spacing from any ad */}
+                  {!timerActive && (
+                    <div className="mt-4 mb-2 w-full flex justify-center">
+                      {currentStep < 3 ? (
+                        <button
+                          onClick={handleNextStepTransition}
+                          className="px-10 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-xl shadow-indigo-600/25 transition-all flex items-center gap-2"
+                        >
+                          Continue to Step {currentStep + 1} <ArrowRight className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleFinalRedirect}
+                          className="px-12 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black text-sm uppercase tracking-wider shadow-xl shadow-emerald-600/25 transition-all flex items-center gap-2"
+                        >
+                          <Lock className="w-4 h-4" /> Access Secured Link
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  <span className="text-[10px] font-semibold text-zinc-400 mt-3 flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> End-to-end SafeLink Protection
                   </span>
                 </div>
+              )}
 
+              {/* Dynamic Post Body HTML */}
+              <div
+                className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed font-sans text-base sm:text-lg space-y-6 break-words"
+                dangerouslySetInnerHTML={{ __html: injectArticleAds(post.content) }}
+              />
 
-
-                {currentStep > 0 && (
-                  <>
-                    {/* Living Warning Banner character linked to Adsterra SmartLink */}
-                    <LivingBanner />
-
-                    {/* Verification Instructions Alert (Hinglish/Hindi compliant) */}
-                    <div className="w-full text-center space-y-1 my-3 px-4">
-                      <p className="text-xs sm:text-sm font-extrabold text-zinc-800 dark:text-zinc-200">
-                        👉 Click Image & Wait & Come back this page to <span className="text-red-650 font-extrabold">Get Link - Download.</span>
-                      </p>
-                      <p className="text-xs sm:text-xs font-bold text-zinc-750 dark:text-zinc-350 font-hindi">
-                        <span className="text-red-650 font-extrabold">▼ LINK पाने और DOWNLOAD करने के लिए,</span> 👉 फोटो पर क्लिक करें, <span className="text-blue-750 font-extrabold">15 सेकंड रुकें</span> और फिर इसी पेज पर वापस आएं
-                      </p>
-                    </div>
-
-                    {timerActive && (
-                      /* Circular Loader (shown while timerActive is true) - thick circle like image */
-                      <div className="flex flex-col items-center justify-center my-6">
-                        <div className="relative w-32 h-32 flex items-center justify-center">
-                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                            <circle
-                              cx="60"
-                              cy="60"
-                              r="45"
-                              fill="transparent"
-                              stroke="#e2e8f0"
-                              className="dark:stroke-zinc-800"
-                              strokeWidth="14"
-                            />
-                            <circle
-                              cx="60"
-                              cy="60"
-                              r="45"
-                              fill="transparent"
-                              stroke="#3b82f6"
-                              strokeWidth="14"
-                              strokeDasharray={2 * Math.PI * 45}
-                              strokeDashoffset={2 * Math.PI * 45 - (Math.round(((15 - timeLeft) / 15) * 100) / 100) * (2 * Math.PI * 45)}
-                              strokeLinecap="round"
-                              className="transition-all duration-1000 ease-linear"
-                            />
-                          </svg>
-                          <div className="absolute text-2xl font-extrabold text-blue-600 dark:text-blue-400 font-mono">
-                            {Math.round(((15 - timeLeft) / 15) * 100)}%
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Wrap Middle Verification Ad & Action group in zero-gap flexbox */}
-                    <div className="w-full flex flex-col items-center" style={{ gap: 0, margin: 0, padding: 0 }}>
-                      {/* Above Verify Ad (Ad 1) */}
-                      {!showPopup && (
-                        <AdUnit
-                          key={`post-above-verify-${currentStep}`}
-                          slot="1909584638"
-                          format="auto"
-                          style={{ margin: 0, padding: 0 }}
-                        />
-                      )}
-
-                      {timerActive ? (
-                        /* Click Ads Instruction Box (Text Box) */
-                        <div className="click-ads-box w-full" style={{ margin: 0, borderRadius: '12px' }}>
-                          <p className="text-sm font-extrabold text-white mb-1">🙏 Thank You For Visiting Our Site</p>
-                          <div className="inner-white-box" style={{ margin: '8px 0 0 0' }}>
-                            Please Click on any <strong>Ads</strong> 👆 Above Or Below 👇 and then <strong>Back</strong> to Continue
-                          </div>
-                        </div>
-                      ) : (
-                        /* Verify Now Button only - strictly touching both ads with no gap */
-                        <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
-                          <button
-                            onClick={() => {
-                              setIsVerified(true);
-                              const bottomEl = document.getElementById('safelink-bottom-trigger');
-                              if (bottomEl) {
-                                bottomEl.scrollIntoView({ behavior: 'smooth' });
-                              }
-                            }}
-                            className="btn-neon-purple px-12 py-3.5 text-base font-extrabold"
-                            style={{ margin: 0 }}
-                          >
-                            ✅ Verify Now
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Below Instruction Ad #1 (Ad 2) */}
-                      {!showPopup && (
-                        <AdUnit
-                          key={`post-verify-mid1-${currentStep}`}
-                          slot="5754054742"
-                          format="auto"
-                          style={{ margin: 0, padding: 0 }}
-                        />
-                      )}
-                    </div>
-
-                    {!timerActive && (
-                      <div className="w-full text-center space-y-1 my-3 px-4 animate-bounce">
-                        <p className="text-sm font-extrabold text-red-600 dark:text-red-400">
-                          👇 Scroll down to bottom and click on {currentStep === 3 ? '"GENERATE LINK"' : '"CONTINUE NEXT STEP"'} 👇
-                        </p>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {/* Dynamic Post Content with Ads Injected */}
-                <div
-                  className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed font-sans text-base sm:text-lg space-y-6 break-words"
-                  dangerouslySetInnerHTML={{ __html: injectAds(post.content) }}
-                />
-
-                {/* Bottom Safelink Action Trigger */}
-                {currentStep > 0 && (
-                  <div id="safelink-bottom-trigger" className="mt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center" style={{ gap: 0, paddingTop: 0 }}>
-
-                    {/* Wrap Bottom Verification Ad & Action group in zero-gap flexbox and use unique slots to prevent collisions */}
-                    <div className="w-full flex flex-col items-center" style={{ gap: 0, margin: 0, padding: 0 }}>
-                      {/* Top Bottom Ad (Ad 1) */}
-                      {!showPopup && (
-                        <AdUnit
-                          key={`post-bottom-top-ad-${currentStep}`}
-                          slot="7317709042"
-                          format="auto"
-                          style={{ margin: 0, padding: 0 }}
-                        />
-                      )}
-
-                      {!timerDone ? (
-                        <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-8 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 cursor-not-allowed select-none text-center">
-                          ⏳ Complete the countdown timer above to unlock the button
-                        </div>
-                      ) : !isVerified ? (
-                        <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-8 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 cursor-not-allowed select-none text-center">
-                          ⏳ Click the "Verify Now" button above to unlock the button
-                        </div>
-                      ) : (
-                        /* Generate Link or Continue Button */
-                        <div className="w-full flex justify-center" style={{ margin: 0, padding: 0 }}>
-                          {currentStep === 3 ? (
-                            <button
-                              onClick={handleFinalRedirect}
-                              className="btn-neon-blue px-14 py-4 text-base font-extrabold uppercase tracking-widest"
-                              style={{ margin: 0 }}
-                            >
-                              Generate Link
-                            </button>
-                          ) : (
-                            <button
-                              onClick={handleStepTransition}
-                              className="btn-neon-orange px-14 py-4 text-base font-extrabold uppercase tracking-widest"
-                              style={{ margin: 0 }}
-                            >
-                              Continue Next Step
-                            </button>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Bottom Ad (Ad 2) */}
-                      {!showPopup && (
-                        <AdUnit
-                          key={`post-bottom-mid-${currentStep}`}
-                          slot="1641433819"
-                          format="auto"
-                          style={{ margin: 0, padding: 0 }}
-                        />
-                      )}
-                    </div>
-
-                    {/* Bottom relaxed Ad - always visible */}
-                    {!showPopup && (
-                      <AdUnit key={`post-bottom-relax-${currentStep}`} slot="8617081290" format="autorelaxed" />
-                    )}
+              {/* Bottom Safe Transit Action (For smooth user experience if scrolled to bottom) */}
+              {currentStep > 0 && timerDone && (
+                <div className="mt-10 p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center gap-3">
+                  <div className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                    Finished reviewing? Proceed with your verified destination:
                   </div>
-                )}
+                  {currentStep < 3 ? (
+                    <button
+                      onClick={handleNextStepTransition}
+                      className="px-8 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2"
+                    >
+                      Proceed to Step {currentStep + 1} <ArrowRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleFinalRedirect}
+                      className="px-10 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2"
+                    >
+                      <Lock className="w-4 h-4" /> Go to Secured Link
+                    </button>
+                  )}
+                </div>
+              )}
 
-              </article>
-            </main>
+              {/* Bottom Ad Unit */}
+              <AdUnit slot="1909584638" format="auto" minHeight="120px" className="mt-8" />
 
-            {/* Sidebar */}
-            <Sidebar hideAds={showPopup} />
-          </div>
+            </article>
+          </main>
+
+          {/* Sidebar */}
+          <Sidebar />
         </div>
+      </div>
     </>
   );
 }
