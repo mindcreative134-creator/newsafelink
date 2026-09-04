@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPosts } from '../services/bloggerApi';
+import { getPostThumbnail } from '../utils/postThumbnail';
 import { Folder, ShieldCheck, Send, ArrowUpRight, Flame } from 'lucide-react';
 import AdUnit from './AdUnit';
 
@@ -107,9 +108,7 @@ export default function Sidebar({ hideAds = false }) {
         </h3>
         <ul className="flex flex-col gap-4">
           {recentPosts.map((post) => {
-            const postImg = post.content?.match(/<img[^>]+src="([^">]+)"/) 
-              ? post.content.match(/<img[^>]+src="([^">]+)"/)[1] 
-              : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=200&auto=format&fit=crop&q=80';
+            const postImg = getPostThumbnail(post);
             return (
               <li key={post.id} className="flex gap-3.5 group items-center">
                 <Link to={`/post/${post.id}`} className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 border border-zinc-200/60 dark:border-zinc-800 shadow-sm relative block bg-zinc-100 dark:bg-zinc-800">

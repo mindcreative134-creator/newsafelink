@@ -60,6 +60,13 @@ async function fetchRssFeed(feedObj) {
       const cleanSlug = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30);
       const uniqueId = `sarkari-rss-${cleanSlug}-${index}`;
 
+      // Extract real image from RSS enclosure, thumbnail, or content
+      let extractedImg = item.thumbnail || (item.enclosure && item.enclosure.link);
+      if (!extractedImg && item.description) {
+        const imgMatch = item.description.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (imgMatch) extractedImg = imgMatch[1];
+      }
+
       return {
         id: uniqueId,
         title: cleanTitle,
@@ -74,6 +81,7 @@ async function fetchRssFeed(feedObj) {
         summary: cleanText(item.description) || cleanTitle,
         publishedDate: item.pubDate ? new Date(item.pubDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         ageLimit: 'As per Central / State Government Guidelines',
+        imageUrl: extractedImg || '',
         isRss: true,
       };
     });

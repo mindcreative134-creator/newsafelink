@@ -1,6 +1,7 @@
 import { getPosts as getBloggerPosts, getPostById as getBloggerPostById } from './bloggerApi';
 import { getLiveSarkariUpdates } from './rssService';
 import defaultJobs from '../data/liveJobs.json';
+import { getPostThumbnail } from '../utils/postThumbnail';
 
 /**
  * Generate high quality, comprehensive HTML blog post for a Sarkari/Yojana/Admission update
@@ -169,23 +170,15 @@ export function generateSarkariArticleHtml(item) {
  * Format a job/RSS item into a standard post object for UI consistency
  */
 function formatJobAsPost(item) {
-  const imagesByCategory = {
-    'Latest Jobs': 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&auto=format&fit=crop&q=80',
-    'Admit Cards': 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop&q=80',
-    'Results': 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&auto=format&fit=crop&q=80',
-    'Govt Schemes & Yojana': 'https://images.unsplash.com/photo-1532619675605-1ede6c2ed2b0?w=800&auto=format&fit=crop&q=80',
-    'University & Admissions': 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&auto=format&fit=crop&q=80',
-    'Answer Keys': 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&auto=format&fit=crop&q=80',
-    'Syllabus': 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&auto=format&fit=crop&q=80',
-  };
-
-  const fallbackImg = imagesByCategory[item.category] || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80';
+  const posterImg = getPostThumbnail(item);
   const contentHtml = generateSarkariArticleHtml(item);
 
   return {
     id: item.id,
     title: item.title,
-    content: `<img src="${fallbackImg}" alt="${item.title}" class="w-full rounded-2xl mb-6 object-cover aspect-video" />` + contentHtml,
+    thumbnail: posterImg,
+    imageUrl: posterImg,
+    content: `<img src="${posterImg}" alt="${item.title}" class="w-full rounded-2xl mb-6 object-cover aspect-video shadow-lg border border-slate-200 dark:border-slate-800" />` + contentHtml,
     published: item.publishedDate || new Date().toISOString(),
     updated: item.publishedDate || new Date().toISOString(),
     labels: [item.category, item.organization || 'Sarkari Update'],

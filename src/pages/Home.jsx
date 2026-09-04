@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getUnifiedPosts } from '../services/postService';
 import { getLiveSarkariUpdates } from '../services/rssService';
 import { useSafelink } from '../context/SafelinkContext';
+import { getPostThumbnail } from '../utils/postThumbnail';
 import Sidebar from '../components/Sidebar';
 import { 
   Calendar, Clock, ArrowRight, ShieldCheck, RefreshCw, Sparkles, 
@@ -130,9 +131,7 @@ export default function Home() {
   };
 
   const getPostImage = (post) => {
-    if (!post.content) return 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80';
-    const match = post.content.match(/<img[^>]+src="([^">]+)"/);
-    return match ? match[1] : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80';
+    return getPostThumbnail(post);
   };
 
   const getExcerpt = (content, limit = 140) => {

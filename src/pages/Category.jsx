@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getUnifiedPosts } from '../services/postService';
+import { getPostThumbnail } from '../utils/postThumbnail';
 import Sidebar from '../components/Sidebar';
 import { Calendar, ArrowRight, Folder, RefreshCw, Clock } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
@@ -87,9 +88,7 @@ export default function Category() {
   };
 
   const getPostImage = (post) => {
-    if (!post.content) return 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80';
-    const match = post.content.match(/<img[^>]+src="([^">]+)"/);
-    return match ? match[1] : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80';
+    return getPostThumbnail(post);
   };
 
   const getExcerpt = (content, limit = 120) => {
