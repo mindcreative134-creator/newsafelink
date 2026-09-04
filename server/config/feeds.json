@@ -52,5 +52,14 @@
     "type": "scrape",
     "labels": ["University Admission", "Entrance Exam", "CUET"],
     "enabled": true
+  },
+  {
+    "id": "feed-real-7",
+    "name": "BiharHelp Official Recruitment & Updates",
+    "url": "https://biharhelp.in/",
+    "category": "Latest Jobs",
+    "type": "scrape",
+    "labels": ["Bihar Help", "Latest Jobs", "BPSC"],
+    "enabled": true
   }
 ]
