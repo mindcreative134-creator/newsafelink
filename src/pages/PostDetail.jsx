@@ -177,37 +177,106 @@ export default function PostDetail() {
     );
   }
 
-  // Safe In-Article AdSense injection respecting policy
+  const CLIENT_ID = import.meta.env?.VITE_ADSENSE_CLIENT_ID || 'ca-pub-9543073887536718';
+
+  // 1:1 BiharHelp In-Article AdSense injection
   const injectArticleAds = (html) => {
     if (!html) return '';
-    const paras = html.split('</p>');
-    if (paras.length <= 4) return html;
 
+    // BiharHelp Advt 2 (In-Article Fluid)
     const inArticleAd = `
-      <div class="my-8 w-full flex flex-col items-center justify-center">
-        <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Advertisement</div>
-        <div class="w-full max-w-2xl overflow-hidden rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-2">
+      <div class="my-6 w-full flex flex-col items-center justify-center clear-both">
+        <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1 select-none flex items-center gap-1">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+          <span>Advertisement</span>
+        </div>
+        <div class="w-full max-w-3xl overflow-hidden rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/70 dark:border-zinc-800/70 p-2 shadow-sm">
           <ins class="adsbygoogle"
                style="display:block; text-align:center;"
                data-ad-layout="in-article"
                data-ad-format="fluid"
-               data-ad-client="ca-pub-9543073887536718"
-               data-ad-slot="1641433819"></ins>
+               data-ad-client="${CLIENT_ID}"
+               data-ad-slot="4392273015"></ins>
         </div>
       </div>
     `;
 
-    let result = '';
-    for (let i = 0; i < paras.length; i++) {
-      result += paras[i];
-      if (i < paras.length - 1) result += '</p>';
-      // Inject after 3rd paragraph
-      if (i === 2) {
-        result += inArticleAd;
+    // BiharHelp Advt 3 (Pre-Action Links Banner)
+    const preLinkAd = `
+      <div class="my-6 w-full flex flex-col items-center justify-center clear-both">
+        <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1 select-none flex items-center gap-1">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+          <span>Advertisement</span>
+        </div>
+        <div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/70 dark:border-zinc-800/70 p-2 shadow-sm">
+          <ins class="adsbygoogle"
+               style="display:block;"
+               data-ad-client="${CLIENT_ID}"
+               data-ad-slot="1362664078"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+        </div>
+      </div>
+    `;
+
+    let modified = html;
+
+    // Inject Pre-Link Ad right above Official Links box if present
+    const linkBoxMarkers = [
+      '⚡ Official Direct Links',
+      'Official Direct Links',
+      'Important Links',
+      'class="article-real-tables"',
+      'Key Information'
+    ];
+
+    let injectedPreLink = false;
+    for (const marker of linkBoxMarkers) {
+      if (modified.includes(marker)) {
+        modified = modified.replace(marker, `${preLinkAd}\n${marker}`);
+        injectedPreLink = true;
+        break;
       }
     }
-    return result;
+
+    // Inject In-Article Ad after 2nd paragraph (matching BiharHelp Ad #2)
+    const paras = modified.split('</p>');
+    if (paras.length > 3) {
+      let result = '';
+      for (let i = 0; i < paras.length; i++) {
+        result += paras[i];
+        if (i < paras.length - 1) result += '</p>';
+        if (i === 1) {
+          result += inArticleAd;
+        }
+        if (!injectedPreLink && i === paras.length - 3) {
+          result += preLinkAd;
+          injectedPreLink = true;
+        }
+      }
+      return result;
+    }
+
+    return modified + (injectedPreLink ? '' : preLinkAd);
   };
+
+  // Trigger AdSense push for all newly injected in-article ad units
+  useEffect(() => {
+    if (!post || loading) return;
+    const timer = setTimeout(() => {
+      try {
+        if (typeof window !== 'undefined') {
+          const ads = document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])');
+          ads.forEach(() => {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+          });
+        }
+      } catch (e) {
+        // Ignored
+      }
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [post, loading]);
 
   const progressCircleOffset = ((TOTAL_SECONDS - timeLeft) / TOTAL_SECONDS) * 282.7;
 
@@ -264,8 +333,8 @@ export default function PostDetail() {
                 </span>
               </div>
 
-              {/* Top Ad Unit (Compliant Placement) */}
-              <AdUnit slot="7317709042" format="auto" minHeight="100px" className="my-2" />
+              {/* Top Ad Unit (BiharHelp Advt #1 - Fluid Native Placement) */}
+              <AdUnit variant="fluid" slot="9320506924" minHeight="120px" className="my-2" />
 
               {/* ── SafeLink Security Transit Card ── */}
               {currentStep > 0 && (
@@ -386,8 +455,8 @@ export default function PostDetail() {
                 </div>
               )}
 
-              {/* Bottom Ad Unit */}
-              <AdUnit slot="1909584638" format="auto" minHeight="120px" className="mt-8" />
+              {/* Bottom Ad Unit (BiharHelp Bottom Placement) */}
+              <AdUnit variant="banner" slot="1909584638" minHeight="120px" className="mt-8" />
 
             </article>
           </main>

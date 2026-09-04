@@ -247,6 +247,16 @@ export default function Home() {
         </div>
       )}
 
+      {/* ── BiharHelp-Style Homepage Interstitial Banner ── */}
+      {!showVerification && (
+        <AdUnit
+          variant="leaderboard"
+          slot="7291097893"
+          minHeight="90px"
+          className="mb-10"
+        />
+      )}
+
       {/* ── Sarkari Job, Yojana & University Quick Matrix Section ── */}
       {!showVerification && (
         <section className="mb-14 bg-white dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 rounded-[32px] p-6 sm:p-8 shadow-sm">
@@ -429,16 +439,19 @@ export default function Home() {
                     </div>
                   </article>
 
-                  {/* Compliant in-feed AdSense unit after 3rd post */}
+                  {/* BiharHelp-Style Fluid in-feed AdSense unit after 3rd post */}
                   {index === 2 && (
-                    <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                      <AdUnit slot="1909584638" format="auto" minHeight="120px" />
+                    <div className="col-span-1 md:col-span-2 lg:col-span-3 my-2">
+                      <AdUnit variant="fluid" slot="1909584638" minHeight="130px" />
                     </div>
                   )}
                 </React.Fragment>
               ))}
             </div>
           )}
+
+          {/* BiharHelp-Style Responsive Bottom Banner */}
+          <AdUnit variant="banner" slot="7317709042" minHeight="100px" className="my-8" />
 
           {/* Load More Button */}
           {nextPageToken && (

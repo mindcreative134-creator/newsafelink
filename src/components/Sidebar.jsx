@@ -96,9 +96,9 @@ export default function Sidebar({ hideAds = false }) {
         </div>
       </div>
 
-      {/* ── Compliant Ad Unit Slot ── */}
+      {/* ── Compliant Ad Unit Slot (Mid-Sidebar) ── */}
       {!hideAds && (
-        <AdUnit slot="7317709042" format="auto" minHeight="250px" />
+        <AdUnit variant="sidebar" slot="7317709042" minHeight="250px" />
       )}
 
       {/* ── Recent Articles Widget ── */}
@@ -127,6 +127,16 @@ export default function Sidebar({ hideAds = false }) {
           })}
         </ul>
       </div>
+
+      {/* ── BiharHelp-Style Sticky Sidebar Ad (Stays in viewport while scrolling long content) ── */}
+      {!hideAds && (
+        <AdUnit
+          variant="sticky-sidebar"
+          slot="1909584638"
+          minHeight="300px"
+          className="mt-2"
+        />
+      )}
 
     </aside>
   );

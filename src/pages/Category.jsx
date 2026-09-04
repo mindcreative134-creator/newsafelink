@@ -194,13 +194,16 @@ export default function Category() {
                     </article>
 
                     {index === 2 && (
-                      <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                        <AdUnit slot="1909584638" format="auto" minHeight="120px" />
+                      <div className="col-span-1 md:col-span-2 lg:col-span-3 my-2">
+                        <AdUnit variant="fluid" slot="1909584638" minHeight="130px" />
                       </div>
                     )}
                   </React.Fragment>
                 ))}
               </div>
+
+              {/* BiharHelp-Style Responsive Bottom Banner */}
+              <AdUnit variant="banner" slot="7317709042" minHeight="100px" className="my-8" />
 
               {nextPageToken && (
                 <div className="flex justify-center mt-6">

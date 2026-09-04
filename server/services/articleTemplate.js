@@ -38,7 +38,7 @@ export function buildClonedHtmlArticle(clonedData, siteCategory = 'Latest Jobs',
       </div>` : ''}
 
       <!-- Top Quick Summary Card -->
-      <div style="background: #f8fafc; border-left: 5px solid #2563eb; padding: 18px 22px; border-radius: 12px; margin-bottom: 26px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
+      <div style="background: #f8fafc; border-left: 5px solid #2563eb; padding: 18px 22px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
         <h3 style="margin: 0 0 12px; color: #0f172a; font-size: 18px; font-weight: 800;">
           📢 Important Overview
         </h3>
@@ -66,7 +66,57 @@ export function buildClonedHtmlArticle(clonedData, siteCategory = 'Latest Jobs',
         </table>
       </div>
 
-      <!-- Real Official Direct Action Links Box (Top) -->
+      <!-- BiharHelpAdvt 1 (Fluid Native Top Banner) -->
+      <div class="code-block code-block-1" style="margin: 18px auto; text-align: center; display: block; clear: both;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 4px;">Advertisement</div>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-format="fluid"
+             data-ad-layout-key="-6t+ed+2i-1n-4w"
+             data-ad-client="ca-pub-9543073887536718"
+             data-ad-slot="9320506924"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+
+      <!-- Real Article Body & Descriptions -->
+      <div class="article-real-body" style="font-size: 15px; color: #334155; margin: 24px 0;">
+        ${bodyContentHtml}
+      </div>
+
+      <!-- BiharHelpAdvt 2 (In-Article Mid Ad) -->
+      <div class="code-block code-block-2" style="margin: 20px 0; clear: both; text-align: center;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 4px;">Advertisement</div>
+        <ins class="adsbygoogle"
+             style="display:block; text-align:center;"
+             data-ad-layout="in-article"
+             data-ad-format="fluid"
+             data-ad-client="ca-pub-9543073887536718"
+             data-ad-slot="4392273015"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+
+      <!-- Real Cloned Information & Vacancy Tables -->
+      ${renderedTables ? `
+      <div class="article-real-tables" style="margin: 28px 0;">
+        <h3 style="color: #0f172a; font-size: 18px; font-weight: 800; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">
+          📊 Key Information &amp; Vacancy Breakdown
+        </h3>
+        ${renderedTables}
+      </div>` : ''}
+
+      <!-- BiharHelpAdvt 3 (Pre-Official Links High CTR Banner) -->
+      <div class="code-block code-block-3" style="margin: 22px auto; text-align: center; display: block; clear: both;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 4px;">Advertisement</div>
+        <ins class="adsbygoogle"
+             style="display:block;"
+             data-ad-client="ca-pub-9543073887536718"
+             data-ad-slot="1362664078"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+
+      <!-- Real Official Direct Action Links Box (Actionable Table/Cards) -->
       <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 14px; padding: 22px; text-align: center; margin: 26px 0; color: #ffffff; box-shadow: 0 8px 20px rgba(15,23,42,0.2);">
         <h4 style="margin: 0 0 14px; color: #f59e0b; font-size: 16px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">
           ⚡ Official Direct Links
@@ -86,21 +136,7 @@ export function buildClonedHtmlArticle(clonedData, siteCategory = 'Latest Jobs',
         </div>
       </div>
 
-      <!-- Real Article Body & Descriptions -->
-      <div class="article-real-body" style="font-size: 15px; color: #334155; margin: 24px 0;">
-        ${bodyContentHtml}
-      </div>
-
-      <!-- Real Cloned Information & Vacancy Tables -->
-      ${renderedTables ? `
-      <div class="article-real-tables" style="margin: 28px 0;">
-        <h3 style="color: #0f172a; font-size: 18px; font-weight: 800; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">
-          📊 Key Information &amp; Vacancy Breakdown
-        </h3>
-        ${renderedTables}
-      </div>` : ''}
-
-      <!-- Bottom Action Links Box -->
+      <!-- Bottom Action Notice Box -->
       <div style="background: #f1f5f9; border-radius: 12px; padding: 20px; text-align: center; margin: 30px 0; border: 1px solid #cbd5e1;">
         <p style="font-size: 14px; color: #1e293b; font-weight: bold; margin-bottom: 12px;">
           Candidates are advised to read the official notification carefully before submitting the online form.
