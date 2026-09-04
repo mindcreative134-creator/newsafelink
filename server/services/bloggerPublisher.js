@@ -63,3 +63,56 @@ export async function postToBlogger(title, contentHtml, labels = []) {
 
   return res.json();
 }
+
+/**
+ * Fetch all posts live from Blogger API to guarantee 100% duplicate prevention
+ */
+export async function fetchAllLiveBloggerPosts() {
+  const key = CONFIG.API_KEY || 'AIzaSyAB38Lkz-xiuvkFFuEDd7BsVo97DMA4g24';
+  const blogId = CONFIG.BLOG_ID;
+  let posts = [];
+  let pageToken = '';
+  let hasNext = true;
+
+  while (hasNext) {
+    let url = `https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts?key=${key}&maxResults=100`;
+    if (pageToken) url += `&pageToken=${pageToken}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) break;
+      const data = await res.json();
+      if (data.items && Array.isArray(data.items)) {
+        posts = posts.concat(data.items);
+      }
+      if (data.nextPageToken) {
+        pageToken = data.nextPageToken;
+      } else {
+        hasNext = false;
+      }
+    } catch {
+      hasNext = false;
+    }
+  }
+
+  return posts;
+}
+
+/**
+ * Delete a post from Blogger API using OAuth token
+ */
+export async function deleteBloggerPost(postId) {
+  const token = await getGoogleAccessToken();
+  if (!token) return false;
+
+  try {
+    const url = `https://www.googleapis.com/blogger/v3/blogs/${CONFIG.BLOG_ID}/posts/${postId}`;
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+

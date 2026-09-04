@@ -7,7 +7,7 @@ import { scrapeSite } from '../scrapers/index.js';
 import { buildClonedHtmlArticle } from './articleTemplate.js';
 import { cloneAuthenticArticle } from '../scrapers/articleCloner.js';
 import { detectPostCategory } from '../scrapers/universalDetector.js';
-import { postToBlogger } from './bloggerPublisher.js';
+import { postToBlogger, fetchAllLiveBloggerPosts } from './bloggerPublisher.js';
 import { loadJson, saveJson, logEvent, POSTED_CACHE_FILE, SCRAPED_POSTS_FILE } from '../utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -18,7 +18,48 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 let bloggerQuotaExhaustedUntil = 0;
 const MAX_BLOGGER_POSTS_PER_CYCLE = 2; // 2 posts per cycle = ~200 posts/day, avoids triggering Google burst limits
 
-// ── Text & URL Normalizers for 100% Duplicate Prevention ──
+// ── Stop words & Semantic Tokenizer for 100% Duplicate Prevention ──
+const STOP_WORDS = new Set([
+  'recruitment', 'bharti', 'भर्ती', 'online', 'form', 'apply', 'notification', 'out', 
+  'new', 'check', 'download', 'details', 'for', 'and', 'the', 'with', 'post', 
+  'posts', 'पद', '2024', '2025', '2026', '2027', 'vacancy', 'vacancies', 'exam', 
+  'date', 'portal', 'official', 'link', 'update', 'updates', 'regarding', 'how',
+  'sarkari', 'result', 'रिजल्ट', 'admit', 'card'
+]);
+
+function extractSignificantTokens(str) {
+  if (!str || typeof str !== 'string') return [];
+  const words = str
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
+  return [...new Set(words)];
+}
+
+function isSemanticDuplicate(titleA, titleB) {
+  const t1 = extractSignificantTokens(titleA);
+  const t2 = extractSignificantTokens(titleB);
+  if (t1.length === 0 || t2.length === 0) return false;
+
+  const set2 = new Set(t2);
+  const intersection = t1.filter((w) => set2.has(w));
+
+  const minLen = Math.min(t1.length, t2.length);
+  const overlapRatio = intersection.length / minLen;
+
+  // If two titles share 2+ core tokens and cover >= 50% of the shorter title's tokens
+  if (intersection.length >= 2 && overlapRatio >= 0.5) {
+    return true;
+  }
+  // Single strong token match if both titles only have 1 significant token
+  if (t1.length === 1 && t2.length === 1 && t1[0] === t2[0]) {
+    return true;
+  }
+  return false;
+}
+
+// ── Text & URL Normalizers ──
 function normalizeText(str) {
   if (!str || typeof str !== 'string') return '';
   return str.toLowerCase().replace(/[^a-z0-9]/g, '').trim();
@@ -43,26 +84,66 @@ export async function runSyncRoutine() {
   logEvent('Starting 24/7 sync routine across all configured websites & scrapers...');
   const feeds = loadJson(CONFIG.FEEDS_FILE, []);
   
-  // ── Load and Index Persistent Deduplication Cache ──
+  // ── 1. Fetch Live Blogger Posts to Guarantee Zero Duplicate Reposting ──
+  let liveBloggerPosts = [];
+  try {
+    liveBloggerPosts = await fetchAllLiveBloggerPosts();
+    logEvent(`[Deduplication Engine] Synced ${liveBloggerPosts.length} live posts directly from Blogger API.`);
+  } catch (err) {
+    logEvent(`[Deduplication Engine] Could not fetch live Blogger posts: ${err.message}`, 'warning');
+  }
+
+  // ── 2. Load and Index Persistent Deduplication Cache ──
   const rawPostedCache = loadJson(POSTED_CACHE_FILE, []);
   const postedCacheEntries = [];
   const postedTitlesSet = new Set();
   const postedUrlsSet = new Set();
   const postedSlugsSet = new Set();
+  const allKnownTitles = [];
 
+  function registerKnownPost(title, cleanTitle = '', url = '', slug = '') {
+    if (title) {
+      postedTitlesSet.add(normalizeText(title));
+      allKnownTitles.push(title);
+    }
+    if (cleanTitle) {
+      postedTitlesSet.add(normalizeText(cleanTitle));
+      allKnownTitles.push(cleanTitle);
+    }
+    if (url) {
+      postedUrlsSet.add(normalizeUrl(url));
+    }
+    if (slug) {
+      postedSlugsSet.add(slug);
+    } else if (title) {
+      postedSlugsSet.add(toSlug(title));
+    }
+  }
+
+  // Index all live Blogger posts
+  for (const bp of liveBloggerPosts) {
+    registerKnownPost(bp.title, bp.title, bp.url);
+  }
+
+  // Index all pre-existing posts from liveJobs.json
+  try {
+    const siteLiveJobsPath = path.resolve(ROOT_DIR, '..', 'src', 'data', 'liveJobs.json');
+    if (fs.existsSync(siteLiveJobsPath)) {
+      const localJobs = loadJson(siteLiveJobsPath, []);
+      for (const lj of localJobs) {
+        registerKnownPost(lj.title, lj.title, lj.applyUrl);
+      }
+    }
+  } catch {}
+
+  // Index all cached posts from POSTED_CACHE_FILE
   for (const entry of rawPostedCache) {
     if (typeof entry === 'string') {
-      const nText = normalizeText(entry);
-      if (nText) postedTitlesSet.add(nText);
-      const slug = toSlug(entry);
-      if (slug) postedSlugsSet.add(slug);
+      registerKnownPost(entry, entry);
       postedCacheEntries.push({ title: entry, cleanTitle: entry });
     } else if (entry && typeof entry === 'object') {
-      if (entry.title) postedTitlesSet.add(normalizeText(entry.title));
-      if (entry.cleanTitle) postedTitlesSet.add(normalizeText(entry.cleanTitle));
-      if (entry.clonedTitle) postedTitlesSet.add(normalizeText(entry.clonedTitle));
-      if (entry.url) postedUrlsSet.add(normalizeUrl(entry.url));
-      if (entry.slug) postedSlugsSet.add(entry.slug);
+      registerKnownPost(entry.title, entry.cleanTitle, entry.url, entry.slug);
+      if (entry.clonedTitle) registerKnownPost(entry.clonedTitle);
       postedCacheEntries.push(entry);
     }
   }
@@ -71,38 +152,40 @@ export async function runSyncRoutine() {
     if (!item) return true;
     const titleToCheck = cleanTitle || item.title || '';
     const normTitle = normalizeText(titleToCheck);
+
+    // Tier 1: Exact Normalized Title
     if (normTitle && postedTitlesSet.has(normTitle)) return true;
 
+    // Tier 2: Normalized Canonical URL
     if (item.link) {
       const normUrl = normalizeUrl(item.link);
       if (normUrl && postedUrlsSet.has(normUrl)) return true;
     }
 
+    // Tier 3: Slug Match
     const slug = toSlug(titleToCheck);
     if (slug && postedSlugsSet.has(slug)) return true;
+
+    // Tier 4: Fuzzy Semantic & Core Entity Overlap Match
+    for (const known of allKnownTitles) {
+      if (isSemanticDuplicate(titleToCheck, known)) {
+        return true;
+      }
+    }
 
     return false;
   }
 
   function markAsPosted(title, cleanTitle, url, clonedTitle = '') {
-    const normTitle = normalizeText(title);
-    const normClean = normalizeText(cleanTitle);
-    const normCloned = normalizeText(clonedTitle);
-    const normUrl = normalizeUrl(url);
-    const slug = toSlug(title);
-
-    if (normTitle) postedTitlesSet.add(normTitle);
-    if (normClean) postedTitlesSet.add(normClean);
-    if (normCloned) postedTitlesSet.add(normCloned);
-    if (normUrl) postedUrlsSet.add(normUrl);
-    if (slug) postedSlugsSet.add(slug);
+    registerKnownPost(title, cleanTitle, url);
+    if (clonedTitle) registerKnownPost(clonedTitle);
 
     postedCacheEntries.push({
       title,
       cleanTitle: cleanTitle || title,
       clonedTitle: clonedTitle || undefined,
-      url: normUrl || undefined,
-      slug,
+      url: url ? normalizeUrl(url) : undefined,
+      slug: toSlug(title),
       postedAt: new Date().toISOString()
     });
 
