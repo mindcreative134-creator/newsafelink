@@ -9,10 +9,12 @@ export default function WpSafelinkTopSection({ currentPostId }) {
   // 7-second countdown on top of each page (Page 1, Page 2, Page 3)
   const [countdown, setCountdown] = useState(7);
   const [canScroll, setCanScroll] = useState(false);
+  const [hasClickedGenerate, setHasClickedGenerate] = useState(false);
 
   useEffect(() => {
     setCountdown(7);
     setCanScroll(false);
+    setHasClickedGenerate(false);
     const interval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -28,9 +30,10 @@ export default function WpSafelinkTopSection({ currentPostId }) {
 
   if (!isSafelinkActive || currentStep < 1 || currentStep > 3) return null;
 
-  // Smooth scroll down to bottom section #wpsafegenerate
-  const handleScrollToBottom = (e) => {
+  // When user clicks / double-clicks: show scroll-down prompt and scroll to bottom section #wpsafegenerate
+  const handleGenerateClick = (e) => {
     e.preventDefault();
+    setHasClickedGenerate(true);
     const bottomTarget = document.getElementById('wpsafegenerate');
     if (bottomTarget) {
       bottomTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -41,34 +44,39 @@ export default function WpSafelinkTopSection({ currentPostId }) {
   };
 
   return (
-    <div className="w-full my-2 flex flex-col items-center justify-center text-center space-y-1">
+    <div className="w-full my-3 flex flex-col items-center justify-center text-center space-y-1.5 select-none animate-fadeIn">
       
       {/* ── Top Ad Unit (Closely Attached) ── */}
       <div className="w-full max-w-[728px] mx-auto overflow-hidden">
         <AdUnit variant="banner" slot="3056127394" minHeight="90px" className="!my-0.5" />
       </div>
 
-      {/* ── Direct Button / Timer (Closely Attached, NO BOX / CARD WRAPPER) ── */}
-      <div className="w-full flex flex-col items-center justify-center py-0.5">
+      {/* ── Direct Button / Timer / Scroll Prompt (WP-Safelink exact mechanics) ── */}
+      <div className="w-full flex flex-col items-center justify-center py-1">
         {!canScroll ? (
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-zinc-100 dark:bg-zinc-850 text-zinc-800 dark:text-zinc-100 font-extrabold text-xs sm:text-sm shadow-sm select-none border border-zinc-200/60 dark:border-zinc-800">
-            <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
-            <span>Please wait... {countdown}s</span>
+          <div className="flex flex-col items-center justify-center gap-1.5 px-3">
+            <div className="text-[11px] sm:text-xs font-semibold text-zinc-600 dark:text-zinc-300 max-w-lg leading-snug">
+              𝗖𝗹𝗶𝗰𝗸 𝗢𝗻 𝗔𝗻𝘆 ☝ 𝗜𝗺𝗮𝗴𝗲𝘀 👇 𝘁𝗵𝗲𝗻 𝗯𝗮𝗰𝗸 𝗮𝗻𝗱 𝗪𝗮𝗶𝘁 𝗙𝗼𝗿 𝗧𝗵𝗲 𝗟𝗶𝗻𝗸 (𝗜𝗳 𝗣𝗮𝗴𝗲 𝗡𝗼𝘁 𝗪𝗼𝗿𝗸𝗶𝗻𝗴 𝗥𝗲𝗳𝗿𝗲𝘀𝗵 𝗧𝗵𝗲 𝗣𝗮𝗴𝗲)
+            </div>
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-zinc-100 dark:bg-zinc-850 text-zinc-800 dark:text-zinc-100 font-extrabold text-xs sm:text-sm shadow-sm border border-zinc-200/60 dark:border-zinc-800">
+              <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
+              <span>Please wait... {countdown}s</span>
+            </div>
           </div>
-        ) : (
+        ) : !hasClickedGenerate ? (
           <a
             href="#wpsafegenerate"
             data-google-vignette="false"
-            onClick={handleScrollToBottom}
-            onDoubleClick={handleScrollToBottom}
-            className="group inline-flex flex-col items-center cursor-pointer transition-transform hover:scale-105 active:scale-95 focus:outline-none select-none my-0.5"
+            onClick={handleGenerateClick}
+            onDoubleClick={handleGenerateClick}
+            className="group inline-flex flex-col items-center cursor-pointer transition-transform hover:scale-105 active:scale-95 focus:outline-none select-none my-1"
             title="Double Click to Generate Link"
           >
             {/* Official WP-Safelink generate button graphic */}
             <img
               src="/assets/safelink/generate4.png"
-              alt="DOUBLE CLICK TO GENERATE LINK"
-              className="h-11 sm:h-13 w-auto object-contain drop-shadow"
+              alt="CLICK 2X FOR GENERATE LINK"
+              className="h-12 sm:h-14 w-auto object-contain drop-shadow"
               onError={(e) => {
                 e.target.style.display = 'none';
                 const fallback = document.getElementById('top-gen-fallback');
@@ -81,10 +89,16 @@ export default function WpSafelinkTopSection({ currentPostId }) {
               id="top-gen-fallback"
               className="hidden items-center gap-2 px-7 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-black rounded-xl shadow-md text-xs sm:text-sm uppercase tracking-wider"
             >
-              <span>DOUBLE CLICK TO GENERATE LINK</span>
+              <span>CLICK 2X FOR GENERATE LINK</span>
               <ArrowDown className="w-4 h-4 animate-bounce" />
             </div>
           </a>
+        ) : (
+          /* Replaced on click/double-click with scroll down instruction per user request */
+          <div className="p-3.5 my-1 max-w-lg w-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-xl text-emerald-800 dark:text-emerald-200 font-bold text-xs sm:text-sm animate-fadeIn flex items-center justify-center gap-2 shadow-sm text-center">
+            <ArrowDown className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 animate-bounce" />
+            <span>👇 Scroll Down to Continue &amp; Click "{currentStep === 3 ? 'DOWNLOAD LINK' : 'CONTINUE'}" 👇</span>
+          </div>
         )}
       </div>
 
@@ -96,3 +110,4 @@ export default function WpSafelinkTopSection({ currentPostId }) {
     </div>
   );
 }
+

@@ -4,7 +4,7 @@ import { useSafelink } from '../context/SafelinkContext';
 import AdUnit from './AdUnit';
 import { CheckCircle2, RefreshCw } from 'lucide-react';
 
-export default function RobotVerificationWidget() {
+export default function RobotVerificationWidget({ currentPostId = '' }) {
   const { step1Verified, markStep1Verified } = useSafelink();
   const [checking, setChecking] = useState(false);
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export default function RobotVerificationWidget() {
 
     setTimeout(() => {
       setChecking(false);
-      markStep1Verified(navigate);
+      markStep1Verified(navigate, currentPostId);
     }, 1100);
   };
 

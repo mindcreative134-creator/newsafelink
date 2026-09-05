@@ -539,3 +539,29 @@ export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label =
   };
 }
 
+/**
+ * Pick a random post guaranteed to be distinct and natural
+ * Draws from all combined posts (Blogger real posts + 155 live verified jobs)
+ * Excludes any post IDs passed in excludeIds
+ */
+export async function getRandomSafelinkPost(excludeIds = []) {
+  let pool = [];
+  try {
+    const res = await getUnifiedPosts({ maxResults: 150 });
+    if (res.items && res.items.length > 0) {
+      pool = res.items;
+    }
+  } catch (_e) {}
+
+  if (!pool || pool.length === 0) {
+    pool = (defaultJobs || []).map(formatJobAsPost);
+  }
+
+  const excludeSet = new Set((excludeIds || []).filter(Boolean));
+  const available = pool.filter(p => p && p.id && !excludeSet.has(p.id));
+  const candidatePool = available.length > 0 ? available : pool;
+
+  const chosen = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+  return chosen || pool[0];
+}
+

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import defaultJobs from '../data/liveJobs.json';
+import { getRandomSafelinkPost } from '../services/postService';
 
 const SafelinkContext = createContext();
 
@@ -7,6 +8,15 @@ export function SafelinkProvider({ children }) {
   const [targetUrl, setTargetUrl] = useState(() => sessionStorage.getItem('SAFE_L') || '');
   const [currentStep, setCurrentStep] = useState(() => Number(sessionStorage.getItem('SAFE_STEP')) || 0);
   const [step1Verified, setStep1Verified] = useState(() => sessionStorage.getItem('SAFE_S1_VERIFIED') === '1');
+  const [visitedPostIds, setVisitedPostIds] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('SAFE_VISITED');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [step2TimerDone, setStep2TimerDone] = useState(false);
   const [step3TimerDone, setStep3TimerDone] = useState(false);
 
@@ -15,10 +25,8 @@ export function SafelinkProvider({ children }) {
     if (!raw) return '';
     let candidate = raw;
     try {
-      // Check if it's base64 encoded
       if (candidate.match(/^[A-Za-z0-9+/=]+$/) && candidate.length > 8) {
         const decoded = atob(candidate);
-        // Check if decoded string is JSON (WP-Safelink format)
         if (decoded.startsWith('{') && decoded.endsWith('}')) {
           const parsed = JSON.parse(decoded);
           candidate = parsed.safelink || parsed.second_safelink_url || parsed.url || candidate;
@@ -30,14 +38,14 @@ export function SafelinkProvider({ children }) {
     return candidate;
   };
 
-  // Auto-detect URL queries on page load or query change (?o=..., ?url=..., ?target=..., ?safelink=..., ?adlinkfly=...)
+  // Auto-detect URL queries on page load or query change (?o=..., ?url=..., ?target=..., ?safelink=..., ?adlinkfly=..., ?newwpsafelink=...)
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const oParam = params.get('o');
       const urlParam = params.get('url') || params.get('target') || params.get('link') || params.get('safelink');
       const adlinkflyParam = params.get('adlinkfly');
-      const wpsafeParam = params.get('wpsafelink') || params.get('safelink_redirect') || params.get('go');
+      const wpsafeParam = params.get('wpsafelink') || params.get('safelink_redirect') || params.get('go') || params.get('newwpsafelink');
       const stepParam = Number(params.get('step'));
 
       let rawTarget = '';
@@ -78,6 +86,8 @@ export function SafelinkProvider({ children }) {
     sessionStorage.setItem('SAFE_L', decodedUrl || '');
     sessionStorage.setItem('SAFE_STEP', String(step));
     sessionStorage.removeItem('SAFE_S1_VERIFIED');
+    sessionStorage.removeItem('SAFE_VISITED');
+    setVisitedPostIds([]);
     setTargetUrl(decodedUrl || '');
     setCurrentStep(step);
     setStep1Verified(false);
@@ -85,48 +95,55 @@ export function SafelinkProvider({ children }) {
     setStep3TimerDone(false);
   }, []);
 
-  const markStep1Verified = useCallback((navigate) => {
+  // When robot check is verified, pick a distinct random post for Step 1
+  const markStep1Verified = useCallback(async (navigate, currentPostId = '') => {
     sessionStorage.setItem('SAFE_S1_VERIFIED', '1');
     setStep1Verified(true);
     setCurrentStep(1);
     sessionStorage.setItem('SAFE_STEP', '1');
 
-    // Pick a random real post from live jobs so it looks 100% natural on Page 1 of 3
-    const postsPool = (defaultJobs && defaultJobs.length > 0) ? defaultJobs : [];
-    const chosenPost = (postsPool.length > 0)
-      ? postsPool[Math.floor(Math.random() * postsPool.length)]
-      : { id: 'emrs-teaching-post' };
+    // Pick a distinct random post from all unified posts (old & new)
+    const chosenPost = await getRandomSafelinkPost([currentPostId]);
+    const chosenId = chosenPost?.id || 'emrs-teaching-post';
+    const updatedVisited = [chosenId];
+    setVisitedPostIds(updatedVisited);
+    sessionStorage.setItem('SAFE_VISITED', JSON.stringify(updatedVisited));
 
     if (navigate) {
-      navigate(`/post/${chosenPost.id}?step=1`);
+      navigate(`/post/${chosenId}?step=1`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, []);
 
-  const goToNextStep = useCallback((navigate, currentPostId = '') => {
+  // When clicking to continue to next step (Step 1 -> 2, or Step 2 -> 3)
+  const goToNextStep = useCallback(async (navigate, currentPostId = '') => {
     const nextVal = currentStep + 1;
     if (nextVal > 3) return;
 
     sessionStorage.setItem('SAFE_STEP', String(nextVal));
     setCurrentStep(nextVal);
 
-    // Pick a random real post from live jobs so it looks 100% natural
-    const postsPool = (defaultJobs && defaultJobs.length > 0) ? defaultJobs : [];
-    const candidates = postsPool.filter(p => p && p.id !== currentPostId);
-    const chosenPost = (candidates.length > 0)
-      ? candidates[Math.floor(Math.random() * candidates.length)]
-      : (postsPool[0] || { id: 'emrs-teaching-post' });
+    // Pick a distinct random post not visited yet
+    const exclude = [currentPostId, ...visitedPostIds];
+    const chosenPost = await getRandomSafelinkPost(exclude);
+    const chosenId = chosenPost?.id || defaultJobs[0]?.id || 'emrs-teaching-post';
+
+    const updatedVisited = [...visitedPostIds, chosenId];
+    setVisitedPostIds(updatedVisited);
+    sessionStorage.setItem('SAFE_VISITED', JSON.stringify(updatedVisited));
 
     if (navigate) {
-      navigate(`/post/${chosenPost.id}?step=${nextVal}`);
+      navigate(`/post/${chosenId}?step=${nextVal}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [currentStep]);
+  }, [currentStep, visitedPostIds]);
 
   const clearSafelink = useCallback(() => {
     sessionStorage.removeItem('SAFE_L');
     sessionStorage.removeItem('SAFE_STEP');
     sessionStorage.removeItem('SAFE_S1_VERIFIED');
+    sessionStorage.removeItem('SAFE_VISITED');
+    setVisitedPostIds([]);
     setTargetUrl('');
     setCurrentStep(0);
     setStep1Verified(false);
@@ -168,4 +185,5 @@ export function SafelinkProvider({ children }) {
 export function useSafelink() {
   return useContext(SafelinkContext);
 }
+
 

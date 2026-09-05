@@ -4,7 +4,6 @@ import { getPostById } from '../services/postService';
 import { getUnifiedPosts } from '../services/postService';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
-import SafelinkStepIndicator from '../components/SafelinkStepIndicator';
 import WpSafelinkTopSection from '../components/WpSafelinkTopSection';
 import WpSafelinkBottomSection from '../components/WpSafelinkBottomSection';
 import RobotVerificationWidget from '../components/RobotVerificationWidget';
@@ -149,8 +148,19 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
-      {/* Top Step Header for SafeLink Transit */}
-      <SafelinkStepIndicator />
+      {/* ── WP-Safelink 3-Page Flow: Top Section (Ad -> Timer / Generate -> Ad) at very top ── */}
+      {isSafelinkActive && step1Verified && currentStep >= 1 && currentStep <= 3 && (
+        <div className="max-w-4xl mx-auto px-4 pt-4">
+          <WpSafelinkTopSection currentPostId={postId} />
+        </div>
+      )}
+
+      {/* ── Initial Entry: I am not a robot (Ad -> Robot Check -> Ad) ── */}
+      {isSafelinkActive && !step1Verified && (
+        <div className="max-w-4xl mx-auto px-4 pt-4">
+          <RobotVerificationWidget currentPostId={postId} />
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
@@ -231,17 +241,6 @@ export default function PostDetail() {
                 </div>
               )}
 
-              {/* ── Initial Entry: I am not a robot (Ad -> Robot Check -> Ad) ── */}
-              {isSafelinkActive && !step1Verified && (
-                <div className="my-4">
-                  <RobotVerificationWidget />
-                </div>
-              )}
-
-              {/* ── WP-Safelink 3-Page Flow: Top Section (Ad -> Timer -> Continue -> Ad) ── */}
-              {isSafelinkActive && step1Verified && currentStep >= 1 && currentStep <= 3 && (
-                <WpSafelinkTopSection currentPostId={postId} />
-              )}
 
               {/* Native Fluid Ad Unit 1 */}
               <AdUnit variant="fluid" slot="9320506924" minHeight="120px" className="my-2" />

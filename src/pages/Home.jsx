@@ -9,7 +9,6 @@ import {
   Search, Lock, CheckCircle2, ChevronRight
 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
-import SafelinkStepIndicator from '../components/SafelinkStepIndicator';
 import RobotVerificationWidget from '../components/RobotVerificationWidget';
 import WpSafelinkTopSection from '../components/WpSafelinkTopSection';
 import DualAdContinueSection from '../components/DualAdContinueSection';
@@ -133,8 +132,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
-      {/* ── Top Step Indicator for SafeLink Transit ── */}
-      {isSafelinkActive && <SafelinkStepIndicator />}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
