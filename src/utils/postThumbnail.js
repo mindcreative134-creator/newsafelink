@@ -1,11 +1,128 @@
 /**
- * Dynamic Content-Specific Sarkari Poster & Thumbnail Generator
+ * Dynamic Content-Specific Poster & Thumbnail Generator
  * Generates high-impact, authentic posters customized to the post's title, department, and category.
+ * Strictly adapts typography and labels for News, Tech, Gaming, Admissions, Schemes, and Jobs.
  */
 
 function detectTheme(title = '', category = '', org = '') {
   const text = `${title} ${category} ${org}`.toLowerCase();
 
+  // 1. Tech, Gaming, Apps & Gadgets (e.g. BGMI, Smartphones, Software, AI)
+  if (
+    text.includes('bgmi') || text.includes('game') || text.includes('gaming') ||
+    text.includes('smartphone') || text.includes('laptop') || text.includes('iphone') ||
+    text.includes('android') || text.includes('download') || text.includes('gadget') ||
+    text.includes('tech') || text.includes('software') || text.includes('artificial intelligence') ||
+    text.includes('ai ') || category.toLowerCase().includes('tech')
+  ) {
+    return {
+      dept: 'TECH & GAMING INSIGHTS',
+      badge: 'TECH GUIDE & RELEASE',
+      bg1: '#0f172a',
+      bg2: '#020617',
+      accent: '#38bdf8',
+      border: '#0284c7',
+      icon: '🎮',
+      tag: 'TECH & DIGITAL',
+      info1Label: '💻 Category',
+      info1Value: 'TECH & GAMING',
+      info2Label: '⚡ Status',
+      info2Value: 'LATEST UPDATE',
+      actionText: 'READ GUIDE ➔',
+    };
+  }
+
+  // 2. University Admissions & Academic Notices (e.g. LLB, BA, B.Ed, Munger Univ, CUET)
+  if (
+    text.includes('cuet') || text.includes('admission') || text.includes('university') ||
+    text.includes('college') || text.includes('entrance') || text.includes('munger') ||
+    text.includes('lnmu') || text.includes('patna') || text.includes('llb') ||
+    text.includes('b.ed') || text.includes('deled') || text.includes('counseling') ||
+    text.includes('counselling') || category.toLowerCase().includes('admission') ||
+    category.toLowerCase().includes('univ')
+  ) {
+    const univName = org ? org.toUpperCase().slice(0, 24) : 'UNIVERSITY ADMISSIONS';
+    return {
+      dept: `${univName} ADMISSIONS`,
+      badge: 'ACADEMIC SESSION 2026',
+      bg1: '#3b0764',
+      bg2: '#0f172a',
+      accent: '#c084fc',
+      border: '#9333ea',
+      icon: '🎓',
+      tag: 'ACADEMIC NOTICE',
+      info1Label: '🎓 Program',
+      info1Value: text.includes('llb') ? 'LAW / LLB ADMISSION' : 'DEGREE / ENTRANCE',
+      info2Label: '📋 Session',
+      info2Value: 'ACADEMIC 2026-27',
+      actionText: 'VIEW NOTICE ➔',
+    };
+  }
+
+  // 3. Government Schemes & Citizen Welfare (e.g. NFOBC, PM Kisan, Scholarship, Yojana)
+  if (
+    text.includes('yojana') || text.includes('scheme') || text.includes('scholarship') ||
+    text.includes('kisan') || text.includes('awas') || text.includes('pension') ||
+    text.includes('subsidy') || text.includes('ration') || text.includes('nfobc') ||
+    text.includes('fellowship') || category.toLowerCase().includes('scheme') ||
+    category.toLowerCase().includes('yojana')
+  ) {
+    return {
+      dept: 'PRADHAN MANTRI & STATE YOJANA',
+      badge: 'GOVT SCHEME & WELFARE',
+      bg1: '#7c2d12',
+      bg2: '#0f172a',
+      accent: '#fb923c',
+      border: '#ea580c',
+      icon: '🏛️',
+      tag: 'CITIZEN WELFARE',
+      info1Label: '🏛️ Scheme',
+      info1Value: text.includes('fellowship') || text.includes('scholar') ? 'RESEARCH FELLOWSHIP' : 'GOVT WELFARE AID',
+      info2Label: '👥 Beneficiary',
+      info2Value: 'ELIGIBLE BENEFICIARIES',
+      actionText: 'CHECK STATUS ➔',
+    };
+  }
+
+  // 4. Admit Cards & Hall Tickets
+  if (text.includes('admit') || text.includes('hall ticket') || text.includes('call letter') || category.toLowerCase().includes('admit')) {
+    return {
+      dept: org ? org.toUpperCase().slice(0, 28) : 'EXAMINATION CONTROLLER',
+      badge: 'ADMIT CARD RELEASED',
+      bg1: '#78350f',
+      bg2: '#0f172a',
+      accent: '#fde047',
+      border: '#d97706',
+      icon: '🎫',
+      tag: 'HALL TICKET ACTIVE',
+      info1Label: '🎫 Document',
+      info1Value: 'EXAM CITY / ADMIT CARD',
+      info2Label: '📅 Status',
+      info2Value: 'DOWNLOAD ACTIVE',
+      actionText: 'DOWNLOAD ➔',
+    };
+  }
+
+  // 5. Results & Merit Lists
+  if (text.includes('result') || text.includes('merit') || text.includes('cutoff') || text.includes('scorecard') || category.toLowerCase().includes('result')) {
+    return {
+      dept: org ? org.toUpperCase().slice(0, 28) : 'EXAMINATION RESULTS DESK',
+      badge: 'OFFICIAL RESULT DECLARED',
+      bg1: '#134e4a',
+      bg2: '#0f172a',
+      accent: '#2dd4bf',
+      border: '#0d9488',
+      icon: '🏆',
+      tag: 'SCORECARD & MERIT LIST',
+      info1Label: '🏆 Scorecard',
+      info1Value: 'MERIT LIST RELEASED',
+      info2Label: '📊 Details',
+      info2Value: 'OFFICIAL CUTOFF',
+      actionText: 'CHECK RESULT ➔',
+    };
+  }
+
+  // 6. Railways Recruitment
   if (text.includes('railway') || text.includes('rrb') || text.includes('irctc') || text.includes('loco pilot') || text.includes('rrc')) {
     return {
       dept: 'INDIAN RAILWAYS (भारतीय रेल)',
@@ -16,9 +133,16 @@ function detectTheme(title = '', category = '', org = '') {
       border: '#059669',
       icon: '🚆',
       tag: 'RRB / RRC VACANCY',
+      info1Label: '📌 Application',
+      info1Value: 'ONLINE RECRUITMENT',
+      info2Label: '🎯 Eligibility',
+      info2Value: '10TH / ITI / GRADUATE',
+      actionText: 'APPLY NOW ➔',
     };
   }
-  if (text.includes('ssc') || text.includes('cgl') || text.includes('chsl') || text.includes('mts') || text.includes('gd constable') || text.includes('stenographer')) {
+
+  // 7. SSC Recruitment
+  if (text.includes('ssc') || text.includes('cgl') || text.includes('chsl') || text.includes('mts') || text.includes('gd constable')) {
     return {
       dept: 'STAFF SELECTION COMMISSION',
       badge: 'SSC OFFICIAL NOTIFICATION',
@@ -28,127 +152,52 @@ function detectTheme(title = '', category = '', org = '') {
       border: '#2563eb',
       icon: '🏛️',
       tag: 'SSC RECRUITMENT',
-    };
-  }
-  if (text.includes('upsc') || text.includes('ias') || text.includes('ips') || text.includes('nda') || text.includes('cds') || text.includes('civil services')) {
-    return {
-      dept: 'UNION PUBLIC SERVICE COMMISSION',
-      badge: 'UPSC CIVIL SERVICES',
-      bg1: '#312e81',
-      bg2: '#0f172a',
-      accent: '#fbbf24',
-      border: '#4f46e5',
-      icon: '⚖️',
-      tag: 'UPSC ADVERTISEMENT',
-    };
-  }
-  if (text.includes('police') || text.includes('constable') || text.includes('sub inspector') || text.includes('si ') || text.includes('daroga')) {
-    return {
-      dept: 'STATE POLICE RECRUITMENT BOARD',
-      badge: 'POLICE BHARTI 2026',
-      bg1: '#881337',
-      bg2: '#0f172a',
-      accent: '#f43f5e',
-      border: '#e11d48',
-      icon: '🛡️',
-      tag: 'POLICE VACANCY',
-    };
-  }
-  if (text.includes('army') || text.includes('navy') || text.includes('air force') || text.includes('agniveer') || text.includes('defense') || text.includes('defence') || text.includes('bsf') || text.includes('crpf')) {
-    return {
-      dept: 'INDIAN ARMED FORCES (भारतीय सेना)',
-      badge: 'DEFENSE RECRUITMENT 2026',
-      bg1: '#14532d',
-      bg2: '#0f172a',
-      accent: '#86efac',
-      border: '#16a34a',
-      icon: '⚔️',
-      tag: 'AGNIVEER / DEFENSE',
-    };
-  }
-  if (text.includes('bank') || text.includes('ibps') || text.includes('sbi') || text.includes('rbi') || text.includes('po ') || text.includes('clerk') || text.includes('nabard')) {
-    return {
-      dept: 'BANKING RECRUITMENT BOARD',
-      badge: 'BANK RECRUITMENT 2026',
-      bg1: '#0c4a6e',
-      bg2: '#082f49',
-      accent: '#38bdf8',
-      border: '#0284c7',
-      icon: '🏦',
-      tag: 'IBPS / SBI NOTICE',
-    };
-  }
-  if (text.includes('yojana') || text.includes('scheme') || text.includes('kisan') || text.includes('awas') || text.includes('pension') || text.includes('subsidy') || text.includes('ration')) {
-    return {
-      dept: 'GOVERNMENT OF INDIA (सरकारी योजना)',
-      badge: 'GOVT SCHEME & WELFARE',
-      bg1: '#7c2d12',
-      bg2: '#0f172a',
-      accent: '#fb923c',
-      border: '#ea580c',
-      icon: '🇮🇳',
-      tag: 'PRADHAN MANTRI YOJANA',
-    };
-  }
-  if (text.includes('admit') || text.includes('hall ticket') || text.includes('call letter') || category.toLowerCase().includes('admit')) {
-    return {
-      dept: 'EXAMINATION CONTROLLER BOARD',
-      badge: 'ADMIT CARD RELEASED',
-      bg1: '#78350f',
-      bg2: '#0f172a',
-      accent: '#fde047',
-      border: '#d97706',
-      icon: '🎫',
-      tag: 'HALL TICKET ACTIVE',
-    };
-  }
-  if (text.includes('result') || text.includes('merit') || text.includes('cutoff') || text.includes('scorecard') || category.toLowerCase().includes('result')) {
-    return {
-      dept: 'EXAM RESULTS PORTAL',
-      badge: 'OFFICIAL RESULT DECLARED',
-      bg1: '#134e4a',
-      bg2: '#0f172a',
-      accent: '#2dd4bf',
-      border: '#0d9488',
-      icon: '🏆',
-      tag: 'SCORECARD & CUTOFF',
-    };
-  }
-  if (text.includes('cuet') || text.includes('admission') || text.includes('university') || text.includes('college') || text.includes('entrance') || category.toLowerCase().includes('admission') || text.includes('counseling')) {
-    return {
-      dept: 'UNIVERSITY ADMISSIONS (CUET / NTA)',
-      badge: 'ADMISSION NOTICE 2026',
-      bg1: '#581c87',
-      bg2: '#0f172a',
-      accent: '#c084fc',
-      border: '#7e22ce',
-      icon: '🎓',
-      tag: 'ENTRANCE & COUNSELING',
-    };
-  }
-  if (text.includes('teacher') || text.includes('tet') || text.includes('bpsc teacher') || text.includes('ctet') || text.includes('prt') || text.includes('tgt') || text.includes('pgt')) {
-    return {
-      dept: 'EDUCATION RECRUITMENT BOARD',
-      badge: 'TEACHER RECRUITMENT 2026',
-      bg1: '#4c1d95',
-      bg2: '#0f172a',
-      accent: '#a78bfa',
-      border: '#6d28d9',
-      icon: '📚',
-      tag: 'TEACHING VACANCY',
+      info1Label: '📌 Application',
+      info1Value: 'ONLINE PORTAL ACTIVE',
+      info2Label: '🎯 Eligibility',
+      info2Value: '10TH / 12TH / DEGREE',
+      actionText: 'APPLY NOW ➔',
     };
   }
 
-  // Default Sarkari Theme
+  // 8. General News, Current Affairs & Sports
+  if (
+    category.toLowerCase().includes('news') || category.toLowerCase().includes('sport') ||
+    text.includes('news') || text.includes('minister') || text.includes('pm ') ||
+    text.includes('president') || text.includes('india') || text.includes('world')
+  ) {
+    return {
+      dept: org ? org.toUpperCase().slice(0, 28) : 'NATIONAL & GLOBAL NEWS DESK',
+      badge: 'VERIFIED REPORT & COVERAGE',
+      bg1: '#1e293b',
+      bg2: '#0f172a',
+      accent: '#f59e0b',
+      border: '#d97706',
+      icon: '📰',
+      tag: 'CURRENT AFFAIRS',
+      info1Label: '🌐 Coverage',
+      info1Value: 'NATIONAL & WORLD',
+      info2Label: '📅 Edition',
+      info2Value: 'LATEST REPORT',
+      actionText: 'READ STORY ➔',
+    };
+  }
+
+  // 9. Default Govt Recruitment Theme
   return {
-    dept: org ? org.toUpperCase().slice(0, 32) : 'GOVERNMENT RECRUITMENT PORTAL',
+    dept: org ? org.toUpperCase().slice(0, 30) : 'GOVERNMENT RECRUITMENT DESK',
     badge: 'OFFICIAL NOTIFICATION 2026',
     bg1: '#1e1b4b',
     bg2: '#020617',
     accent: '#818cf8',
     border: '#4338ca',
-    icon: '📌',
-    tag: category.toUpperCase() || 'LATEST UPDATE',
+    icon: '💼',
+    tag: 'GOVT RECRUITMENT',
+    info1Label: '📌 Status',
+    info1Value: 'ACTIVE NOTICE',
+    info2Label: '🎯 Target',
+    info2Value: 'OFFICIAL GUIDELINES',
+    actionText: 'READ NOTICE ➔',
   };
 }
 
@@ -181,12 +230,12 @@ function wrapText(text, maxCharsPerLine = 30, maxLines = 3) {
 }
 
 /**
- * Creates an authentic Sarkari thumbnail SVG Data-URI customized for the specific post
+ * Creates an authentic, topic-specific poster SVG Data-URI customized for the specific post
  */
 export function createSarkariPosterSvg(post = {}) {
-  const rawTitle = post.title || 'Government Recruitment Notification';
-  const category = post.category || 'Latest Jobs';
-  const org = post.organization || '';
+  const rawTitle = post.title || 'Official Portal Notification';
+  const category = post.category || 'News & Updates';
+  const org = post.organization || post.sourceName || '';
   const theme = detectTheme(rawTitle, category, org);
 
   // Clean title
@@ -228,8 +277,8 @@ export function createSarkariPosterSvg(post = {}) {
 
   <!-- Center Badge / Alert Box -->
   <g transform="translate(36, 110)">
-    <rect x="0" y="0" width="220" height="32" rx="8" fill="url(#accentGrad)"/>
-    <text x="110" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="900" fill="#ffffff" letter-spacing="1">
+    <rect x="0" y="0" width="230" height="32" rx="8" fill="url(#accentGrad)"/>
+    <text x="115" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="900" fill="#ffffff" letter-spacing="1">
       ★ ${escapeXml(theme.badge)} ★
     </text>
   </g>
@@ -246,20 +295,20 @@ export function createSarkariPosterSvg(post = {}) {
       .join('')}
   </g>
 
-  <!-- Bottom Info Bar -->
+  <!-- Bottom Info Bar (Topic-Adaptive) -->
   <g transform="translate(36, 360)">
     <rect x="0" y="0" width="728" height="52" rx="12" fill="${theme.bg1}" stroke="${theme.border}" stroke-width="1"/>
     
     <text x="24" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#ffffff">
-      📌 Application: <tspan fill="${theme.accent}">ONLINE PORTAL ACTIVE</tspan>
+      ${escapeXml(theme.info1Label)}: <tspan fill="${theme.accent}">${escapeXml(theme.info1Value)}</tspan>
     </text>
     <text x="360" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#ffffff">
-      🎯 Eligibility: <tspan fill="${theme.accent}">10th / 12th / Graduate</tspan>
+      ${escapeXml(theme.info2Label)}: <tspan fill="${theme.accent}">${escapeXml(theme.info2Value)}</tspan>
     </text>
     
-    <rect x="610" y="10" width="104" height="32" rx="8" fill="#16a34a"/>
-    <text x="662" y="31" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="900" fill="#ffffff">
-      APPLY NOW ➔
+    <rect x="596" y="10" width="118" height="32" rx="8" fill="${theme.border}"/>
+    <text x="655" y="31" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="900" fill="#ffffff">
+      ${escapeXml(theme.actionText)}
     </text>
   </g>
 </svg>
@@ -270,25 +319,25 @@ export function createSarkariPosterSvg(post = {}) {
 
 /**
  * Universal Post Thumbnail Extractor & Generator
- * Checks if a post already has an authentic image; otherwise returns a customized Sarkari poster.
+ * Checks if a post already has an authentic image; otherwise returns a customized topic poster.
  */
 export function getPostThumbnail(post) {
   if (!post) return createSarkariPosterSvg({});
 
-  // 1. Check explicit image fields (that are NOT generic Unsplash fallbacks)
+  // 1. Check explicit image fields
   const candidateUrl = post.imageUrl || post.thumbnail || post.image;
-  if (candidateUrl && typeof candidateUrl === 'string' && !candidateUrl.includes('unsplash.com')) {
+  if (candidateUrl && typeof candidateUrl === 'string' && !candidateUrl.includes('unsplash.com') && candidateUrl.startsWith('http')) {
     return candidateUrl;
   }
 
-  // 2. Check HTML content for embedded <img> tags (ignoring old unsplash fallback)
+  // 2. Check HTML content for embedded <img> tags
   if (post.content && typeof post.content === 'string') {
     const match = post.content.match(/<img[^>]+src=["']([^"']+)["']/i);
-    if (match && match[1] && !match[1].includes('unsplash.com')) {
+    if (match && match[1] && !match[1].includes('unsplash.com') && match[1].startsWith('http')) {
       return match[1];
     }
   }
 
-  // 3. Generate content-specific Sarkari Poster SVG
+  // 3. Generate topic-specific Poster SVG
   return createSarkariPosterSvg(post);
 }

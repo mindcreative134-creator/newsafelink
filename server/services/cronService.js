@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import cron from 'node-cron';
 import { CONFIG } from '../config/index.js';
 import { scrapeSite } from '../scrapers/index.js';
-import { buildClonedHtmlArticle } from './articleTemplate.js';
+import { buildClonedHtmlArticle, generateComprehensiveArticle } from './articleTemplate.js';
 import { cloneAuthenticArticle } from '../scrapers/articleCloner.js';
 import { detectPostCategory } from '../scrapers/universalDetector.js';
 import { postToBlogger, fetchAllLiveBloggerPosts } from './bloggerPublisher.js';
@@ -274,31 +274,28 @@ export async function runSyncRoutine() {
             let postTitle = cleanTitle;
             let htmlContent = '';
 
-            if (cloned && cloned.bodyContentHtml) {
+            if (cloned && cloned.bodyContentHtml && cloned.bodyContentHtml.length > 250) {
               postTitle = cloned.title || cleanTitle;
               htmlContent = buildClonedHtmlArticle(cloned, finalBloggerCategory, item.sourceName || feed.name);
-
-              // Update scrapedMap with real media, body content & links for website feed
-              const mapItem = scrapedMap.get(cleanTitle.toLowerCase());
-              if (mapItem) {
-                if (cloned.featuredImage) mapItem.imageUrl = cloned.featuredImage;
-                if (cloned.applyOnlineUrl) mapItem.applyUrl = cloned.applyOnlineUrl;
-                if (cloned.bodyContentHtml) mapItem.bodyContentHtml = cloned.bodyContentHtml;
-              }
             } else {
-              const isJobNotice = finalBloggerCategory.toLowerCase().includes('job') || finalBloggerCategory.toLowerCase().includes('admit');
-              // Clean authentic fallback
-              htmlContent = `
-                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.8; color: #1e293b; max-width: 800px; margin: 0 auto;">
-                  <h2 style="color: #0f172a; margin-bottom: 16px;">${cleanTitle}</h2>
-                  <p style="font-size: 16px; color: #334155; line-height: 1.8;">${item.contentSnippet || cleanTitle}</p>
-                  <div style="margin: 26px 0; text-align: center;">
-                    <a href="${item.link || feed.url}" target="_blank" rel="noopener noreferrer" style="background: #4f46e5; color: #ffffff; padding: 12px 26px; text-decoration: none; border-radius: 10px; font-weight: bold; display: inline-block;">
-                      ${isJobNotice ? '🔗 Open Official Notification & Apply Online' : '📖 Read Full Story on Official Source ➔'}
-                    </a>
-                  </div>
-                </div>
-              `;
+              // High-value, comprehensive editorial post with overview, breakdown, tables, and FAQs
+              htmlContent = generateComprehensiveArticle({
+                title: cleanTitle,
+                category: finalBloggerCategory,
+                sourceName: item.sourceName || feed.name,
+                sourceUrl: item.link || feed.url,
+                snippet: item.contentSnippet || cleanTitle,
+                featuredImage: cloned?.featuredImage || item.imageUrl || '',
+                existingBody: cloned?.bodyContentHtml || '',
+              });
+            }
+
+            // Update scrapedMap with real media, body content & links for website feed
+            const mapItem = scrapedMap.get(cleanTitle.toLowerCase());
+            if (mapItem) {
+              if (cloned?.featuredImage) mapItem.imageUrl = cloned.featuredImage;
+              if (cloned?.applyOnlineUrl) mapItem.applyUrl = cloned.applyOnlineUrl;
+              mapItem.bodyContentHtml = htmlContent;
             }
 
 

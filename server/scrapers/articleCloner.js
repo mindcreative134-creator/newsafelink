@@ -16,18 +16,37 @@ export async function cloneAuthenticArticle(articleUrl, defaultCategory = 'Lates
   }
 
   try {
-    const res = await axios.get(articleUrl, {
-      httpsAgent: ipv4Agent,
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8',
-      },
-      timeout: 18000,
-    });
+    let html = '';
+    try {
+      const resp = await fetch(articleUrl, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9',
+        },
+        signal: AbortSignal.timeout(18000),
+      });
+      if (resp.ok) {
+        html = await resp.text();
+      }
+    } catch {}
 
-    const $ = cheerio.load(res.data);
+    if (!html) {
+      const res = await axios.get(articleUrl, {
+        httpsAgent: ipv4Agent,
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9',
+        },
+        timeout: 18000,
+      });
+      html = res.data;
+    }
+
+    const $ = cheerio.load(html);
 
     // 1. Exact Title
     const rawTitle =

@@ -138,31 +138,174 @@ export function generateSarkariArticleHtml(item) {
 }
 
 /**
+ * Generate rich, comprehensive, multi-section article HTML for News, Schemes, Universities, and Tech
+ */
+export function generateComprehensiveArticleHtml(item) {
+  const title = item.title || 'Official Announcement';
+  const category = item.category || 'News & Updates';
+  const org = item.organization || item.sourceName || 'Official Source';
+  const pubDate = item.publishedDate || new Date().toISOString().split('T')[0];
+  const summary = item.summary || item.contentSnippet || `${title} released by ${org}.`;
+  const applyUrl = item.applyUrl || item.sourceUrl || '#';
+
+  const catLower = category.toLowerCase();
+  const textLower = `${title} ${summary}`.toLowerCase();
+
+  const isScheme = catLower.includes('scheme') || catLower.includes('yojana') || textLower.includes('yojana') || textLower.includes('scholarship');
+  const isUniv = catLower.includes('univ') || catLower.includes('admission') || textLower.includes('admission') || textLower.includes('entrance');
+  const isTech = catLower.includes('tech') || textLower.includes('game') || textLower.includes('bgmi') || textLower.includes('download');
+
+  let section1 = 'Key Highlights & Important Details';
+  let section2 = 'Eligibility, Standards & Requirements';
+  let section3 = 'Step-by-Step Procedure';
+  let steps = [
+    `Access the verified official portal using the direct link provided below.`,
+    `Locate the active notification / application section for <strong>${title}</strong>.`,
+    `Review the complete guidelines, criteria, and official brochure.`,
+    `Submit your registration or required verification details as per official instructions.`,
+    `Keep a printed or digital copy of the acknowledgement for future reference.`
+  ];
+
+  if (isScheme) {
+    section1 = 'Scheme Benefits & Financial Assistance';
+    section2 = 'Beneficiary Eligibility & Required Documents';
+    section3 = 'How to Apply for the Scheme';
+    steps = [
+      `Visit the designated welfare or state/central portal.`,
+      `Navigate to the online registration window for <strong>${title}</strong>.`,
+      `Fill in applicant personal, family income, and residential details.`,
+      `Upload essential verification documents (Aadhaar, income/caste certificate, bank account).`,
+      `Submit application and track beneficiary status through the portal.`
+    ];
+  } else if (isUniv) {
+    section1 = 'Academic Programs & Course Intake';
+    section2 = 'Admission Eligibility & Qualifying Criteria';
+    section3 = 'How to Complete Online Admission';
+    steps = [
+      `Go to the official university admission portal.`,
+      `Complete online student registration with basic details.`,
+      `Enter academic scores, qualifying examination details, and course choices.`,
+      `Upload academic certificates, photograph, and signature.`,
+      `Pay the registration fee and download the admission application slip.`
+    ];
+  } else if (isTech) {
+    section1 = 'Features & What’s New';
+    section2 = 'System Requirements & Device Specifications';
+    section3 = 'How to Download / Access';
+    steps = [
+      `Verify device compatibility with minimum operating system requirements.`,
+      `Access the official distribution platform or verified web portal.`,
+      `Initiate setup or account registration following safety guidelines.`,
+      `Complete installation and check for latest patches or updates.`
+    ];
+  }
+
+  return `
+    <div class="comprehensive-article-view space-y-6">
+      <!-- Quick Overview Highlights Card -->
+      <div class="bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900/60 rounded-2xl p-6">
+        <h3 class="text-base font-black text-indigo-900 dark:text-indigo-200 mb-2 font-heading">
+          📢 Overview &amp; Verification Summary
+        </h3>
+        <p class="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+          ${summary}
+        </p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div class="bg-white dark:bg-zinc-900 p-3 rounded-xl border border-indigo-100 dark:border-zinc-800">
+            <span class="text-zinc-400 block text-[10px] font-bold uppercase">Authority</span>
+            <strong class="text-zinc-900 dark:text-zinc-100 font-extrabold line-clamp-1">${org}</strong>
+          </div>
+          <div class="bg-white dark:bg-zinc-900 p-3 rounded-xl border border-indigo-100 dark:border-zinc-800">
+            <span class="text-zinc-400 block text-[10px] font-bold uppercase">Category</span>
+            <strong class="text-indigo-600 dark:text-indigo-400 font-extrabold">${category}</strong>
+          </div>
+          <div class="bg-white dark:bg-zinc-900 p-3 rounded-xl border border-indigo-100 dark:border-zinc-800">
+            <span class="text-zinc-400 block text-[10px] font-bold uppercase">Published</span>
+            <strong class="text-zinc-900 dark:text-zinc-100 font-extrabold">${pubDate}</strong>
+          </div>
+          <div class="bg-white dark:bg-zinc-900 p-3 rounded-xl border border-indigo-100 dark:border-zinc-800">
+            <span class="text-zinc-400 block text-[10px] font-bold uppercase">Status</span>
+            <strong class="text-emerald-600 dark:text-emerald-400 font-extrabold">Active Release</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- In-Depth Section 1 -->
+      <div class="space-y-3">
+        <h3 class="text-lg font-black text-zinc-900 dark:text-white font-heading">
+          📌 ${section1}
+        </h3>
+        <p class="text-base text-zinc-700 dark:text-zinc-300 leading-relaxed">
+          The release regarding <strong>${title}</strong> provides critical updates and guidelines issued by <strong>${org}</strong>. It aims to ensure clear access, verified information, and standard procedures for all interested candidates and readers.
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-sm sm:text-base text-zinc-700 dark:text-zinc-300">
+          <li>Authentic announcement officially circulated under <strong>${org}</strong>.</li>
+          <li>Complete protocols and verified documents are accessible through the designated online gateway.</li>
+          <li>Candidates and readers are advised to check all eligibility requirements before final submission.</li>
+        </ul>
+      </div>
+
+      <!-- In-Depth Section 2 -->
+      <div class="space-y-3 pt-2">
+        <h3 class="text-lg font-black text-zinc-900 dark:text-white font-heading">
+          🎯 ${section2}
+        </h3>
+        <p class="text-sm sm:text-base text-zinc-700 dark:text-zinc-300 leading-relaxed">
+          Before taking action, ensure that you satisfy the prerequisite norms outlined by the governing authority:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-sm sm:text-base text-zinc-700 dark:text-zinc-300">
+          <li>Ensure valid identification, educational certificates, or requisite credentials are kept ready.</li>
+          <li>Adhere strictly to official timelines and deadlines announced by <strong>${org}</strong>.</li>
+          <li>For detailed clauses, refer directly to the verified official documentation linked below.</li>
+        </ul>
+      </div>
+
+      <!-- In-Depth Section 3: Step-by-Step Procedure -->
+      <div class="space-y-3 pt-2">
+        <h3 class="text-lg font-black text-zinc-900 dark:text-white font-heading">
+          📝 ${section3}
+        </h3>
+        <ol class="list-decimal pl-5 space-y-2.5 text-sm sm:text-base text-zinc-700 dark:text-zinc-300">
+          ${steps.map(s => `<li>${s}</li>`).join('')}
+        </ol>
+      </div>
+
+      <!-- Frequently Asked Questions -->
+      <div class="space-y-3 pt-2">
+        <h3 class="text-lg font-black text-zinc-900 dark:text-white font-heading">
+          ❓ Frequently Asked Questions
+        </h3>
+        <div class="space-y-3">
+          <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">
+            <h4 class="text-sm font-bold text-zinc-900 dark:text-white mb-1">What is the status of ${title}?</h4>
+            <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300">The update has been officially confirmed by ${org} and is active for verification and online access.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">
+            <h4 class="text-sm font-bold text-zinc-900 dark:text-white mb-1">Where can I access the direct official link?</h4>
+            <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300">Click the official link button provided below to access the verified source portal directly.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
  * Format a job/RSS/News item into a standard post object for UI consistency
  */
 function formatJobAsPost(item) {
   const posterImg = item.imageUrl || getPostThumbnail(item);
   const cat = (item.category || '').toLowerCase();
   const titleLower = (item.title || '').toLowerCase();
-  const isJob = cat.includes('job') || cat.includes('admit') || cat.includes('result') || cat.includes('scheme') || cat.includes('yojana') || titleLower.includes('recruitment') || titleLower.includes('vacancy');
+  const isJob = cat.includes('job') || cat.includes('admit') || cat.includes('result') || titleLower.includes('recruitment') || titleLower.includes('vacancy');
   
   let contentHtml = '';
-  if (item.bodyContentHtml) {
+  if (item.bodyContentHtml && item.bodyContentHtml.length > 200) {
     contentHtml = item.bodyContentHtml;
   } else if (isJob) {
     contentHtml = generateSarkariArticleHtml(item);
   } else {
-    contentHtml = `
-      <div class="news-body-content text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300 space-y-4">
-        <p>${item.summary || item.title}</p>
-        ${item.sourceUrl ? `
-        <div class="pt-4 mt-6 border-t border-zinc-200 dark:border-zinc-800">
-          <a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-            Read complete coverage on ${item.sourceName || 'source portal'} ➔
-          </a>
-        </div>` : ''}
-      </div>
-    `;
+    contentHtml = generateComprehensiveArticleHtml(item);
   }
 
   return {
