@@ -36,16 +36,16 @@ export default function WpSafelinkBottomSection({ currentPostId }) {
     <div
       id="wpsafegenerate"
       tabIndex="-1"
-      className="w-full my-6 flex flex-col items-center justify-center text-center space-y-3 focus:outline-none"
+      className="w-full my-2 flex flex-col items-center justify-center text-center space-y-1 focus:outline-none"
     >
       
-      {/* ── Top Ad Unit in Bottom Section ── */}
+      {/* ── Top Ad Unit in Bottom Section (Closely Attached) ── */}
       <div className="w-full max-w-[728px] mx-auto overflow-hidden">
-        <AdUnit variant="banner" slot="5930219482" minHeight="100px" />
+        <AdUnit variant="banner" slot="5930219482" minHeight="90px" className="!my-0.5" />
       </div>
 
-      {/* ── Direct Button / Wait Graphic (NO BOX / CARD WRAPPER, NO HELPER TEXT) ── */}
-      <div className="w-full flex flex-col items-center justify-center py-1">
+      {/* ── Direct Button / Wait Graphic (Closely Attached, NO BOX / CARD WRAPPER, NO HELPER TEXT) ── */}
+      <div className="w-full flex flex-col items-center justify-center py-0.5">
         {isWaiting ? (
           <div id="wpsafe-wait2" className="flex flex-col items-center justify-center select-none">
             {/* Official WP-Safelink wait4.png graphic */}
@@ -102,9 +102,9 @@ export default function WpSafelinkBottomSection({ currentPostId }) {
         )}
       </div>
 
-      {/* ── Bottom Ad Unit in Bottom Section ── */}
+      {/* ── Bottom Ad Unit in Bottom Section (Closely Attached) ── */}
       <div className="w-full max-w-[728px] mx-auto overflow-hidden">
-        <AdUnit variant="banner" slot="8301948271" minHeight="100px" />
+        <AdUnit variant="banner" slot="8301948271" minHeight="90px" className="!my-0.5" />
       </div>
 
     </div>

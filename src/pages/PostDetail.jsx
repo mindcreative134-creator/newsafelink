@@ -293,9 +293,12 @@ export default function PostDetail() {
 
             </article>
 
-            {/* Related Articles Feed */}
+            {/* Related Articles Feed with Native In-Feed Ad */}
             {relatedPosts.length > 0 && (
-              <div className="mt-10">
+              <div className="mt-8">
+                <div className="mb-6">
+                  <AdUnit variant="fluid" slot="1909584638" minHeight="120px" />
+                </div>
                 <h3 className="text-base font-bold text-zinc-900 dark:text-white font-heading mb-4 pb-2 border-b border-zinc-200 dark:border-zinc-800">
                   Related Stories &amp; Updates
                 </h3>

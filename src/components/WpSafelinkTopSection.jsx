@@ -41,15 +41,15 @@ export default function WpSafelinkTopSection({ currentPostId }) {
   };
 
   return (
-    <div className="w-full my-4 flex flex-col items-center justify-center text-center space-y-3">
+    <div className="w-full my-2 flex flex-col items-center justify-center text-center space-y-1">
       
-      {/* ── Top Ad Unit ── */}
+      {/* ── Top Ad Unit (Closely Attached) ── */}
       <div className="w-full max-w-[728px] mx-auto overflow-hidden">
-        <AdUnit variant="banner" slot="3056127394" minHeight="100px" />
+        <AdUnit variant="banner" slot="3056127394" minHeight="90px" className="!my-0.5" />
       </div>
 
-      {/* ── Direct Button / Timer (NO BOX / CARD WRAPPER) ── */}
-      <div className="w-full flex flex-col items-center justify-center py-1">
+      {/* ── Direct Button / Timer (Closely Attached, NO BOX / CARD WRAPPER) ── */}
+      <div className="w-full flex flex-col items-center justify-center py-0.5">
         {!canScroll ? (
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-zinc-100 dark:bg-zinc-850 text-zinc-800 dark:text-zinc-100 font-extrabold text-sm shadow-sm select-none">
             <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
@@ -85,9 +85,9 @@ export default function WpSafelinkTopSection({ currentPostId }) {
         )}
       </div>
 
-      {/* ── Bottom Ad Unit ── */}
+      {/* ── Bottom Ad Unit (Closely Attached) ── */}
       <div className="w-full max-w-[728px] mx-auto overflow-hidden">
-        <AdUnit variant="banner" slot="7489201934" minHeight="100px" />
+        <AdUnit variant="banner" slot="7489201934" minHeight="90px" className="!my-0.5" />
       </div>
 
     </div>

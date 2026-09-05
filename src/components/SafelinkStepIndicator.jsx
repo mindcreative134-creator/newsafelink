@@ -3,14 +3,15 @@ import { useSafelink } from '../context/SafelinkContext';
 import { ShieldCheck, Lock, CheckCircle2, ChevronRight, X } from 'lucide-react';
 
 export default function SafelinkStepIndicator() {
-  const { currentStep, isSafelinkActive, clearSafelink } = useSafelink();
+  const { currentStep, isSafelinkActive, clearSafelink, step1Verified } = useSafelink();
 
-  if (!isSafelinkActive || currentStep < 1) return null;
+  // Strictly show for the 3 article transit pages after "I am not a robot"
+  if (!isSafelinkActive || !step1Verified || currentStep < 1 || currentStep > 3) return null;
 
   const stepMeta = [
-    { num: 1, name: 'Human Verification', short: 'Verification' },
-    { num: 2, name: 'Secure Link Generation', short: 'Security Check' },
-    { num: 3, name: 'Link Decryption & Access', short: 'Get Link' },
+    { num: 1, name: 'Verification Check 1', short: 'Step 1' },
+    { num: 2, name: 'Verification Check 2', short: 'Step 2' },
+    { num: 3, name: 'Final Link Generation', short: 'Final Link' },
   ];
 
   const activeMeta = stepMeta.find((s) => s.num === currentStep) || stepMeta[0];

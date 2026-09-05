@@ -85,9 +85,22 @@ export function SafelinkProvider({ children }) {
     setStep3TimerDone(false);
   }, []);
 
-  const markStep1Verified = useCallback(() => {
+  const markStep1Verified = useCallback((navigate) => {
     sessionStorage.setItem('SAFE_S1_VERIFIED', '1');
     setStep1Verified(true);
+    setCurrentStep(1);
+    sessionStorage.setItem('SAFE_STEP', '1');
+
+    // Pick a random real post from live jobs so it looks 100% natural on Page 1 of 3
+    const postsPool = (defaultJobs && defaultJobs.length > 0) ? defaultJobs : [];
+    const chosenPost = (postsPool.length > 0)
+      ? postsPool[Math.floor(Math.random() * postsPool.length)]
+      : { id: 'emrs-teaching-post' };
+
+    if (navigate) {
+      navigate(`/post/${chosenPost.id}?step=1`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }, []);
 
   const goToNextStep = useCallback((navigate, currentPostId = '') => {

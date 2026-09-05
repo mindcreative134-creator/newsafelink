@@ -245,6 +245,10 @@ export default function Home() {
                       </div>
                     </div>
                   </Link>
+                  {/* Ad banner directly after featured lead story */}
+                  <div className="my-5">
+                    <AdUnit variant="fluid" slot="9320506924" minHeight="120px" />
+                  </div>
                 </div>
               )}
 
@@ -315,8 +319,9 @@ export default function Home() {
                         </div>
                       </Link>
 
-                      {idx === 2 && (
-                        <div className="col-span-1 md:col-span-2 lg:col-span-3 my-2">
+                      {/* In-feed ad unit between posts (every 3 posts across all screen sizes) */}
+                      {(idx + 1) % 3 === 0 && (
+                        <div className="col-span-1 md:col-span-2 lg:col-span-3 my-3">
                           <AdUnit variant="fluid" slot="1909584638" minHeight="120px" />
                         </div>
                       )}
