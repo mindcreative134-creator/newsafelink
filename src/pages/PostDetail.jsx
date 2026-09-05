@@ -44,7 +44,7 @@ function PostDetailSkeleton() {
 export default function PostDetail() {
   const { postId } = useParams();
   const navigate = useNavigate();
-  const { currentStep, isSafelinkActive } = useSafelink();
+  const { currentStep, isSafelinkActive, step1Verified } = useSafelink();
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
