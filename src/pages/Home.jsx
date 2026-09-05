@@ -9,6 +9,9 @@ import {
   Search, Lock, CheckCircle2, ChevronRight
 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
+import SafelinkStepIndicator from '../components/SafelinkStepIndicator';
+import RobotVerificationWidget from '../components/RobotVerificationWidget';
+import DualAdContinueSection from '../components/DualAdContinueSection';
 
 function PostCardSkeleton() {
   return (
@@ -34,45 +37,20 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const { startSafelink } = useSafelink();
+  const { currentStep, isSafelinkActive, startSafelink } = useSafelink();
   const navigate = useNavigate();
-
-  // Safelink landing page states
-  const [safelinkTarget, setSafelinkTarget] = useState('');
-  const [showVerification, setShowVerification] = useState(false);
-  const [verifying, setVerifying] = useState(false);
-  const [verified, setVerified] = useState(false);
 
   // Handle Safelink Landing Page Query (?o=... or ?url=...)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const oParam = params.get('o');
-    const urlParam = params.get('url');
+    const urlParam = params.get('url') || params.get('target');
 
     if (oParam || urlParam) {
       const target = oParam ? `https://piko.site.je/?o=${oParam}` : urlParam;
-      setSafelinkTarget(target);
-      setShowVerification(true);
+      startSafelink(target, 1);
     }
-  }, []);
-
-  const handleSafeTransitStart = () => {
-    setVerifying(true);
-    setTimeout(() => {
-      setVerifying(false);
-      setVerified(true);
-      
-      startSafelink(safelinkTarget);
-      
-      getUnifiedPosts({ maxResults: 15 }).then((data) => {
-        if (data.items && data.items.length > 0) {
-          const randomIndex = Math.floor(Math.random() * data.items.length);
-          const randomPost = data.items[randomIndex];
-          navigate(`/post/${randomPost.id}`);
-        }
-      });
-    }, 1200);
-  };
+  }, [startSafelink]);
 
   // Fetch posts
   const fetchPosts = (label = '') => {
@@ -153,97 +131,64 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+      
+      {/* ── Top Step Indicator for SafeLink Transit ── */}
+      {isSafelinkActive && <SafelinkStepIndicator />}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
-        {/* ── Transit Verification Gateway (Only when coming from external safelink) ── */}
-        {showVerification && (
-          <div className="w-full max-w-xl mx-auto my-8 p-6 sm:p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl flex flex-col items-center text-center animate-fadeIn">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4">
-              <Lock className="w-7 h-7" />
-            </div>
-
-            <span className="px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-xs font-bold uppercase tracking-wider mb-2">
-              SafeLink Transit
-            </span>
-
-            <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white font-heading mb-2">
-              Destination Security Check
-            </h2>
-
-            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mb-6 leading-relaxed">
-              Verifying safety protocols. Click below to continue securely to your destination.
-            </p>
-
-            <button
-              onClick={handleSafeTransitStart}
-              disabled={verifying || verified}
-              className="w-full sm:w-auto px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md disabled:opacity-75"
-            >
-              {verifying ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" /> Verifying...
-                </>
-              ) : verified ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-300" /> Verified! Proceeding...
-                </>
-              ) : (
-                <>
-                  <ShieldCheck className="w-4 h-4 text-amber-300" /> Start Safe Transit
-                </>
-              )}
-            </button>
-          </div>
-        )}
-
         {/* ── Clean Portal Header & Search Filter ── */}
-        {!showVerification && (
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-zinc-200/80 dark:border-zinc-800/80">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white font-heading tracking-tight">
+                Latest Articles &amp; Real-Time Updates
+              </h1>
+              <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                Verified news, recruitment notifications, admissions, and citizen welfare updates.
+              </p>
+            </div>
+
+            {/* Clean Inline Search */}
+            <form onSubmit={handleSearchSubmit} className="w-full md:w-80 relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <input
+                type="text"
+                placeholder="Filter or search posts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+              />
+            </form>
+          </div>
+
+          {/* Clean Category Navigation Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto py-3 no-scrollbar">
+            {categoriesTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabClick(tab.id)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200/70 dark:hover:bg-zinc-800'
+                }`}
+              >
+                {tab.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── On-Page Human Verification Widget (Step 1 - Embedded, NO POPUP) ── */}
+        {isSafelinkActive && currentStep === 1 && (
           <div className="mb-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-zinc-200/80 dark:border-zinc-800/80">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white font-heading tracking-tight">
-                  Latest Articles &amp; Real-Time Updates
-                </h1>
-                <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                  Verified news, recruitment notifications, admissions, and citizen welfare updates.
-                </p>
-              </div>
-
-              {/* Clean Inline Search */}
-              <form onSubmit={handleSearchSubmit} className="w-full md:w-80 relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                <input
-                  type="text"
-                  placeholder="Filter or search posts..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
-                />
-              </form>
-            </div>
-
-            {/* Clean Category Navigation Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto py-3 no-scrollbar">
-              {categoriesTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabClick(tab.id)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200/70 dark:hover:bg-zinc-800'
-                  }`}
-                >
-                  {tab.name}
-                </button>
-              ))}
-            </div>
+            <RobotVerificationWidget />
           </div>
         )}
 
-        {/* ── Main Content Area (Editorial Magazine Layout) ── */}
-        {!showVerification && (
-          <div className="flex flex-col lg:flex-row gap-8">
+        {/* ── Main Content Area (Editorial Magazine Layout - Always 100% visible & clickable) ── */}
+        <div className="flex flex-col lg:flex-row gap-8">
             
             {/* Left Feed */}
             <main className="flex-1 min-w-0">
@@ -391,13 +336,19 @@ export default function Home() {
                 </div>
               )}
 
+              {/* Dual Ad Continue Section (Step 1) */}
+              {isSafelinkActive && currentStep === 1 && (
+                <div className="mt-8">
+                  <DualAdContinueSection />
+                </div>
+              )}
+
             </main>
 
             {/* Sidebar Column */}
             <Sidebar />
 
           </div>
-        )}
 
       </div>
     </div>

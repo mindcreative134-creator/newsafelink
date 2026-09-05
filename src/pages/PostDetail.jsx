@@ -4,7 +4,10 @@ import { getPostById } from '../services/postService';
 import { getUnifiedPosts } from '../services/postService';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
-import StepHeader from '../components/StepHeader';
+import SafelinkStepIndicator from '../components/SafelinkStepIndicator';
+import RobotVerificationWidget from '../components/RobotVerificationWidget';
+import WaitingTimerWidget from '../components/WaitingTimerWidget';
+import DualAdContinueSection from '../components/DualAdContinueSection';
 import { 
   Calendar, Clock, User, ArrowRight, ShieldCheck, 
   CheckCircle2, Lock, ExternalLink, ChevronRight, Share2, FileText
@@ -41,20 +44,13 @@ function PostDetailSkeleton() {
 export default function PostDetail() {
   const { postId } = useParams();
   const navigate = useNavigate();
-  const { currentStep, targetUrl, nextStep, clearSafelink } = useSafelink();
+  const { currentStep, isSafelinkActive } = useSafelink();
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [relatedPosts, setRelatedPosts] = useState([]);
   const [copied, setCopied] = useState(false);
-
-  // SafeLink countdown timer state
-  const TOTAL_SECONDS = 15;
-  const [timeLeft, setTimeLeft] = useState(TOTAL_SECONDS);
-  const [timerActive, setTimerActive] = useState(false);
-  const [timerDone, setTimerDone] = useState(false);
-  const timerRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -86,52 +82,6 @@ export default function PostDetail() {
       })
       .catch(() => {});
   }, [postId]);
-
-  // Handle SafeLink Transit Countdown
-  useEffect(() => {
-    if (currentStep > 0 && !timerDone) {
-      setTimeLeft(TOTAL_SECONDS);
-      setTimerActive(true);
-
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current);
-            setTimerActive(false);
-            setTimerDone(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => {
-        if (timerRef.current) clearInterval(timerRef.current);
-      };
-    }
-  }, [currentStep, timerDone]);
-
-  const handleNextStepTransition = () => {
-    nextStep();
-    setTimeLeft(TOTAL_SECONDS);
-    setTimerActive(false);
-    setTimerDone(false);
-
-    getUnifiedPosts({ maxResults: 10 }).then((data) => {
-      if (data.items && data.items.length > 0) {
-        const remaining = data.items.filter((p) => p.id !== postId);
-        const randomPost = remaining[Math.floor(Math.random() * remaining.length)] || data.items[0];
-        navigate(`/post/${randomPost.id}`);
-      }
-    });
-  };
-
-  const handleFinalRedirect = () => {
-    if (targetUrl) {
-      clearSafelink();
-      window.location.href = targetUrl;
-    }
-  };
 
   const handleShare = () => {
     if (navigator.share) {
@@ -184,10 +134,8 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
-      {/* Step Header for SafeLink Transit */}
-      {currentStep > 0 && (
-        <StepHeader timerActive={timerActive} timeLeft={timeLeft} totalTime={TOTAL_SECONDS} />
-      )}
+      {/* Top Step Header for SafeLink Transit */}
+      <SafelinkStepIndicator />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
@@ -268,24 +216,15 @@ export default function PostDetail() {
                 </div>
               )}
 
-              {/* SafeLink Transit Card (only when user came from safelink redirect) */}
-              {currentStep > 0 && (
-                <div className="p-6 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/50 flex flex-col items-center text-center">
-                  <span className="px-3 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider mb-2">
-                    Security Transit Step {currentStep}/3
-                  </span>
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-4">
-                    {timerActive ? `Running security verification (${timeLeft}s remaining)...` : 'Security checks complete.'}
-                  </p>
-                  {!timerActive && (
-                    <button
-                      onClick={currentStep < 3 ? handleNextStepTransition : handleFinalRedirect}
-                      className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-2"
-                    >
-                      {currentStep < 3 ? `Proceed to Step ${currentStep + 1} ➔` : 'Access Secured Link ➔'}
-                    </button>
-                  )}
-                </div>
+              {/* ── SafeLink Security Widgets (Step 1: Robot Verify, Step 2: 8s Timer, Step 3: 5s Timer) ── */}
+              {isSafelinkActive && currentStep === 1 && (
+                <RobotVerificationWidget />
+              )}
+              {isSafelinkActive && currentStep === 2 && (
+                <WaitingTimerWidget initialSeconds={8} stepNumber={2} />
+              )}
+              {isSafelinkActive && currentStep === 3 && (
+                <WaitingTimerWidget initialSeconds={5} stepNumber={3} />
               )}
 
               {/* Native Fluid Ad Unit 1 */}
@@ -349,6 +288,13 @@ export default function PostDetail() {
                       {isRecruitment ? 'Open Official Portal ➔' : 'View Original Source ➔'}
                     </a>
                   </div>
+                </div>
+              )}
+
+              {/* SafeLink Dual Ad Continue Action at the very bottom */}
+              {isSafelinkActive && (
+                <div className="mt-6">
+                  <DualAdContinueSection currentPostId={postId} />
                 </div>
               )}
 
