@@ -58,6 +58,7 @@ export default function WpSafelinkTopSection({ currentPostId }) {
         ) : (
           <a
             href="#wpsafegenerate"
+            data-google-vignette="false"
             onClick={handleScrollToBottom}
             onDoubleClick={handleScrollToBottom}
             className="group inline-flex flex-col items-center cursor-pointer transition-transform hover:scale-105 active:scale-95 focus:outline-none select-none my-0.5"

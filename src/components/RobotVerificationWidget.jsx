@@ -31,6 +31,7 @@ export default function RobotVerificationWidget() {
       <div className="w-full max-w-sm mx-auto py-1">
         <div
           onClick={handleCheckboxClick}
+          data-google-vignette="false"
           className={`w-full p-3.5 rounded-xl border transition-all flex items-center justify-between cursor-pointer shadow-sm ${
             step1Verified
               ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800'

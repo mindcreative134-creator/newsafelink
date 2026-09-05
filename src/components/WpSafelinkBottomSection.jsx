@@ -74,6 +74,7 @@ export default function WpSafelinkBottomSection({ currentPostId }) {
           <div id="wpsafe-link" className="flex flex-col items-center justify-center select-none animate-fadeIn">
             <a
               href="#proceed"
+              data-google-vignette="false"
               onClick={handleBottomClick}
               className="group inline-flex flex-col items-center cursor-pointer transition-transform hover:scale-105 active:scale-95 focus:outline-none"
             >

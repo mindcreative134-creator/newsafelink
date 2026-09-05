@@ -257,6 +257,20 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   margin: 0 !important;
 }
 
+/* Prevent Google AdSense full-screen blank vignette overlay from freezing the viewport */
+html.google-vignette-open,
+body.google-vignette-open {
+  overflow: auto !important;
+  position: static !important;
+}
+
+iframe[id^="aswift_"][width="0"],
+iframe[id^="aswift_"][height="0"],
+iframe[id*="google_ads_iframe"][width="0"],
+iframe[id*="google_ads_iframe"][height="0"] {
+  display: none !important;
+}
+
 /* Typography Headings */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--heading);

@@ -13,6 +13,18 @@ export default function App() {
   const { currentStep } = useSafelink();
   const location = useLocation();
 
+  // Prevent Google AdSense from hijacking page navigation with empty full-screen Vignettes
+  useEffect(() => {
+    const handleGlobalClick = (e) => {
+      const clickable = e.target.closest('a, button, [role="button"]');
+      if (clickable && !clickable.hasAttribute('data-google-vignette')) {
+        clickable.setAttribute('data-google-vignette', 'false');
+      }
+    };
+    document.addEventListener('click', handleGlobalClick, true);
+    return () => document.removeEventListener('click', handleGlobalClick, true);
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
       {/* Dynamic Navigation Header */}
