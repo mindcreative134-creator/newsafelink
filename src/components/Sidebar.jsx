@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPosts } from '../services/bloggerApi';
 import { getPostThumbnail } from '../utils/postThumbnail';
-import { Folder, ShieldCheck, Send, ArrowUpRight, Flame, Sparkles } from 'lucide-react';
+import { Folder, Flame } from 'lucide-react';
 import AdUnit from './AdUnit';
 
 export default function Sidebar({ hideAds = false }) {
@@ -27,120 +27,72 @@ export default function Sidebar({ hideAds = false }) {
   }, []);
 
   return (
-    <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8">
+    <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-6">
       
-      {/* ── Official Trust & Portal Info Widget ── */}
-      <div className="glass-panel-elevated rounded-[28px] p-6 text-zinc-900 dark:text-white shadow-xl relative overflow-hidden border border-indigo-500/25">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-        
-        <div className="flex items-center gap-2 mb-3">
-          <span className="p-1.5 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-            <ShieldCheck className="w-5 h-5 text-amber-400" />
-          </span>
-          <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
-            Official Portal
-          </span>
-        </div>
-
-        <h3 className="text-lg font-black font-heading text-zinc-900 dark:text-white mb-2 leading-tight">
-          SarkariTrend Alerts
+      {/* ── Recent Stories Widget ── */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
+        <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-3.5 pb-2.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center gap-2 font-heading">
+          <Flame className="w-4 h-4 text-indigo-500" /> Recent Stories
         </h3>
-        
-        <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4 font-medium">
-          India's verified intelligence destination for government job vacancy notices, exam dates, admit cards, answer keys, and welfare schemes.
-        </p>
-
-        <div className="flex items-center gap-4 pt-2 border-t border-zinc-200/80 dark:border-indigo-800/60 text-[11px] font-bold text-zinc-600 dark:text-indigo-300">
-          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-radar"></span>
-            100% Genuine
-          </span>
-          <span className="flex items-center gap-1">⚡ Daily Updates</span>
-        </div>
-      </div>
-
-      {/* ── Instant Telegram VIP Join Widget ── */}
-      <div className="btn-shimmer bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[28px] p-6 text-white shadow-lg shadow-blue-600/20 flex flex-col gap-3 relative overflow-hidden">
-        <div className="flex items-center justify-between">
-          <span className="px-3 py-1 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-wider">
-            FREE JOB NOTIFICATIONS
-          </span>
-          <Send className="w-5 h-5 text-blue-200" />
-        </div>
-        <h4 className="text-base font-black font-heading leading-tight">
-          Get Instant Sarkari Alerts on Telegram
-        </h4>
-        <p className="text-xs text-blue-100 font-medium">
-          Never miss an application deadline! Join 250,000+ candidates today.
-        </p>
-        <a
-          href="https://t.me"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-1 px-4 py-2.5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs text-center uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5"
-        >
-          Join Telegram Channel <ArrowUpRight className="w-4 h-4" />
-        </a>
-      </div>
-
-      {/* ── Trending Categories Widget ── */}
-      <div className="glass-panel rounded-[28px] p-6 shadow-sm">
-        <h3 className="text-base font-black text-zinc-900 dark:text-white mb-4 border-b border-zinc-100 dark:border-zinc-800/80 pb-3 flex items-center gap-2 font-heading">
-          <Folder className="w-4.5 h-4.5 text-indigo-500" /> Trending Topics
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <Link
-              key={cat}
-              to={`/category/${encodeURIComponent(cat)}`}
-              className="inline-block px-3 py-1.5 text-xs font-extrabold rounded-xl bg-zinc-100/90 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all hover:scale-105"
-            >
-              {cat}
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Compliant Ad Unit Slot (Mid-Sidebar) ── */}
-      {!hideAds && (
-        <AdUnit variant="sidebar" slot="7317709042" minHeight="250px" />
-      )}
-
-      {/* ── Recent Articles Widget ── */}
-      <div className="glass-panel rounded-[28px] p-6 shadow-sm">
-        <h3 className="text-base font-black text-zinc-900 dark:text-white mb-4 border-b border-zinc-100 dark:border-zinc-800/80 pb-3 flex items-center gap-2 font-heading">
-          <Flame className="w-4.5 h-4.5 text-amber-500" /> Recent Updates
-        </h3>
-        <ul className="flex flex-col gap-4">
-          {recentPosts.map((post) => {
-            const postImg = getPostThumbnail(post);
-            return (
-              <li key={post.id} className="flex gap-3.5 group items-center">
-                <Link to={`/post/${post.id}`} className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 border border-zinc-200/60 dark:border-zinc-800 shadow-sm relative block bg-zinc-100 dark:bg-zinc-800">
-                  <img src={postImg} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-                </Link>
-                <div className="flex flex-col gap-1 min-w-0">
-                  <Link to={`/post/${post.id}`} className="text-xs font-bold text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug transition-colors">
-                    {post.title}
+        <ul className="flex flex-col gap-3.5">
+          {recentPosts.length === 0 ? (
+            <li className="text-xs text-zinc-400 py-2">Loading updates...</li>
+          ) : (
+            recentPosts.map((post) => {
+              const postImg = getPostThumbnail(post);
+              return (
+                <li key={post.id} className="flex gap-3 group items-center">
+                  <Link to={`/post/${post.id}`} className="w-13 h-13 w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-zinc-200/60 dark:border-zinc-800 relative block bg-zinc-100 dark:bg-zinc-800">
+                    <img src={postImg} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                   </Link>
-                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-extrabold uppercase tracking-wider">
-                    {new Date(post.published).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                  </span>
-                </div>
-              </li>
-            );
-          })}
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                    <Link to={`/post/${post.id}`} className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug transition-colors">
+                      {post.title}
+                    </Link>
+                    <span className="text-[10px] text-zinc-400 font-medium">
+                      {new Date(post.published).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                </li>
+              );
+            })
+          )}
         </ul>
       </div>
 
-      {/* ── BiharHelp-Style Sticky Sidebar Ad ── */}
+      {/* ── Trending Categories Widget ── */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
+        <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-3 pb-2.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center gap-2 font-heading">
+          <Folder className="w-4 h-4 text-indigo-500" /> Browse Categories
+        </h3>
+        <div className="flex flex-wrap gap-1.5">
+          {categories.length === 0 ? (
+            ['News', 'Jobs', 'Admit Cards', 'Results', 'Schemes', 'Technology'].map((cat) => (
+              <Link
+                key={cat}
+                to={`/category/${encodeURIComponent(cat)}`}
+                className="inline-block px-2.5 py-1 text-xs font-medium rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+              >
+                {cat}
+              </Link>
+            ))
+          ) : (
+            categories.map((cat) => (
+              <Link
+                key={cat}
+                to={`/category/${encodeURIComponent(cat)}`}
+                className="inline-block px-2.5 py-1 text-xs font-medium rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+              >
+                {cat}
+              </Link>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* ── Compliant Single Ad Slot ── */}
       {!hideAds && (
-        <AdUnit
-          variant="sticky-sidebar"
-          slot="1909584638"
-          minHeight="300px"
-          className="mt-2"
-        />
+        <AdUnit variant="sidebar" slot="7317709042" minHeight="250px" />
       )}
 
     </aside>

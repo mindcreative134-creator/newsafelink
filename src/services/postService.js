@@ -138,27 +138,49 @@ export function generateSarkariArticleHtml(item) {
 }
 
 /**
- * Format a job/RSS item into a standard post object for UI consistency
+ * Format a job/RSS/News item into a standard post object for UI consistency
  */
 function formatJobAsPost(item) {
   const posterImg = item.imageUrl || getPostThumbnail(item);
-  const contentHtml = generateSarkariArticleHtml(item);
+  const cat = (item.category || '').toLowerCase();
+  const titleLower = (item.title || '').toLowerCase();
+  const isJob = cat.includes('job') || cat.includes('admit') || cat.includes('result') || cat.includes('scheme') || cat.includes('yojana') || titleLower.includes('recruitment') || titleLower.includes('vacancy');
+  
+  let contentHtml = '';
+  if (item.bodyContentHtml) {
+    contentHtml = item.bodyContentHtml;
+  } else if (isJob) {
+    contentHtml = generateSarkariArticleHtml(item);
+  } else {
+    contentHtml = `
+      <div class="news-body-content text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300 space-y-4">
+        <p>${item.summary || item.title}</p>
+        ${item.sourceUrl ? `
+        <div class="pt-4 mt-6 border-t border-zinc-200 dark:border-zinc-800">
+          <a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+            Read complete coverage on ${item.sourceName || 'source portal'} ➔
+          </a>
+        </div>` : ''}
+      </div>
+    `;
+  }
 
   return {
     id: item.id,
     title: item.title,
     thumbnail: posterImg,
     imageUrl: posterImg,
-    content: `<img src="${posterImg}" alt="${item.title}" class="w-full rounded-2xl mb-6 object-cover aspect-video shadow-lg border border-slate-200 dark:border-slate-800" />` + contentHtml,
+    content: contentHtml,
     published: item.publishedDate || new Date().toISOString(),
     updated: item.publishedDate || new Date().toISOString(),
-    labels: [item.category, item.organization || 'Sarkari Update'],
-    isSarkariJob: true,
-    sourceName: item.sourceName || item.organization || 'Official Portal',
+    labels: [item.category || 'News & Updates', item.sourceName || item.organization || 'Verified Source'],
+    isSarkariJob: isJob,
+    sourceName: item.sourceName || item.organization || 'Verified Source',
     sourceUrl: item.sourceUrl || item.applyUrl || '',
     rawJob: item,
   };
 }
+
 
 /**
  * Get single post by ID (Checking Blogger API or local/RSS/scraped Sarkari repository)

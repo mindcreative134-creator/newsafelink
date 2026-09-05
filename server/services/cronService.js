@@ -217,7 +217,7 @@ export async function runSyncRoutine() {
           const key = cleanTitle.toLowerCase();
           if (!scrapedMap.has(key)) {
             const cleanSlug = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 45);
-            const { category: detectedCat, badge: detectedBadge } = detectPostCategory(cleanTitle, item.contentSnippet || '');
+            const { category: detectedCat, badge: detectedBadge } = detectPostCategory(cleanTitle, item.contentSnippet || '', feed);
             const postCategory = (!feed.category || feed.category.includes('Auto Detect')) ? detectedCat : (item.category || feed.category || detectedCat);
             const postBadge = item.badge || detectedBadge;
 
@@ -229,15 +229,15 @@ export async function runSyncRoutine() {
               sourceName: item.sourceName || feed.name,
               sourceUrl: item.link || feed.url,
               originalPostUrl: item.link || feed.url,
-              totalPosts: 'Refer to Official Notice',
-              qualification: 'As per Official Notice / Brochure',
-              lastDate: 'Online Application / Notice Active',
+              totalPosts: 'Refer to Source Notice',
+              qualification: 'As per Official Guidelines',
+              lastDate: 'Active',
               status: 'Active',
               badge: postBadge,
               applyUrl: item.link || feed.url,
               summary: item.contentSnippet || `${postCategory} update from ${feed.name}: ${cleanTitle}`,
               publishedDate: new Date().toISOString().split('T')[0],
-              ageLimit: 'As per official recruitment/admission norms',
+              ageLimit: 'As per official norms',
               imageUrl: item.imageUrl || '',
               isScrapedLive: true,
               fetchedAt: new Date().toISOString(),
@@ -264,10 +264,10 @@ export async function runSyncRoutine() {
               continue;
             }
 
-            const { category: postCat } = detectPostCategory(cleanTitle, item.contentSnippet || '');
+            const { category: postCat } = detectPostCategory(cleanTitle, item.contentSnippet || '', feed);
             const finalBloggerCategory = (!feed.category || feed.category.includes('Auto Detect')) ? postCat : (feed.category || postCat);
 
-            logEvent(`Cloning 100% authentic article & media for: "${cleanTitle}" from ${feed.name}...`);
+            logEvent(`Cloning authentic article & media for: "${cleanTitle}" from ${feed.name}...`);
             const cloned = await cloneAuthenticArticle(item.link || feed.url, finalBloggerCategory);
 
             let postTitle = cleanTitle;
@@ -277,26 +277,29 @@ export async function runSyncRoutine() {
               postTitle = cloned.title || cleanTitle;
               htmlContent = buildClonedHtmlArticle(cloned, finalBloggerCategory, item.sourceName || feed.name);
 
-              // Update scrapedMap with real media & links for website feed
+              // Update scrapedMap with real media, body content & links for website feed
               const mapItem = scrapedMap.get(cleanTitle.toLowerCase());
               if (mapItem) {
                 if (cloned.featuredImage) mapItem.imageUrl = cloned.featuredImage;
                 if (cloned.applyOnlineUrl) mapItem.applyUrl = cloned.applyOnlineUrl;
+                if (cloned.bodyContentHtml) mapItem.bodyContentHtml = cloned.bodyContentHtml;
               }
             } else {
+              const isJobNotice = finalBloggerCategory.toLowerCase().includes('job') || finalBloggerCategory.toLowerCase().includes('admit');
               // Clean authentic fallback
               htmlContent = `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.8; color: #1e293b; max-width: 800px; margin: 0 auto;">
-                  <h2 style="color: #0f172a;">${cleanTitle}</h2>
-                  <p style="font-size: 15px; color: #334155;">${item.contentSnippet || cleanTitle}</p>
-                  <div style="margin: 24px 0; text-align: center;">
-                    <a href="${item.link || feed.url}" target="_blank" rel="noopener noreferrer" style="background: #2563eb; color: #ffffff; padding: 12px 26px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
-                      🔗 Open Official Notification & Apply Online
+                  <h2 style="color: #0f172a; margin-bottom: 16px;">${cleanTitle}</h2>
+                  <p style="font-size: 16px; color: #334155; line-height: 1.8;">${item.contentSnippet || cleanTitle}</p>
+                  <div style="margin: 26px 0; text-align: center;">
+                    <a href="${item.link || feed.url}" target="_blank" rel="noopener noreferrer" style="background: #4f46e5; color: #ffffff; padding: 12px 26px; text-decoration: none; border-radius: 10px; font-weight: bold; display: inline-block;">
+                      ${isJobNotice ? '🔗 Open Official Notification & Apply Online' : '📖 Read Full Story on Official Source ➔'}
                     </a>
                   </div>
                 </div>
               `;
             }
+
 
             try {
               const pubResult = await postToBlogger(postTitle, htmlContent, feed.labels || [finalBloggerCategory]);

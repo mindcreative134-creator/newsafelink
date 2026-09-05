@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { isValidSarkariPost } from './index.js';
+import { isValidPost } from './index.js';
 import { logEvent } from '../utils/logger.js';
 
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
@@ -24,10 +24,24 @@ export function cleanSiteUrl(inputUrl) {
 }
 
 /**
- * Intelligent Post Category Classifier based on title & snippet keywords
+ * Intelligent Universal Post Category Classifier based on title, snippet, and site context
  */
-export function detectPostCategory(title = '', snippet = '') {
+export function detectPostCategory(title = '', snippet = '', siteConfig = {}) {
   const text = `${title} ${snippet}`.toLowerCase();
+
+  // If site config has an explicit specific category (and not Auto Detect), prioritize it
+  if (siteConfig.category && !siteConfig.category.includes('Auto Detect')) {
+    const cat = siteConfig.category;
+    let badge = 'UPDATE';
+    if (cat.toLowerCase().includes('job')) badge = 'JOB';
+    else if (cat.toLowerCase().includes('admit')) badge = 'ADMIT';
+    else if (cat.toLowerCase().includes('result')) badge = 'RESULT';
+    else if (cat.toLowerCase().includes('scheme') || cat.toLowerCase().includes('yojana')) badge = 'YOJANA';
+    else if (cat.toLowerCase().includes('univ')) badge = 'UNIV';
+    else if (cat.toLowerCase().includes('news')) badge = 'NEWS';
+    else if (cat.toLowerCase().includes('tech')) badge = 'TECH';
+    return { category: cat, badge };
+  }
 
   // 1. Admit Cards / Hall Tickets
   if (
@@ -99,9 +113,75 @@ export function detectPostCategory(title = '', snippet = '') {
     return { category: 'University & Admissions', badge: 'UNIV' };
   }
 
-  // 5. Default: Latest Jobs / Recruitment
-  return { category: 'Latest Jobs', badge: 'JOB' };
+  // 5. Technology, AI & Gadgets
+  if (
+    text.includes('technology') ||
+    text.includes('gadget') ||
+    text.includes('smartphone') ||
+    text.includes('iphone') ||
+    text.includes('android') ||
+    text.includes('ai ') ||
+    text.includes('artificial intelligence') ||
+    text.includes('software') ||
+    text.includes('cyber') ||
+    text.includes('app') ||
+    text.includes('google') ||
+    text.includes('microsoft') ||
+    text.includes('apple')
+  ) {
+    return { category: 'Technology', badge: 'TECH' };
+  }
+
+  // 6. Business, Finance & Markets
+  if (
+    text.includes('share market') ||
+    text.includes('stock market') ||
+    text.includes('sensex') ||
+    text.includes('nifty') ||
+    text.includes('gold price') ||
+    text.includes('petrol price') ||
+    text.includes('rbi') ||
+    text.includes('crypto') ||
+    text.includes('economy') ||
+    text.includes('business')
+  ) {
+    return { category: 'Business & Economy', badge: 'BIZ' };
+  }
+
+  // 7. Sports & Cricket
+  if (
+    text.includes('cricket') ||
+    text.includes('ipl') ||
+    text.includes('match') ||
+    text.includes('team india') ||
+    text.includes('t20') ||
+    text.includes('world cup') ||
+    text.includes('bcci') ||
+    text.includes('football') ||
+    text.includes('olympics')
+  ) {
+    return { category: 'Sports', badge: 'SPORTS' };
+  }
+
+  // 8. Jobs & Recruitment
+  if (
+    text.includes('recruitment') ||
+    text.includes('bharti') ||
+    text.includes('भर्ती') ||
+    text.includes('vacancy') ||
+    text.includes('vacancies') ||
+    text.includes('post') ||
+    text.includes('online form') ||
+    text.includes('apply online') ||
+    text.includes('job')
+  ) {
+    return { category: 'Latest Jobs', badge: 'JOB' };
+  }
+
+  // 9. General News / Current Affairs (Default for media & news sites)
+  return { category: 'News & Updates', badge: 'NEWS' };
 }
+
 
 /**
  * 1-Click Site Auto-Detector:
@@ -191,10 +271,10 @@ export async function autoDetectSite(rawUrl) {
         }
       }
 
-      // 3. Count potential genuine recruitment links on page
+      // 3. Count potential genuine article / post links on page
       $('a').each((_, el) => {
         const text = $(el).text().trim();
-        if (isValidSarkariPost(text)) {
+        if (isValidPost(text)) {
           samplePostsFound++;
         }
       });
@@ -209,14 +289,14 @@ export async function autoDetectSite(rawUrl) {
     feedUrl,
     type: detectedType,
     category: 'Auto Detect (Multi-Category)',
-    labels: [siteName, 'Sarkari Update', 'Govt Recruitment'],
+    labels: [siteName, 'News & Updates', 'Latest Updates'],
     samplePostsFound,
   };
 }
 
 /**
  * Universal Smart HTML Post Extractor:
- * Extracts genuine recruitment and government update posts from any website HTML
+ * Extracts genuine articles, news stories, and notices from any website HTML
  */
 export async function scrapeGenericHtml(siteConfig) {
   const targetUrl = siteConfig.url;
@@ -237,7 +317,7 @@ export async function scrapeGenericHtml(siteConfig) {
       const text = $(el).text().replace(/\s+/g, ' ').trim();
       const href = $(el).attr('href');
 
-      if (!text || !href || !isValidSarkariPost(text)) return;
+      if (!text || !href || !isValidPost(text, siteConfig)) return;
 
       let fullUrl = href;
       if (!fullUrl.startsWith('http')) {
@@ -265,13 +345,13 @@ export async function scrapeGenericHtml(siteConfig) {
         }
       }
 
-      // Detect post category automatically
-      const { category, badge } = detectPostCategory(text);
+      // Detect post category automatically with siteConfig context
+      const { category, badge } = detectPostCategory(text, '', siteConfig);
 
       results.push({
         title: text,
         link: fullUrl,
-        category,
+        category: (!siteConfig.category || siteConfig.category.includes('Auto Detect')) ? category : (siteConfig.category || category),
         badge,
         imageUrl,
         sourceName: siteConfig.name,
@@ -287,3 +367,4 @@ export async function scrapeGenericHtml(siteConfig) {
     return [];
   }
 }
+

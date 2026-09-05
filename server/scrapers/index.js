@@ -8,22 +8,24 @@ import { scrapeGenericHtml, detectPostCategory } from './universalDetector.js';
 import { logEvent } from '../utils/logger.js';
 
 /**
- * Strict Quality Filter: Rejects menu items, navigation labels, and crime/negative news.
- * Guarantees that only genuine government recruitment, admission, and scheme notices pass.
+ * Universal Quality Filter: Rejects website navigation labels, menu items, footer links, and spam.
+ * Allows genuine news articles, editorial posts, technology updates, and recruitment/education notices.
  */
-export function isValidSarkariPost(title) {
+export function isValidPost(title, siteConfig = {}) {
   if (!title || typeof title !== 'string') return false;
   const t = title.toLowerCase().trim();
 
-  // 1. Length constraint (allow short titles like "UP Scholarship" or "UPSC CMS 2026")
-  if (t.length < 10 || t.length > 250) return false;
+  // 1. Length constraint (allow headlines from 8 to 280 characters)
+  if (t.length < 8 || t.length > 280) return false;
 
-  // 2. Reject website navigation & category menu labels
+  // 2. Reject website navigation, category menu labels, and footer boilerplate
   const menuBlacklist = [
     'all india jobs',
     'latest job',
     'latest jobs',
     'home',
+    'homepage',
+    'main menu',
     'admit card',
     'admit cards',
     'result',
@@ -33,90 +35,71 @@ export function isValidSarkariPost(title) {
     'admission',
     'admissions',
     'contact us',
+    'contact',
     'about us',
+    'about',
     'privacy policy',
+    'privacy',
     'disclaimer',
     'terms and conditions',
     'term & condition',
+    'terms of service',
     'view all',
     'click here',
     'view more',
+    'read more',
     'trending now',
     'quick links',
+    'important links',
+    'login',
+    'sign in',
+    'sign up',
+    'register',
+    'subscribe',
+    'newsletter',
+    'search',
+    'advertise with us',
+    'feedback',
+    'sitemap',
+    'cookie policy',
+    'all rights reserved',
+    'follow us',
+    'join telegram',
+    'whatsapp group',
+    'download app',
   ];
   if (menuBlacklist.includes(t)) return false;
 
-  // 3. Reject Crime / Negative / Non-Job News (unless it is a legitimate recruitment / exam term)
-  const isRecruitmentPost = t.includes('recruitment') || t.includes('bharti') || t.includes('result') || 
-                            t.includes('admit card') || t.includes('vacancy') || t.includes('post') || 
-                            t.includes('warder') || t.includes('jailor') || t.includes('exam');
-
-  if (!isRecruitmentPost) {
-    const crimeBlacklist = [
-      'arrest',
-      'arrested',
-      'rape',
-      'raped',
-      'murder',
-      'crime',
-      'blast',
-      'fraud',
-      'scam',
-      'digital arrest',
-      'killed',
-      'police custody',
-      'extortion',
-      'assault',
-      'terror',
-      'suicide',
-      'cyber fraud',
-    ];
-    if (crimeBlacklist.some((word) => t.includes(word))) return false;
+  // Reject generic action labels with few words
+  const words = t.split(/\s+/).filter(Boolean);
+  if (words.length <= 2 && (
+    t.includes('click') || t.includes('here') || t.includes('more') || 
+    t.includes('view') || t.includes('menu') || t.includes('category')
+  )) {
+    return false;
   }
 
-  // 4. Must contain genuine government recruitment / exam / university / scheme keywords
-  const validKeywords = [
-    // Recruitment & Jobs
-    'recruitment', 'bharti', 'भर्ती', 'vacancy', 'vacancies', 'posts', 'पद', 
-    'online form', 'apply online', 'online apply', 'notification', 'admit card', 
-    'result', 'रिजल्ट', 'answer key', 'scorecard', 'score card', 'cutoff', 'cut off', 
-    'apprentice', 'officer', 'constable', 'cgl', 'chsl', 'upsc', 'bpsc', 'bssc', 'csbc', 
-    'ssc', 'rrb', 'railway', 'gds', 'ctet', 'tet', 'jee', 'neet', 'police', 'army', 
-    'navy', 'airforce', 'agniveer', 'bank', 'sbi', 'ibps', 'inter', 'matric', 'clerk', 
-    'teacher', 'warder', 'jailor', 'prahari', 'dsssb', 'rpsc', 'oicl', 'lic', 'nabard', 
-    'aiims', 'epfo', 'drdo', 'isro', 'walk-in', 'walk in', 'interview',
+  // 3. For specialized recruitment sites (sarkariresult, freejobalert), ensure relevance
+  const siteUrl = (siteConfig.url || '').toLowerCase();
+  const isDedicatedRecruitmentSite = siteUrl.includes('sarkariresult') || siteUrl.includes('freejobalert');
 
-    // University & Academic Updates (Munger, Bihar Universities, UG/PG, B.Ed)
-    'university', 'vishwavidyalaya', 'विश्वविद्यालय', 'munger', 'patna', 'lnmu', 'vksu', 
-    'magadh', 'brabu', 'purnea', 'tmbu', 'bnmu', 'ppu', 'ignou', 'du', 'bhu', 'jnu', 
-    'aktu', 'ccsu', 'prsu', 'college', 'degree', 'ug', 'pg', 'semester', 'session', 
-    'part 1', 'part 2', 'part 3', 'ba', 'bsc', 'bcom', 'ma', 'msc', 'mcom', 'bed', 
-    'b.ed', 'deled', 'd.el.ed', 'bceceb', 'counselling', 'counseling', 'choice filling', 
-    'seat allotment', 'allotment', 'provisional', 'migration', 'certificate', 'marksheet', 
-    'merit list', 'merit', 'timetable', 'routine', 'exam date', 'date sheet', 'syllabus', 
-    'admission', 'entrance', 'iti', 'polytechnic', 'bseb', 'cbse', 'board', 'b.tech', 
-    'diploma', 'registration', 'transcript', 'city slip', 'city details', 'city intimation', 
-    'intimation slip', 'slip', 're-exam', 're exam', 'dossier', 'e-dossier', 'panjiyan', 'पंजीयन',
+  if (isDedicatedRecruitmentSite) {
+    const isRecruitmentPost = t.includes('recruitment') || t.includes('bharti') || t.includes('result') || 
+                              t.includes('admit card') || t.includes('vacancy') || t.includes('post') || 
+                              t.includes('warder') || t.includes('jailor') || t.includes('exam') ||
+                              t.includes('online form') || t.includes('apply') || t.includes('answer key');
+    return isRecruitmentPost;
+  }
 
-    // Government Schemes, Portals & Citizen Welfare
-    'yojana', 'योजना', 'scheme', 'pension', 'subsidy', 'scholarship', 'छात्रवृत्ति', 
-    'kisan', 'ration', 'राशन', 'pds', 'ayushman', 'loan', 'samman nidhi', 'fasal bima', 
-    'udyami', 'beneficiary', 'awas', 'pmaw', 'eshram', 'e-shram', 'job card', 'nrega', 
-    'mgnrega', 'card', 'कार्ड', 'voter', 'epic', 'driving licence', 'driving license', 
-    'licence', 'license', 'rojgar', 'रोजगार', 'rojgar mela', 'mela', 'मेला', 'complaint', 
-    'sahyog', 'portal', 'csc', 'rtps', 'caste certificate', 'income certificate', 
-    'निवास', 'जाति', 'आय', 'medhasoft', 'nsp',
-
-    // General Exam & News Updates
-    'notice', 'circular', 'order', 'guidelines', 'update', 'alert', 'press note', 
-    'announcement', 'programme', 'schedule', 'exam', 'examination', 'परीक्षा', 'आवेदन', 'फॉर्म'
-  ];
-
-  return validKeywords.some((k) => t.includes(k));
+  // 4. Universal validation: passes if it resembles a genuine headline or article notice
+  return true;
 }
 
+// Backwards compatibility alias
+export const isValidSarkariPost = isValidPost;
+
 /**
- * Dispatch scraper based on site type or domain with strict filtering
+ * Dispatch scraper based on site type or domain with smart universal filtering
  */
 export async function scrapeSite(siteConfig) {
   const url = (siteConfig.url || '').toLowerCase();
@@ -148,18 +131,18 @@ export async function scrapeSite(siteConfig) {
       rawItems = await scrapeGenericHtml(siteConfig);
     }
 
-    // 2. Strict Quality & Authenticity Filter + Dynamic Category Assignment
+    // 2. Smart Quality & Category Assignment
     const verifiedItems = rawItems
       .filter((item) => {
-        const isValid = isValidSarkariPost(item.title);
+        const isValid = isValidPost(item.title, siteConfig);
         if (!isValid) {
-          logEvent(`Filtered out non-recruitment or menu item: "${item.title}"`, 'info');
+          logEvent(`Filtered out navigation/menu item: "${item.title}"`, 'info');
         }
         return isValid;
       })
       .map((item) => {
         // Automatically determine per-post category & badge from title/snippet
-        const detected = detectPostCategory(item.title, item.contentSnippet || '');
+        const detected = detectPostCategory(item.title, item.contentSnippet || '', siteConfig);
         return {
           ...item,
           category: (!siteConfig.category || siteConfig.category.includes('Auto Detect')) 
@@ -169,10 +152,11 @@ export async function scrapeSite(siteConfig) {
         };
       });
 
-    logEvent(`[Quality Filter] ${verifiedItems.length} of ${rawItems.length} items verified as genuine recruitment posts for ${siteConfig.name}`);
+    logEvent(`[Ingestion Filter] ${verifiedItems.length} of ${rawItems.length} items verified for ${siteConfig.name}`);
     return verifiedItems;
   } catch (err) {
     logEvent(`Scraping failed for "${siteConfig.name}": ${err.message}`, 'error');
     return [];
   }
 }
+
