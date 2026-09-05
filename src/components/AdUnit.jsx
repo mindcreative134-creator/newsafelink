@@ -161,31 +161,23 @@ export default function AdUnit({
 
   return (
     <div
-      className={`ad-container-biharhelp my-3 w-full flex flex-col items-center justify-center ${
+      className={`ad-container-biharhelp my-2 w-full flex flex-col items-center justify-center ${
         isSticky ? 'sticky top-20 z-20' : ''
       } ${className}`}
       style={{ minHeight: finalMinHeight, ...style }}
     >
-      {showLabel && (
-        <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1 select-none flex items-center gap-1">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500/80 animate-pulse"></span>
-          <span>Sponsored Advertisement</span>
-        </div>
-      )}
-      <div
-        className={`ad-unit-inner w-full ${containerMaxW} overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 transition-all shadow-sm hover:shadow-md`}
-      >
+      <div className={`ad-unit-inner w-full ${containerMaxW} overflow-hidden text-center`}>
         <ins ref={insRef} {...insProps} />
 
-        {/* High-CTR Interactive Fallback Card (renders when AdSense hasn't served, ensuring 100% clickable ads & revenue) */}
+        {/* High-CTR Clean Natural Ad Card (renders when AdSense hasn't served) */}
         {showFallback && (
           <a
             href={selectedAd.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex flex-col sm:flex-row items-center gap-3.5 p-3 rounded-xl bg-gradient-to-br from-indigo-50/50 via-white to-amber-50/30 dark:from-zinc-800/80 dark:via-zinc-900 dark:to-zinc-800/50 border border-indigo-100 dark:border-zinc-700/60 hover:border-indigo-300 dark:hover:border-indigo-500 transition-all text-left w-full cursor-pointer"
+            className="group flex flex-col sm:flex-row items-center gap-3.5 p-3 rounded-xl bg-zinc-50/70 hover:bg-zinc-100/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-850/80 transition-all text-left w-full cursor-pointer"
           >
-            <div className="w-full sm:w-28 h-20 shrink-0 overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800 relative">
+            <div className="w-full sm:w-28 h-20 shrink-0 overflow-hidden rounded-lg bg-zinc-200 dark:bg-zinc-800 relative">
               <img
                 src={selectedAd.img}
                 alt={selectedAd.title}
@@ -210,7 +202,7 @@ export default function AdUnit({
               </div>
 
               <div className="mt-2 flex items-center justify-between">
-                <span className="text-[10px] font-semibold text-zinc-400">Verified Partner</span>
+                <span className="text-[10px] font-semibold text-zinc-400">Sponsored</span>
                 <span className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold uppercase tracking-wider group-hover:bg-indigo-700 shadow-sm transition-colors">
                   {selectedAd.cta}
                 </span>

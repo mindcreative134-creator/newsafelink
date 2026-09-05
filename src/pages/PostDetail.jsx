@@ -217,15 +217,8 @@ export default function PostDetail() {
                 </div>
               )}
 
-              {/* ── WP-Safelink Flow: Step 3 Final Access Gateway ("Smile Please!") ── */}
-              {isSafelinkActive && currentStep === 3 && (
-                <div className="mb-8">
-                  <FinalGatewayStep />
-                </div>
-              )}
-
-              {/* ── WP-Safelink Flow: Step 1 Verify & Step 2 Top Waiting/Generate Section ── */}
-              {isSafelinkActive && (currentStep === 1 || currentStep === 2) && (
+              {/* ── WP-Safelink 3-Page Flow: Top Section (Ad -> Timer -> Continue -> Ad) ── */}
+              {isSafelinkActive && currentStep >= 1 && currentStep <= 3 && (
                 <WpSafelinkTopSection currentPostId={postId} />
               )}
 
@@ -293,16 +286,9 @@ export default function PostDetail() {
                 </div>
               )}
 
-              {/* ── WP-Safelink Flow: Step 2 Bottom Section (#wpsafegenerate: wait4 -> target4) ── */}
-              {isSafelinkActive && currentStep === 2 && (
+              {/* ── WP-Safelink 3-Page Flow: Bottom Section (Ad -> Wait -> Action Button -> Ad) ── */}
+              {isSafelinkActive && currentStep >= 1 && currentStep <= 3 && (
                 <WpSafelinkBottomSection currentPostId={postId} />
-              )}
-
-              {/* ── Step 1 Bottom Dual-Ad Section ── */}
-              {isSafelinkActive && currentStep === 1 && (
-                <div className="mt-6">
-                  <DualAdContinueSection currentPostId={postId} />
-                </div>
               )}
 
             </article>
