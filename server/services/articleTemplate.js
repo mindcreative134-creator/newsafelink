@@ -1,9 +1,43 @@
 /**
- * Universal AdSense-Compliant HTML Article Builder
- * Dynamically builds:
- * 1. Editorial / News layout for general news, technology, sports, business, and editorial stories
- * 2. Official Recruitment layout for government jobs, admit cards, exam results, and schemes
+ * Curated High-Definition Topic Banner Image Provider
+ * Guarantees that 100% of posts sent to Blogger and the site always have a valid image
+ * for automatic Blogger thumbnail generation and visual reader engagement.
  */
+export function getCategoryBannerImage(title = '', category = '') {
+  const t = (title || '').toLowerCase();
+  const c = (category || '').toLowerCase();
+  const combined = `${t} ${c}`;
+
+  if (combined.includes('bgmi') || combined.includes('freefire') || combined.includes('game') || combined.includes('gaming') || combined.includes('esport')) {
+    return 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&h=630&q=80';
+  }
+  if (combined.includes('tech') || combined.includes('gadget') || combined.includes('phone') || combined.includes('software') || combined.includes('ai') || combined.includes('scam') || combined.includes('cyber') || combined.includes('fraudster')) {
+    return 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&h=630&q=80';
+  }
+  if (combined.includes('baaghi') || combined.includes('movie') || combined.includes('cinema') || combined.includes('film') || combined.includes('trailer') || combined.includes('actor') || combined.includes('actress')) {
+    return 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&h=630&q=80';
+  }
+  if (combined.includes('result') || combined.includes('score') || combined.includes('marks') || combined.includes('merit') || combined.includes('cutoff')) {
+    return 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&h=630&q=80';
+  }
+  if (combined.includes('admit') || combined.includes('hall ticket') || combined.includes('exam date')) {
+    return 'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?auto=format&fit=crop&w=1200&h=630&q=80';
+  }
+  if (combined.includes('admission') || combined.includes('university') || combined.includes('college') || combined.includes('munger') || combined.includes('llb') || combined.includes('ug') || combined.includes('pg') || combined.includes('bed') || combined.includes('certificate fee')) {
+    return 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&h=630&q=80';
+  }
+  if (combined.includes('scheme') || combined.includes('yojana') || combined.includes('scholarship') || combined.includes('nfobc') || combined.includes('kisan') || combined.includes('dbt')) {
+    return 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&h=630&q=80';
+  }
+  if (combined.includes('job') || combined.includes('recruitment') || combined.includes('bharti') || combined.includes('vacancy') || combined.includes('assistant') || combined.includes('officer') || combined.includes('clerk') || combined.includes('apprentice')) {
+    return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&h=630&q=80';
+  }
+  if (combined.includes('sport') || combined.includes('cricket') || combined.includes('ipl') || combined.includes('football')) {
+    return 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&h=630&q=80';
+  }
+  // Default news/media fallback
+  return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1200&h=630&q=80';
+}
 
 export function buildClonedHtmlArticle(clonedData, siteCategory = 'News & Updates', sourceName = 'Official Source') {
   const {
@@ -43,6 +77,9 @@ export function buildClonedHtmlArticle(clonedData, siteCategory = 'News & Update
   const pdfLink = notificationPdfUrl || '';
   const officialLink = officialWebsiteUrl || applyLink;
   const renderedTables = tablesHtml.slice(0, 3).join('\n');
+  const finalBanner = (featuredImage && typeof featuredImage === 'string' && featuredImage.startsWith('http'))
+    ? featuredImage
+    : getCategoryBannerImage(title, siteCategory);
 
   // ─────────────────────────────────────────────────────────────
   // 1. RECRUITMENT & EXAM ARTICLE TEMPLATE
@@ -51,11 +88,10 @@ export function buildClonedHtmlArticle(clonedData, siteCategory = 'News & Update
     return `
       <div class="sarkari-article-modern" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.8; color: #1e293b; max-width: 860px; margin: 0 auto;">
         
-        <!-- Real Featured Banner Image -->
-        ${featuredImage ? `
+        <!-- Guaranteed Lead Banner Image (Blogger & Reader Thumbnail) -->
         <div style="text-align: center; margin-bottom: 26px;">
-          <img src="${featuredImage}" alt="${title}" style="max-width: 100%; height: auto; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
-        </div>` : ''}
+          <img src="${finalBanner}" alt="${title}" style="max-width: 100%; height: auto; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
+        </div>
 
         <!-- Top Quick Summary Card -->
         <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #cbd5e1; border-left: 6px solid #4f46e5; padding: 22px 26px; border-radius: 16px; margin-bottom: 24px;">
@@ -166,11 +202,10 @@ export function buildClonedHtmlArticle(clonedData, siteCategory = 'News & Update
   return `
     <div class="news-article-modern" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.85; color: #1e293b; max-width: 860px; margin: 0 auto;">
       
-      <!-- Featured Banner Image -->
-      ${featuredImage ? `
+      <!-- Guaranteed Lead Banner Image (Blogger & Reader Thumbnail) -->
       <div style="text-align: center; margin-bottom: 26px;">
-        <img src="${featuredImage}" alt="${title}" style="max-width: 100%; height: auto; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;" />
-      </div>` : ''}
+        <img src="${finalBanner}" alt="${title}" style="max-width: 100%; height: auto; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;" />
+      </div>
 
       <!-- Editorial Header Metadata -->
       <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding-bottom: 14px; margin-bottom: 24px; flex-wrap: wrap; gap: 8px;">
@@ -333,15 +368,17 @@ export function generateComprehensiveArticle({
   }
 
   const primaryText = snippet && snippet.length > 50 ? snippet : `${cleanTitle} has been officially announced by ${sourceName}. This detailed guide covers everything you need to know, including official guidelines, eligibility, dates, and direct links.`;
+  const finalBanner = (featuredImage && typeof featuredImage === 'string' && featuredImage.startsWith('http'))
+    ? featuredImage
+    : getCategoryBannerImage(cleanTitle, category);
 
   return `
     <div class="comprehensive-article-container" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.85; color: #1e293b; max-width: 860px; margin: 0 auto;">
       
-      <!-- Lead Banner Image -->
-      ${featuredImage ? `
+      <!-- Guaranteed Lead Banner Image (Blogger & Reader Thumbnail) -->
       <div style="text-align: center; margin-bottom: 26px;">
-        <img src="${featuredImage}" alt="${cleanTitle}" style="max-width: 100%; height: auto; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;" />
-      </div>` : ''}
+        <img src="${finalBanner}" alt="${cleanTitle}" style="max-width: 100%; height: auto; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;" />
+      </div>
 
       <!-- Top Summary Card -->
       <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #cbd5e1; border-left: 6px solid #4f46e5; padding: 22px 26px; border-radius: 16px; margin-bottom: 26px;">

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
 import { updatePostSeo, cleanupPostSeo } from '../utils/seoHelper';
+import { getPostThumbnail } from '../utils/postThumbnail';
 
 function PostDetailSkeleton() {
   return (
@@ -168,7 +169,7 @@ export default function PostDetail() {
   const org = rawJob.organization || (post.labels && post.labels[1]) || post.sourceName || 'Verified Source';
   const category = rawJob.category || (post.labels && post.labels[0]) || 'News & Updates';
   const applyUrl = rawJob.applyUrl || rawJob.sourceUrl || post.sourceUrl || '';
-  const postImage = post.imageUrl || post.thumbnail;
+  const postImage = post.imageUrl || post.thumbnail || getPostThumbnail(post);
   const pubDate = post.published ? new Date(post.published).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'long',

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import cron from 'node-cron';
 import { CONFIG } from '../config/index.js';
 import { scrapeSite } from '../scrapers/index.js';
-import { buildClonedHtmlArticle, generateComprehensiveArticle } from './articleTemplate.js';
+import { buildClonedHtmlArticle, generateComprehensiveArticle, getCategoryBannerImage } from './articleTemplate.js';
 import { cloneAuthenticArticle } from '../scrapers/articleCloner.js';
 import { detectPostCategory } from '../scrapers/universalDetector.js';
 import { postToBlogger, fetchAllLiveBloggerPosts } from './bloggerPublisher.js';
@@ -240,7 +240,7 @@ export async function runSyncRoutine(customBatchLimit) {
               summary: item.contentSnippet || `${postCategory} update from ${feed.name}: ${cleanTitle}`,
               publishedDate: new Date().toISOString().split('T')[0],
               ageLimit: 'As per official norms',
-              imageUrl: item.imageUrl || '',
+              imageUrl: (item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.startsWith('http')) ? item.imageUrl : getCategoryBannerImage(cleanTitle, postCategory),
               isScrapedLive: true,
               fetchedAt: new Date().toISOString(),
             });
@@ -272,11 +272,18 @@ export async function runSyncRoutine(customBatchLimit) {
             logEvent(`Cloning authentic article & media for: "${cleanTitle}" from ${feed.name}...`);
             const cloned = await cloneAuthenticArticle(item.link || feed.url, finalBloggerCategory);
 
+            const verifiedImage = (cloned?.featuredImage && typeof cloned.featuredImage === 'string' && cloned.featuredImage.startsWith('http'))
+              ? cloned.featuredImage
+              : (item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.startsWith('http'))
+                ? item.imageUrl
+                : getCategoryBannerImage(cleanTitle, finalBloggerCategory);
+
             let postTitle = cleanTitle;
             let htmlContent = '';
 
             if (cloned && cloned.bodyContentHtml && cloned.bodyContentHtml.length > 250) {
               postTitle = cloned.title || cleanTitle;
+              cloned.featuredImage = verifiedImage;
               htmlContent = buildClonedHtmlArticle(cloned, finalBloggerCategory, item.sourceName || feed.name);
             } else {
               // High-value, comprehensive editorial post with overview, breakdown, tables, and FAQs
@@ -286,7 +293,7 @@ export async function runSyncRoutine(customBatchLimit) {
                 sourceName: item.sourceName || feed.name,
                 sourceUrl: item.link || feed.url,
                 snippet: item.contentSnippet || cleanTitle,
-                featuredImage: cloned?.featuredImage || item.imageUrl || '',
+                featuredImage: verifiedImage,
                 existingBody: cloned?.bodyContentHtml || '',
               });
             }
@@ -294,7 +301,7 @@ export async function runSyncRoutine(customBatchLimit) {
             // Update scrapedMap with real media, body content & links for website feed
             const mapItem = scrapedMap.get(cleanTitle.toLowerCase());
             if (mapItem) {
-              if (cloned?.featuredImage) mapItem.imageUrl = cloned.featuredImage;
+              mapItem.imageUrl = verifiedImage;
               if (cloned?.applyOnlineUrl) mapItem.applyUrl = cloned.applyOnlineUrl;
               mapItem.bodyContentHtml = htmlContent;
             }
