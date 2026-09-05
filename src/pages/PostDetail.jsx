@@ -5,8 +5,9 @@ import { getUnifiedPosts } from '../services/postService';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import SafelinkStepIndicator from '../components/SafelinkStepIndicator';
-import RobotVerificationWidget from '../components/RobotVerificationWidget';
-import WaitingTimerWidget from '../components/WaitingTimerWidget';
+import WpSafelinkTopSection from '../components/WpSafelinkTopSection';
+import WpSafelinkBottomSection from '../components/WpSafelinkBottomSection';
+import FinalGatewayStep from '../components/FinalGatewayStep';
 import DualAdContinueSection from '../components/DualAdContinueSection';
 import { 
   Calendar, Clock, User, ArrowRight, ShieldCheck, 
@@ -216,15 +217,16 @@ export default function PostDetail() {
                 </div>
               )}
 
-              {/* ── SafeLink Security Widgets (Step 1: Robot Verify, Step 2: 8s Timer, Step 3: 5s Timer) ── */}
-              {isSafelinkActive && currentStep === 1 && (
-                <RobotVerificationWidget />
-              )}
-              {isSafelinkActive && currentStep === 2 && (
-                <WaitingTimerWidget initialSeconds={8} stepNumber={2} />
-              )}
+              {/* ── WP-Safelink Flow: Step 3 Final Access Gateway ("Smile Please!") ── */}
               {isSafelinkActive && currentStep === 3 && (
-                <WaitingTimerWidget initialSeconds={5} stepNumber={3} />
+                <div className="mb-8">
+                  <FinalGatewayStep />
+                </div>
+              )}
+
+              {/* ── WP-Safelink Flow: Step 1 Verify & Step 2 Top Waiting/Generate Section ── */}
+              {isSafelinkActive && (currentStep === 1 || currentStep === 2) && (
+                <WpSafelinkTopSection currentPostId={postId} />
               )}
 
               {/* Native Fluid Ad Unit 1 */}
@@ -291,8 +293,13 @@ export default function PostDetail() {
                 </div>
               )}
 
-              {/* SafeLink Dual Ad Continue Action at the very bottom */}
-              {isSafelinkActive && (
+              {/* ── WP-Safelink Flow: Step 2 Bottom Section (#wpsafegenerate: wait4 -> target4) ── */}
+              {isSafelinkActive && currentStep === 2 && (
+                <WpSafelinkBottomSection currentPostId={postId} />
+              )}
+
+              {/* ── Step 1 Bottom Dual-Ad Section ── */}
+              {isSafelinkActive && currentStep === 1 && (
                 <div className="mt-6">
                   <DualAdContinueSection currentPostId={postId} />
                 </div>

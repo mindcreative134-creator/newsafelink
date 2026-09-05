@@ -10,30 +10,50 @@ export function SafelinkProvider({ children }) {
   const [step2TimerDone, setStep2TimerDone] = useState(false);
   const [step3TimerDone, setStep3TimerDone] = useState(false);
 
-  // Auto-detect URL queries on page load or query change (?o=..., ?url=..., ?target=..., ?step=...)
+  // Helper to safely extract destination URL from varied query params / base64 payloads
+  const extractDestination = (raw) => {
+    if (!raw) return '';
+    let candidate = raw;
+    try {
+      // Check if it's base64 encoded
+      if (candidate.match(/^[A-Za-z0-9+/=]+$/) && candidate.length > 8) {
+        const decoded = atob(candidate);
+        // Check if decoded string is JSON (WP-Safelink format)
+        if (decoded.startsWith('{') && decoded.endsWith('}')) {
+          const parsed = JSON.parse(decoded);
+          candidate = parsed.safelink || parsed.second_safelink_url || parsed.url || candidate;
+        } else if (decoded.startsWith('http')) {
+          candidate = decoded;
+        }
+      }
+    } catch {}
+    return candidate;
+  };
+
+  // Auto-detect URL queries on page load or query change (?o=..., ?url=..., ?target=..., ?safelink=..., ?adlinkfly=...)
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const oParam = params.get('o');
-      const urlParam = params.get('url') || params.get('target') || params.get('link');
+      const urlParam = params.get('url') || params.get('target') || params.get('link') || params.get('safelink');
+      const adlinkflyParam = params.get('adlinkfly');
+      const wpsafeParam = params.get('wpsafelink') || params.get('safelink_redirect') || params.get('go');
       const stepParam = Number(params.get('step'));
 
-      let detectedTarget = '';
+      let rawTarget = '';
       if (oParam) {
-        detectedTarget = `https://piko.site.je/?o=${oParam}`;
+        rawTarget = `https://piko.site.je/?o=${oParam}`;
       } else if (urlParam) {
-        detectedTarget = urlParam;
+        rawTarget = urlParam;
+      } else if (wpsafeParam) {
+        rawTarget = extractDestination(wpsafeParam);
+      } else if (adlinkflyParam) {
+        rawTarget = `https://shortxlinks.com/${adlinkflyParam}`;
       }
 
-      if (detectedTarget) {
-        // Decode base64 if passed as base64 string
-        let finalDecoded = detectedTarget;
-        try {
-          if (detectedTarget.match(/^[A-Za-z0-9+/=]+$/) && detectedTarget.length > 8) {
-            finalDecoded = atob(detectedTarget);
-          }
-        } catch {}
+      const finalDecoded = extractDestination(rawTarget);
 
+      if (finalDecoded) {
         sessionStorage.setItem('SAFE_L', finalDecoded);
         setTargetUrl(finalDecoded);
 

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
 import SafelinkStepIndicator from '../components/SafelinkStepIndicator';
-import RobotVerificationWidget from '../components/RobotVerificationWidget';
+import WpSafelinkTopSection from '../components/WpSafelinkTopSection';
 import DualAdContinueSection from '../components/DualAdContinueSection';
 
 function PostCardSkeleton() {
@@ -180,10 +180,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── On-Page Human Verification Widget (Step 1 - Embedded, NO POPUP) ── */}
+        {/* ── On-Page WP-Safelink Top Section (Step 1 - Ad 1 -> Verify -> Ad 2) ── */}
         {isSafelinkActive && currentStep === 1 && (
           <div className="mb-8">
-            <RobotVerificationWidget />
+            <WpSafelinkTopSection />
           </div>
         )}
 
