@@ -7,8 +7,7 @@ import Sidebar from '../components/Sidebar';
 import SafelinkStepIndicator from '../components/SafelinkStepIndicator';
 import WpSafelinkTopSection from '../components/WpSafelinkTopSection';
 import WpSafelinkBottomSection from '../components/WpSafelinkBottomSection';
-import FinalGatewayStep from '../components/FinalGatewayStep';
-import DualAdContinueSection from '../components/DualAdContinueSection';
+import RobotVerificationWidget from '../components/RobotVerificationWidget';
 import { 
   Calendar, Clock, User, ArrowRight, ShieldCheck, 
   CheckCircle2, Lock, ExternalLink, ChevronRight, Share2, FileText
@@ -217,8 +216,15 @@ export default function PostDetail() {
                 </div>
               )}
 
+              {/* ── Initial Entry: I am not a robot (Ad -> Robot Check -> Ad) ── */}
+              {isSafelinkActive && !step1Verified && (
+                <div className="my-4">
+                  <RobotVerificationWidget />
+                </div>
+              )}
+
               {/* ── WP-Safelink 3-Page Flow: Top Section (Ad -> Timer -> Continue -> Ad) ── */}
-              {isSafelinkActive && currentStep >= 1 && currentStep <= 3 && (
+              {isSafelinkActive && step1Verified && currentStep >= 1 && currentStep <= 3 && (
                 <WpSafelinkTopSection currentPostId={postId} />
               )}
 
@@ -287,7 +293,7 @@ export default function PostDetail() {
               )}
 
               {/* ── WP-Safelink 3-Page Flow: Bottom Section (Ad -> Wait -> Action Button -> Ad) ── */}
-              {isSafelinkActive && currentStep >= 1 && currentStep <= 3 && (
+              {isSafelinkActive && step1Verified && currentStep >= 1 && currentStep <= 3 && (
                 <WpSafelinkBottomSection currentPostId={postId} />
               )}
 

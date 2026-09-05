@@ -3,9 +3,9 @@
  * Ensures dynamic Title, Meta, OpenGraph, Twitter Cards, and Schema.org JSON-LD for every post.
  */
 
-const SITE_URL = 'https://iwantgovjob.vercel.app';
-const SITE_NAME = 'SarkariTrend';
-const DEFAULT_LOGO = 'https://iwantgovjob.vercel.app/favicon.svg';
+const SITE_URL = (typeof window !== 'undefined' && window.location.origin) ? window.location.origin : 'https://iwantgovjob.vercel.app';
+const SITE_NAME = 'SafeLink News & Portal';
+const DEFAULT_LOGO = `${SITE_URL}/favicon.svg`;
 
 function cleanExcerpt(contentOrSummary, title = '') {
   if (!contentOrSummary) return `${title} – Check latest official notice, eligibility, important dates, and verified direct links on SarkariTrend.`;

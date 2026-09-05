@@ -51,7 +51,7 @@ export default function WpSafelinkTopSection({ currentPostId }) {
       {/* ── Direct Button / Timer (Closely Attached, NO BOX / CARD WRAPPER) ── */}
       <div className="w-full flex flex-col items-center justify-center py-0.5">
         {!canScroll ? (
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-zinc-100 dark:bg-zinc-850 text-zinc-800 dark:text-zinc-100 font-extrabold text-sm shadow-sm select-none">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-zinc-100 dark:bg-zinc-850 text-zinc-800 dark:text-zinc-100 font-extrabold text-xs sm:text-sm shadow-sm select-none border border-zinc-200/60 dark:border-zinc-800">
             <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
             <span>Please wait... {countdown}s</span>
           </div>
@@ -59,13 +59,15 @@ export default function WpSafelinkTopSection({ currentPostId }) {
           <a
             href="#wpsafegenerate"
             onClick={handleScrollToBottom}
-            className="group inline-flex flex-col items-center cursor-pointer transition-transform hover:scale-105 active:scale-95 focus:outline-none select-none"
+            onDoubleClick={handleScrollToBottom}
+            className="group inline-flex flex-col items-center cursor-pointer transition-transform hover:scale-105 active:scale-95 focus:outline-none select-none my-0.5"
+            title="Double Click to Generate Link"
           >
             {/* Official WP-Safelink generate button graphic */}
             <img
               src="/assets/safelink/generate4.png"
-              alt="CLICK TO CONTINUE"
-              className="h-12 sm:h-14 w-auto object-contain drop-shadow"
+              alt="DOUBLE CLICK TO GENERATE LINK"
+              className="h-11 sm:h-13 w-auto object-contain drop-shadow"
               onError={(e) => {
                 e.target.style.display = 'none';
                 const fallback = document.getElementById('top-gen-fallback');
@@ -76,9 +78,9 @@ export default function WpSafelinkTopSection({ currentPostId }) {
             {/* Fallback button if image is delayed */}
             <div
               id="top-gen-fallback"
-              className="hidden items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-black rounded-xl shadow-md text-sm uppercase tracking-wider"
+              className="hidden items-center gap-2 px-7 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-black rounded-xl shadow-md text-xs sm:text-sm uppercase tracking-wider"
             >
-              <span>CLICK TO CONTINUE</span>
+              <span>DOUBLE CLICK TO GENERATE LINK</span>
               <ArrowDown className="w-4 h-4 animate-bounce" />
             </div>
           </a>
