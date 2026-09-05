@@ -9,6 +9,7 @@ import { cloneAuthenticArticle } from '../scrapers/articleCloner.js';
 import { detectPostCategory } from '../scrapers/universalDetector.js';
 import { postToBlogger, fetchAllLiveBloggerPosts } from './bloggerPublisher.js';
 import { loadJson, saveJson, logEvent, POSTED_CACHE_FILE, SCRAPED_POSTS_FILE } from '../utils/logger.js';
+import { updateSitemapXml } from './sitemapGenerator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -338,8 +339,8 @@ export async function runSyncRoutine() {
     }
   }
 
-  // Persist top 150 verified scraped posts for immediate website display
-  const updatedScrapedList = Array.from(scrapedMap.values()).slice(0, 150);
+  // Persist top 300 verified scraped posts across all categories for immediate website display
+  const updatedScrapedList = Array.from(scrapedMap.values()).slice(0, 300);
   saveJson(SCRAPED_POSTS_FILE, updatedScrapedList);
 
   // Synchronize with frontend data files so website immediately displays all newly scraped updates
@@ -354,6 +355,13 @@ export async function runSyncRoutine() {
     }
   } catch (syncErr) {
     // Non-fatal if paths differ
+  }
+
+  // Dynamically regenerate sitemap.xml and ping Google & Bing search engines
+  try {
+    await updateSitemapXml(updatedScrapedList);
+  } catch (sitemapErr) {
+    logEvent(`[SEO Sitemap] Failed to update sitemap: ${sitemapErr.message}`, 'warning');
   }
 
   logEvent(`Sync finished. Total new Blogger posts published: ${newPostsCount}. Total verified live posts on site: ${updatedScrapedList.length}`);

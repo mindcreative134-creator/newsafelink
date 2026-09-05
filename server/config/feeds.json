@@ -1,6 +1,114 @@
 [
   {
-    "id": "feed-real-1",
+    "id": "feed-news-1",
+    "name": "NDTV Top Stories",
+    "url": "https://feeds.feedburner.com/ndtvnews-top-stories",
+    "category": "News & Updates",
+    "type": "rss",
+    "labels": ["NDTV", "Top News", "Breaking News"],
+    "enabled": true
+  },
+  {
+    "id": "feed-news-2",
+    "name": "NDTV India News",
+    "url": "https://feeds.feedburner.com/ndtvnews-india-news",
+    "category": "News & Updates",
+    "type": "rss",
+    "labels": ["India News", "National Updates"],
+    "enabled": true
+  },
+  {
+    "id": "feed-news-3",
+    "name": "Zee News National",
+    "url": "https://zeenews.india.com/rss/india-national-news.xml",
+    "category": "News & Updates",
+    "type": "rss",
+    "labels": ["Zee News", "Hindi News", "National News"],
+    "enabled": true
+  },
+  {
+    "id": "feed-news-4",
+    "name": "Amar Ujala Breaking News",
+    "url": "https://www.amarujala.com/rss/breaking-news.xml",
+    "category": "News & Updates",
+    "type": "rss",
+    "labels": ["Amar Ujala", "Hindi Samachar", "Breaking News"],
+    "enabled": true
+  },
+  {
+    "id": "feed-tech-1",
+    "name": "NDTV Gadgets 360",
+    "url": "https://feeds.feedburner.com/gadgets360-latest",
+    "category": "Technology",
+    "type": "rss",
+    "labels": ["Tech News", "Gadgets", "AI Updates"],
+    "enabled": true
+  },
+  {
+    "id": "feed-sports-1",
+    "name": "NDTV Sports & Cricket",
+    "url": "https://feeds.feedburner.com/ndtvsports-cricket",
+    "category": "Sports",
+    "type": "rss",
+    "labels": ["Sports", "Cricket", "Match Updates"],
+    "enabled": true
+  },
+  {
+    "id": "feed-yojana-1",
+    "name": "BiharHelp Sarkari Yojana",
+    "url": "https://biharhelp.in/category/sarkari-yojana/feed/",
+    "category": "Govt Schemes & Yojana",
+    "type": "rss",
+    "labels": ["Bihar Yojana", "Sarkari Scheme", "PM Yojana"],
+    "enabled": true
+  },
+  {
+    "id": "feed-yojana-2",
+    "name": "OnlineUpdateSTM Govt Schemes",
+    "url": "https://onlineupdatestm.in/category/yojana/feed/",
+    "category": "Govt Schemes & Yojana",
+    "type": "rss",
+    "labels": ["Govt Schemes", "Yojana", "Bihar Updates"],
+    "enabled": true
+  },
+  {
+    "id": "feed-yojana-3",
+    "name": "MyScheme National Welfare Portal",
+    "url": "https://www.myscheme.gov.in",
+    "category": "Govt Schemes & Yojana",
+    "type": "scrape",
+    "labels": ["Central Schemes", "PM Schemes", "National Welfare"],
+    "enabled": true
+  },
+  {
+    "id": "feed-univ-1",
+    "name": "Bihar University & Admissions",
+    "url": "https://biharhelp.in/category/university/feed/",
+    "category": "University & Admissions",
+    "type": "rss",
+    "labels": ["Bihar University", "UG PG Admission", "Merit List"],
+    "enabled": true
+  },
+  {
+    "id": "feed-univ-2",
+    "name": "OnlineUpdateSTM Admissions",
+    "url": "https://onlineupdatestm.in/category/admission/feed/",
+    "category": "University & Admissions",
+    "type": "rss",
+    "labels": ["University Admission", "Entrance Exam", "Merit List"],
+    "enabled": true
+  },
+  {
+    "id": "feed-univ-3",
+    "name": "Munger University Official Portal",
+    "url": "https://mungeruniversity.ac.in/",
+    "category": "University & Admissions",
+    "type": "scrape",
+    "labels": ["Munger University", "Bihar University", "Exam Notices"],
+    "enabled": true
+  },
+  {
+    "id": "feed-job-1",
     "name": "SarkariResult Official Latest Jobs",
     "url": "https://www.sarkariresult.com",
     "category": "Latest Jobs",
@@ -9,7 +117,7 @@
     "enabled": true
   },
   {
-    "id": "feed-real-2",
+    "id": "feed-job-2",
     "name": "FreeJobAlert Central & State Recruitment",
     "url": "https://www.freejobalert.com",
     "category": "Latest Jobs",
@@ -18,7 +126,25 @@
     "enabled": true
   },
   {
-    "id": "feed-real-3",
+    "id": "feed-job-3",
+    "name": "BiharHelp Latest Jobs",
+    "url": "https://biharhelp.in/category/latest-jobs/feed/",
+    "category": "Latest Jobs",
+    "type": "rss",
+    "labels": ["Bihar Help", "Latest Jobs", "BPSC", "BSSC"],
+    "enabled": true
+  },
+  {
+    "id": "feed-job-4",
+    "name": "OnlineUpdateSTM Latest Jobs",
+    "url": "https://onlineupdatestm.in/category/latest-jobs/feed/",
+    "category": "Latest Jobs",
+    "type": "rss",
+    "labels": ["OnlineUpdateSTM", "Latest Jobs", "Bihar Jobs"],
+    "enabled": true
+  },
+  {
+    "id": "feed-admit-1",
     "name": "SarkariResult Official Admit Cards",
     "url": "https://www.sarkariresult.com",
     "category": "Admit Cards",
@@ -27,7 +153,16 @@
     "enabled": true
   },
   {
-    "id": "feed-real-4",
+    "id": "feed-admit-2",
+    "name": "BiharHelp Admit Cards",
+    "url": "https://biharhelp.in/category/admit-card/feed/",
+    "category": "Admit Cards",
+    "type": "rss",
+    "labels": ["Admit Card", "Hall Ticket", "Exam Date"],
+    "enabled": true
+  },
+  {
+    "id": "feed-result-1",
     "name": "SarkariResult Official Results & Scorecards",
     "url": "https://www.sarkariresult.com",
     "category": "Results",
@@ -36,57 +171,12 @@
     "enabled": true
   },
   {
-    "id": "feed-real-5",
-    "name": "MyScheme National Welfare Schemes Portal",
-    "url": "https://www.myscheme.gov.in",
-    "category": "Govt Schemes & Yojana",
-    "type": "scrape",
-    "labels": ["Govt Scheme", "PM Yojana", "Central Schemes"],
-    "enabled": true
-  },
-  {
-    "id": "feed-real-6",
-    "name": "Sarkari Admissions & University Entrance",
-    "url": "https://www.sarkariresult.com",
-    "category": "University & Admissions",
-    "type": "scrape",
-    "labels": ["University Admission", "Entrance Exam", "CUET"],
-    "enabled": true
-  },
-  {
-    "id": "feed-real-7",
-    "name": "BiharHelp Official Recruitment & Updates",
-    "url": "https://biharhelp.in/",
-    "category": "Latest Jobs",
-    "type": "scrape",
-    "labels": ["Bihar Help", "Latest Jobs", "BPSC"],
-    "enabled": true
-  },
-  {
-    "id": "feed-real-8",
-    "name": "OnlineUpdateSTM Official Jobs & Updates",
-    "url": "https://onlineupdatestm.in/",
-    "category": "Latest Jobs",
-    "type": "scrape",
-    "labels": ["OnlineUpdateSTM", "Latest Jobs", "Bihar Jobs"],
-    "enabled": true
-  },
-  {
-    "id": "feed-real-9",
-    "name": "Munger University Official Portal",
-    "url": "https://mungeruniversity.ac.in/",
-    "category": "University & Admissions",
-    "type": "scrape",
-    "labels": ["Munger University", "Bihar University", "Exam Notices", "Admission"],
-    "enabled": true
-  },
-  {
-    "id": "feed-real-10",
-    "name": "Bihar University Admissions & Notices",
-    "url": "https://biharhelp.in/category/university/",
-    "category": "University & Admissions",
-    "type": "scrape",
-    "labels": ["Bihar University", "UG PG Admission", "Merit List", "Counselling"],
+    "id": "feed-result-2",
+    "name": "BiharHelp Results & Merit List",
+    "url": "https://biharhelp.in/category/result/feed/",
+    "category": "Results",
+    "type": "rss",
+    "labels": ["Result", "Scorecard", "Merit List"],
     "enabled": true
   }
 ]

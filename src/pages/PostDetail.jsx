@@ -10,6 +10,7 @@ import {
   CheckCircle2, Lock, ExternalLink, ChevronRight, Share2, FileText
 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
+import { updatePostSeo, cleanupPostSeo } from '../utils/seoHelper';
 
 function PostDetailSkeleton() {
   return (
@@ -64,21 +65,16 @@ export default function PostDetail() {
     getPostById(postId)
       .then((data) => {
         setPost(data);
-        document.title = `${data.title} – SafeLink Portal`;
-
-        const plainText = data.content ? data.content.replace(/<\/?[^>]+(>|$)/g, '') : '';
-        const excerpt = plainText.length > 155 ? plainText.substring(0, 155) + '...' : plainText;
-        let metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc) {
-          metaDesc.setAttribute('content', excerpt);
-        }
-
+        updatePostSeo(data);
         setLoading(false);
       })
       .catch((err) => {
         setError(err.message || 'Article not found');
         setLoading(false);
       });
+
+    // Clean up SEO tags when navigating away
+    return () => cleanupPostSeo();
 
     // Related posts
     getUnifiedPosts({ maxResults: 4 })

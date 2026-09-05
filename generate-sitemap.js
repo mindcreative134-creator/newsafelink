@@ -49,7 +49,7 @@ async function run() {
   const bloggerPosts = await fetchAllBloggerPosts();
   console.log(`Fetched ${bloggerPosts.length} Blogger posts.`);
 
-  // 2. Load live verified jobs from liveJobs.json
+  // 2. Load live verified jobs from liveJobs.json and server/data/scrapedPosts.json
   let liveJobs = [];
   try {
     const liveJobsPath = path.join(__dirname, 'src', 'data', 'liveJobs.json');
@@ -57,8 +57,14 @@ async function run() {
       liveJobs = JSON.parse(fs.readFileSync(liveJobsPath, 'utf8'));
       console.log(`Loaded ${liveJobs.length} verified jobs from liveJobs.json.`);
     }
+    const serverScrapedPath = path.join(__dirname, 'server', 'data', 'scrapedPosts.json');
+    if (fs.existsSync(serverScrapedPath)) {
+      const serverPosts = JSON.parse(fs.readFileSync(serverScrapedPath, 'utf8'));
+      console.log(`Loaded ${serverPosts.length} posts from server/data/scrapedPosts.json.`);
+      liveJobs = liveJobs.concat(serverPosts);
+    }
   } catch (e) {
-    console.error('Error reading liveJobs.json:', e.message);
+    console.error('Error reading posts:', e.message);
   }
 
   const baseUrl = process.env.SITE_URL || 'https://iwantgovjob.vercel.app';
@@ -79,11 +85,15 @@ async function run() {
 
   // Category archive routes
   const categoryUrls = [
+    '/category/News%20%26%20Updates',
     '/category/Latest%20Jobs',
-    '/category/Admit%20Cards',
-    '/category/Results',
     '/category/Govt%20Schemes%20%26%20Yojana',
     '/category/University%20%26%20Admissions',
+    '/category/Admit%20Cards',
+    '/category/Results',
+    '/category/Technology',
+    '/category/Sports',
+    '/category/Business%20%26%20Economy',
     '/category/Syllabus'
   ];
 
@@ -101,7 +111,7 @@ async function run() {
     xml += `    <loc>${baseUrl}${catUrl}</loc>\n`;
     xml += `    <lastmod>${today}</lastmod>\n`;
     xml += '    <changefreq>daily</changefreq>\n';
-    xml += '    <priority>0.8</priority>\n';
+    xml += '    <priority>0.85</priority>\n';
     xml += '  </url>\n';
   });
 

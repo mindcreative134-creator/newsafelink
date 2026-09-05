@@ -5,117 +5,47 @@ const CACHE_TIME_KEY = 'SARKARI_RSS_CACHE_TIME_V7_REAL_ONLY';
 const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
 /**
- * Strict Authenticity Filter:
- * Rejects menu headers, navigation categories, and crime/negative/non-job news.
+ * Universal Post Authenticity Filter:
+ * Rejects empty titles, navigation/menu headers, and spam links while accepting
+ * verified news, government jobs, yojana/schemes, university admissions, and tech updates.
  */
-export function isValidSarkariPost(title) {
+export function isValidPost(title) {
   if (!title || typeof title !== 'string') return false;
   const t = title.toLowerCase().trim();
 
-  // 1. Length constraint (allow short titles like "UP Scholarship" or "UPSC CMS 2026")
-  if (t.length < 10 || t.length > 250) return false;
+  // 1. Length constraint
+  if (t.length < 8 || t.length > 300) return false;
 
   // 2. Reject website navigation & category menu labels
   const menuBlacklist = [
-    'all india jobs',
-    'latest job',
-    'latest jobs',
-    'home',
-    'admit card',
-    'admit cards',
-    'result',
-    'results',
-    'answer key',
-    'syllabus',
-    'admission',
-    'admissions',
-    'contact us',
-    'about us',
-    'privacy policy',
-    'disclaimer',
-    'terms and conditions',
-    'term & condition',
-    'view all',
-    'click here',
-    'view more',
-    'trending now',
-    'quick links',
+    'all india jobs', 'latest job', 'latest jobs', 'home', 'admit card', 
+    'admit cards', 'result', 'results', 'answer key', 'syllabus', 
+    'admission', 'admissions', 'contact us', 'about us', 'privacy policy', 
+    'disclaimer', 'terms and conditions', 'term & condition', 'view all', 
+    'click here', 'view more', 'trending now', 'quick links', 'read more', 
+    'login', 'register', 'sign in', 'sign up', 'menu', 'search'
   ];
   if (menuBlacklist.includes(t)) return false;
 
-  // 3. Reject Crime / Negative / Non-Job News (unless it is a legitimate recruitment / exam term)
-  const isRecruitmentPost = t.includes('recruitment') || t.includes('bharti') || t.includes('result') || 
-                            t.includes('admit card') || t.includes('vacancy') || t.includes('post') || 
-                            t.includes('warder') || t.includes('jailor') || t.includes('exam');
+  // 3. Reject pure spam/gambling/adult terms
+  const spamTerms = ['casino', 'betting', 'gambling', 'viagra', 'porn', 'lottery ticket online'];
+  if (spamTerms.some((term) => t.includes(term))) return false;
 
-  if (!isRecruitmentPost) {
-    const crimeBlacklist = [
-      'arrest',
-      'arrested',
-      'rape',
-      'raped',
-      'murder',
-      'crime',
-      'blast',
-      'fraud',
-      'scam',
-      'digital arrest',
-      'killed',
-      'police custody',
-      'extortion',
-      'assault',
-      'terror',
-      'suicide',
-      'cyber fraud',
-    ];
-    if (crimeBlacklist.some((word) => t.includes(word))) return false;
-  }
-
-  // 4. Must contain genuine government recruitment / exam / university / scheme keywords
-  const validKeywords = [
-    // Recruitment & Jobs
-    'recruitment', 'bharti', 'भर्ती', 'vacancy', 'vacancies', 'posts', 'पद', 
-    'online form', 'apply online', 'online apply', 'notification', 'admit card', 
-    'result', 'रिजल्ट', 'answer key', 'scorecard', 'score card', 'cutoff', 'cut off', 
-    'apprentice', 'officer', 'constable', 'cgl', 'chsl', 'upsc', 'bpsc', 'bssc', 'csbc', 
-    'ssc', 'rrb', 'railway', 'gds', 'ctet', 'tet', 'jee', 'neet', 'police', 'army', 
-    'navy', 'airforce', 'agniveer', 'bank', 'sbi', 'ibps', 'inter', 'matric', 'clerk', 
-    'teacher', 'warder', 'jailor', 'prahari', 'dsssb', 'rpsc', 'oicl', 'lic', 'nabard', 
-    'aiims', 'epfo', 'drdo', 'isro', 'walk-in', 'walk in', 'interview',
-
-    // University & Academic Updates (Munger, Bihar Universities, UG/PG, B.Ed)
-    'university', 'vishwavidyalaya', 'विश्वविद्यालय', 'munger', 'patna', 'lnmu', 'vksu', 
-    'magadh', 'brabu', 'purnea', 'tmbu', 'bnmu', 'ppu', 'ignou', 'du', 'bhu', 'jnu', 
-    'aktu', 'ccsu', 'prsu', 'college', 'degree', 'ug', 'pg', 'semester', 'session', 
-    'part 1', 'part 2', 'part 3', 'ba', 'bsc', 'bcom', 'ma', 'msc', 'mcom', 'bed', 
-    'b.ed', 'deled', 'd.el.ed', 'bceceb', 'counselling', 'counseling', 'choice filling', 
-    'seat allotment', 'allotment', 'provisional', 'migration', 'certificate', 'marksheet', 
-    'merit list', 'merit', 'timetable', 'routine', 'exam date', 'date sheet', 'syllabus', 
-    'admission', 'entrance', 'iti', 'polytechnic', 'bseb', 'cbse', 'board', 'b.tech', 
-    'diploma', 'registration', 'transcript', 'city slip', 'city details', 'city intimation', 
-    'intimation slip', 'slip', 're-exam', 're exam', 'dossier', 'e-dossier', 'panjiyan', 'पंजीयन',
-
-    // Government Schemes, Portals & Citizen Welfare
-    'yojana', 'योजना', 'scheme', 'pension', 'subsidy', 'scholarship', 'छात्रवृत्ति', 
-    'kisan', 'ration', 'राशन', 'pds', 'ayushman', 'loan', 'samman nidhi', 'fasal bima', 
-    'udyami', 'beneficiary', 'awas', 'pmaw', 'eshram', 'e-shram', 'job card', 'nrega', 
-    'mgnrega', 'card', 'कार्ड', 'voter', 'epic', 'driving licence', 'driving license', 
-    'licence', 'license', 'rojgar', 'रोजगार', 'rojgar mela', 'mela', 'मेला', 'complaint', 
-    'sahyog', 'portal', 'csc', 'rtps', 'caste certificate', 'income certificate', 
-    'निवास', 'जाति', 'आय', 'medhasoft', 'nsp',
-
-    // General Exam & News Updates
-    'notice', 'circular', 'order', 'guidelines', 'update', 'alert', 'press note', 
-    'announcement', 'programme', 'schedule', 'exam', 'examination', 'परीक्षा', 'आवेदन', 'फॉर्म'
-  ];
-
-  return validKeywords.some((k) => t.includes(k));
+  return true;
 }
 
-// Curated RSS feeds across Government Jobs, Schemes (योजना), and University Admissions
+export const isValidSarkariPost = isValidPost;
+
+// Curated RSS feeds across News, Govt Schemes (योजना), University Admissions, Tech, and Jobs
 const RSS_FEEDS = [
   {
-    name: 'Google News - Sarkari Naukri',
+    name: 'Google News - National & Top News',
+    url: 'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en',
+    category: 'News & Updates',
+    defaultBadge: 'NEWS',
+  },
+  {
+    name: 'Google News - Sarkari Naukri & Jobs',
     url: 'https://news.google.com/rss/search?q=sarkari+naukri+recruitment+when:2d&hl=en-IN&gl=IN&ceid=IN:en',
     category: 'Latest Jobs',
     defaultBadge: 'JOB',
@@ -127,22 +57,22 @@ const RSS_FEEDS = [
     defaultBadge: 'YOJANA',
   },
   {
-    name: 'Google News - University Admissions & CUET',
-    url: 'https://news.google.com/rss/search?q=university+admission+cuet+when:3d&hl=en-IN&gl=IN&ceid=IN:en',
+    name: 'Google News - University Admissions & Exams',
+    url: 'https://news.google.com/rss/search?q=university+admission+exam+when:3d&hl=en-IN&gl=IN&ceid=IN:en',
     category: 'University & Admissions',
-    defaultBadge: 'ADMISSION',
+    defaultBadge: 'UNIV',
   },
   {
-    name: 'Google News - Govt Exam Admit Card',
-    url: 'https://news.google.com/rss/search?q=admit+card+exam+when:2d&hl=en-IN&gl=IN&ceid=IN:en',
+    name: 'Google News - Technology & Digital India',
+    url: 'https://news.google.com/rss/search?q=technology+ai+smartphones+when:3d&hl=en-IN&gl=IN&ceid=IN:en',
+    category: 'Technology',
+    defaultBadge: 'TECH',
+  },
+  {
+    name: 'Google News - Govt Exam Admit Card & Results',
+    url: 'https://news.google.com/rss/search?q=admit+card+result+declared+when:2d&hl=en-IN&gl=IN&ceid=IN:en',
     category: 'Admit Cards',
     defaultBadge: 'ADMIT',
-  },
-  {
-    name: 'Google News - Sarkari Result',
-    url: 'https://news.google.com/rss/search?q=exam+result+declared+when:2d&hl=en-IN&gl=IN&ceid=IN:en',
-    category: 'Results',
-    defaultBadge: 'RESULT',
   },
 ];
 
@@ -188,7 +118,7 @@ async function fetchRssFeed(feedObj) {
         lastDate: 'Online Application Window Active',
         status: 'Active',
         badge: feedObj.defaultBadge,
-        applyUrl: item.link || 'https://sarkariresult.com',
+        applyUrl: item.link || feedObj.url || '',
         summary: cleanText(item.description) || cleanTitle,
         publishedDate: item.pubDate ? new Date(item.pubDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         ageLimit: 'As per Central / State Government Guidelines',
