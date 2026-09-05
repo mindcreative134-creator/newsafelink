@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -8,6 +8,8 @@ import Category from './pages/Category';
 import StaticPages from './pages/StaticPages';
 import StickyBottomAd from './components/StickyBottomAd';
 import { useSafelink } from './context/SafelinkContext';
+
+import ErrorBoundary from './components/ErrorBoundary';
 
 export default function App() {
   const { currentStep } = useSafelink();
@@ -32,16 +34,18 @@ export default function App() {
 
       {/* Main Page Area */}
       <div className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/post/:postId" element={<PostDetail />} />
-          <Route path="/category/:label" element={<Category />} />
-          <Route path="/about" element={<StaticPages type="about" />} />
-          <Route path="/contact" element={<StaticPages type="contact" />} />
-          <Route path="/privacy-policy" element={<StaticPages type="privacy" />} />
-          <Route path="/disclaimer" element={<StaticPages type="disclaimer" />} />
-          <Route path="/terms-conditions" element={<StaticPages type="terms" />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/post/:postId" element={<PostDetail />} />
+            <Route path="/category/:label" element={<Category />} />
+            <Route path="/about" element={<StaticPages type="about" />} />
+            <Route path="/contact" element={<StaticPages type="contact" />} />
+            <Route path="/privacy-policy" element={<StaticPages type="privacy" />} />
+            <Route path="/disclaimer" element={<StaticPages type="disclaimer" />} />
+            <Route path="/terms-conditions" element={<StaticPages type="terms" />} />
+          </Routes>
+        </ErrorBoundary>
       </div>
 
       {/* Policy compliant Footer */}
