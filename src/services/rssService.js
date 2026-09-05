@@ -160,7 +160,15 @@ async function fetchBackendScrapedPosts() {
   return [];
 }
 
+let inMemoryLiveUpdates = null;
+
 export async function getLiveSarkariUpdates(forceRefresh = false) {
+  // 1. Instant in-memory return (0ms)
+  if (!forceRefresh && inMemoryLiveUpdates && inMemoryLiveUpdates.length > 0) {
+    return inMemoryLiveUpdates;
+  }
+
+  // 2. Instant localStorage cache return (0ms)
   if (!forceRefresh) {
     try {
       const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
@@ -168,49 +176,57 @@ export async function getLiveSarkariUpdates(forceRefresh = false) {
       if (cachedTime && cachedData && Date.now() - Number(cachedTime) < CACHE_DURATION_MS) {
         const parsed = JSON.parse(cachedData);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          inMemoryLiveUpdates = parsed;
           return parsed;
         }
       }
     } catch (_e) {}
   }
 
+  // 3. Fast non-blocking fetch with 1000ms timeout
   try {
-    // 1. Fetch real scraped posts from backend server
-    const backendPosts = await fetchBackendScrapedPosts();
+    const fetchWork = async () => {
+      // Fetch backend posts or RSS
+      const backendPosts = await fetchBackendScrapedPosts();
 
-    // 2. Fetch fresh verified RSS items
-    const feedPromises = RSS_FEEDS.map((f) => fetchRssFeed(f));
-    const feedResults = await Promise.allSettled(feedPromises);
+      const feedPromises = RSS_FEEDS.slice(0, 3).map((f) => fetchRssFeed(f));
+      const feedResults = await Promise.allSettled(feedPromises);
 
-    const liveItems = [];
-    feedResults.forEach((res) => {
-      if (res.status === 'fulfilled' && Array.isArray(res.value)) {
-        liveItems.push(...res.value);
+      const liveItems = [];
+      feedResults.forEach((res) => {
+        if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+          liveItems.push(...res.value);
+        }
+      });
+
+      const combined = [...backendPosts, ...liveItems.slice(0, 20), ...(defaultJobs || [])];
+      const seenTitles = new Set();
+      const uniqueMerged = [];
+
+      for (const item of combined) {
+        if (!item || !item.title) continue;
+        const normalized = item.title.trim().toLowerCase();
+        if (!seenTitles.has(normalized)) {
+          seenTitles.add(normalized);
+          uniqueMerged.push(item);
+        }
       }
-    });
 
-    // 3. Merge: Scraped backend posts first, then live RSS items, then default verified jobs
-    const combined = [...backendPosts, ...liveItems.slice(0, 25), ...defaultJobs];
-
-    // Deduplicate by clean title
-    const seenTitles = new Set();
-    const uniqueMerged = [];
-
-    for (const item of combined) {
-      if (!item || !item.title) continue;
-      const normalized = item.title.trim().toLowerCase();
-      if (!seenTitles.has(normalized)) {
-        seenTitles.add(normalized);
-        uniqueMerged.push(item);
+      if (uniqueMerged.length > 0) {
+        inMemoryLiveUpdates = uniqueMerged;
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(uniqueMerged));
+          localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
+        } catch (_e) {}
       }
-    }
 
-    try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify(uniqueMerged));
-      localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
-    } catch (_e) {}
+      return uniqueMerged.length > 0 ? uniqueMerged : defaultJobs;
+    };
 
-    return uniqueMerged;
+    // Timeout guard so page speed is NEVER harmed
+    const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(defaultJobs), 1000));
+    const result = await Promise.race([fetchWork(), timeoutPromise]);
+    return result || defaultJobs;
   } catch (_err) {
     return defaultJobs;
   }

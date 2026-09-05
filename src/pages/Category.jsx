@@ -147,6 +147,8 @@ export default function Category() {
                             <img
                               src={getPostImage(post)}
                               alt={post.title}
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
                             />
                             {post.labels && (

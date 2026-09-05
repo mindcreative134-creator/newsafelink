@@ -213,6 +213,8 @@ export default function Home() {
                         <img
                           src={getPostImage(featuredPost)}
                           alt={featuredPost.title}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
                         />
                         <span className="absolute top-3 left-3 px-3 py-1 rounded-md bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
@@ -287,6 +289,8 @@ export default function Home() {
                             <img
                               src={getPostImage(post)}
                               alt={post.title}
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
                             />
                             {post.labels && (

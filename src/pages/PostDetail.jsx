@@ -51,10 +51,25 @@ export default function PostDetail() {
   const [error, setError] = useState('');
   const [relatedPosts, setRelatedPosts] = useState([]);
   const [copied, setCopied] = useState(false);
+  const articleRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [postId]);
+
+  useEffect(() => {
+    if (!post || !articleRef.current) return;
+    try {
+      if (typeof window !== 'undefined' && window.adsbygoogle) {
+        const uninitialized = articleRef.current.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])');
+        uninitialized.forEach(() => {
+          try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+          } catch {}
+        });
+      }
+    } catch {}
+  }, [post]);
 
   useEffect(() => {
     setLoading(true);
@@ -154,7 +169,7 @@ export default function PostDetail() {
           
           {/* Main Article Container */}
           <main className="flex-1 min-w-0">
-            <article className="bg-white dark:bg-zinc-900 rounded-2xl p-6 sm:p-9 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex flex-col gap-6">
+            <article ref={articleRef} className="bg-white dark:bg-zinc-900 rounded-2xl p-6 sm:p-9 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex flex-col gap-6">
               
               {/* Category Badge & Share Button */}
               <div className="flex items-center justify-between gap-3 flex-wrap">
