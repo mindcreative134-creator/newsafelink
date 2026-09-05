@@ -16,4 +16,6 @@ export const CONFIG = {
   API_KEY: process.env.BLOGGER_API_KEY || 'AIzaSyAB38Lkz-xiuvkFFuEDd7BsVo97DMA4g24',
   CRON_SCHEDULE: process.env.CRON_SCHEDULE || '*/30 * * * *',
   FEEDS_FILE: path.join(__dirname, 'feeds.json'),
+  MAX_POSTS_PER_CYCLE: parseInt(process.env.MAX_BLOGGER_POSTS_PER_CYCLE || '6', 10),
 };
+

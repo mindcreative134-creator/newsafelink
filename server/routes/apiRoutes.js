@@ -127,10 +127,11 @@ router.delete('/api/feeds/:id', (req, res) => {
   res.json({ success: true });
 });
 
-// Trigger manual sync
+// Trigger manual sync (supports optional { limit: 5 } in body)
 router.post('/api/sync-now', async (req, res) => {
   try {
-    const result = await runSyncRoutine();
+    const limit = req.body?.limit ? parseInt(req.body.limit, 10) : undefined;
+    const result = await runSyncRoutine(limit);
     res.json({ success: true, ...result });
   } catch (err) {
     res.status(500).json({ error: err.message });

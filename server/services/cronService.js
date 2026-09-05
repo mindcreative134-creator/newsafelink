@@ -81,8 +81,9 @@ function toSlug(str) {
   return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50);
 }
 
-export async function runSyncRoutine() {
-  logEvent('Starting 24/7 sync routine across all configured websites & scrapers...');
+export async function runSyncRoutine(customBatchLimit) {
+  const batchLimit = customBatchLimit || CONFIG.MAX_POSTS_PER_CYCLE || 6;
+  logEvent(`Starting 24/7 sync routine across all configured websites & scrapers (Batch Limit: ${batchLimit} posts)...`);
   const feeds = loadJson(CONFIG.FEEDS_FILE, []);
   
   // ── 1. Fetch Live Blogger Posts to Guarantee Zero Duplicate Reposting ──
@@ -252,11 +253,11 @@ export async function runSyncRoutine() {
 
         if (isBloggerQuotaPaused) {
           // Blogger API write quota cooling down - feeds are still scraped and saved to website live feed
-        } else if (newPostsCount >= MAX_BLOGGER_POSTS_PER_CYCLE) {
+        } else if (newPostsCount >= batchLimit) {
           // Reached batch limit for this sync run
         } else {
           for (const item of items) {
-            if (newPostsCount >= MAX_BLOGGER_POSTS_PER_CYCLE) break;
+            if (newPostsCount >= batchLimit) break;
             const cleanTitle = (item.title || '').replace(/\s*-\s*[^-]+$/, '').trim();
             if (!cleanTitle) continue;
 
