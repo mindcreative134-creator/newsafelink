@@ -317,68 +317,46 @@ export function createSarkariPosterSvg(post = {}) {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-export function getCategoryBannerImage(title = '', category = '') {
-  const t = (title || '').toLowerCase();
-  const c = (category || '').toLowerCase();
-  const combined = `${t} ${c}`;
+function isValidPostImage(imgUrl) {
+  if (!imgUrl || typeof imgUrl !== 'string') return false;
+  const lower = imgUrl.toLowerCase().trim();
+  if (!lower.startsWith('http://') && !lower.startsWith('https://')) return false;
 
-  if (combined.includes('bgmi') || combined.includes('freefire') || combined.includes('game') || combined.includes('gaming') || combined.includes('esport')) {
-    return 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&h=630&q=80';
-  }
-  if (combined.includes('tech') || combined.includes('gadget') || combined.includes('phone') || combined.includes('software') || combined.includes('ai') || combined.includes('scam') || combined.includes('cyber') || combined.includes('fraudster')) {
-    return 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&h=630&q=80';
-  }
-  if (combined.includes('baaghi') || combined.includes('movie') || combined.includes('cinema') || combined.includes('film') || combined.includes('trailer') || combined.includes('actor') || combined.includes('actress')) {
-    return 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&h=630&q=80';
-  }
-  if (combined.includes('result') || combined.includes('score') || combined.includes('marks') || combined.includes('merit') || combined.includes('cutoff')) {
-    return 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&h=630&q=80';
-  }
-  if (combined.includes('admit') || combined.includes('hall ticket') || combined.includes('exam date')) {
-    return 'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?auto=format&fit=crop&w=1200&h=630&q=80';
-  }
-  if (combined.includes('admission') || combined.includes('university') || combined.includes('college') || combined.includes('munger') || combined.includes('llb') || combined.includes('ug') || combined.includes('pg') || combined.includes('bed') || combined.includes('certificate fee')) {
-    return 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&h=630&q=80';
-  }
-  if (combined.includes('scheme') || combined.includes('yojana') || combined.includes('scholarship') || combined.includes('nfobc') || combined.includes('kisan') || combined.includes('dbt')) {
-    return 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&h=630&q=80';
-  }
-  if (combined.includes('job') || combined.includes('recruitment') || combined.includes('bharti') || combined.includes('vacancy') || combined.includes('assistant') || combined.includes('officer') || combined.includes('clerk') || combined.includes('apprentice')) {
-    return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&h=630&q=80';
-  }
-  if (combined.includes('sport') || combined.includes('cricket') || combined.includes('ipl') || combined.includes('football')) {
-    return 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&h=630&q=80';
-  }
-  return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1200&h=630&q=80';
+  const junkPatterns = [
+    'flaticon', 'favicon', 'site-logo', 'logo.png', 'biharhelp.png', 'gravatar',
+    'telegram', 'whatsapp', 'facebook', 'twitter', 'instagram', 'youtube',
+    'pixel', 'spinner', 'loading', 'placeholder', 'blank.gif', 'share-icon',
+    '1x1', 'arrow', 'badge-icon', 'rss.png', 'feed-icon', 'icon-', 'avatar'
+  ];
+  return !junkPatterns.some((p) => lower.includes(p));
+}
+
+export function getCategoryBannerImage(title = '', category = '') {
+  // Never return random Unsplash images of gaming, movie seats, or unrelated office laptops.
+  return '';
 }
 
 /**
  * Universal Post Thumbnail Extractor & Generator
- * Checks if a post already has an authentic image; otherwise returns a customized topic banner or SVG poster.
+ * Checks if a post already has an authentic image; otherwise returns a customized official SVG poster.
  */
 export function getPostThumbnail(post) {
   if (!post) return createSarkariPosterSvg({});
 
-  // 1. Check explicit image fields (including Blogger API native images array)
+  // 1. Check explicit image fields
   const candidateUrl = post.imageUrl || post.thumbnail || post.image || post.images?.[0]?.url;
-  if (candidateUrl && typeof candidateUrl === 'string' && candidateUrl.startsWith('http')) {
+  if (candidateUrl && isValidPostImage(candidateUrl)) {
     return candidateUrl;
   }
 
   // 2. Check HTML content for embedded <img> tags
   if (post.content && typeof post.content === 'string') {
     const match = post.content.match(/<img[^>]+src=["']([^"']+)["']/i);
-    if (match && match[1] && match[1].startsWith('http')) {
+    if (match && match[1] && isValidPostImage(match[1])) {
       return match[1];
     }
   }
 
-  // 3. Fallback to curated high-resolution topic banner
-  const banner = getCategoryBannerImage(post.title || '', (post.labels && post.labels[0]) || post.category || '');
-  if (banner) {
-    return banner;
-  }
-
-  // 4. Generate topic-specific Poster SVG
+  // 3. Fallback: Generate authentic, topic-specific official notification poster SVG
   return createSarkariPosterSvg(post);
 }

@@ -18,22 +18,20 @@ export default function Footer() {
           
           {/* Column 1: Brand Info */}
           <div className="flex flex-col gap-4">
-            <Link to="/" className="flex items-center gap-3 group" aria-label="SarkariTrend Home">
-              <img 
-                src="/favicon.svg" 
-                alt="SarkariTrend Logo" 
-                className="w-10 h-10 object-contain rounded-xl shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-all duration-300" 
-              />
+            <Link to="/" className="flex items-center gap-3 group" aria-label="SafeLink Portal Home">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-black text-lg shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                ⚡
+              </div>
               <div className="flex flex-col leading-none">
-                <div className="flex items-baseline gap-px">
-                  <span className="text-xl font-black tracking-tight text-white font-heading leading-none">Sarkari</span>
-                  <span className="text-xl font-black tracking-tight text-indigo-400 font-heading leading-none">Trend</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xl font-black tracking-tight text-white font-heading leading-none">SafeLink</span>
+                  <span className="text-xl font-black tracking-tight text-indigo-400 font-heading leading-none">Portal</span>
                 </div>
-                <span className="text-[9px] font-extrabold text-zinc-400 uppercase tracking-[0.2em] mt-1">Jobs &amp; Education Portal</span>
+                <span className="text-[9px] font-extrabold text-zinc-400 uppercase tracking-[0.2em] mt-1">Authentic Notices &amp; Schemes</span>
               </div>
             </Link>
             <p className="text-xs text-zinc-400 leading-relaxed font-medium">
-              SarkariTrend is India's leading career portal providing official government job notifications, exam results, admit cards, answer keys, and career counseling guides.
+              SafeLink Portal delivers 100% verified government job circulars, Sarkari Yojana guidelines, university entrance notices, and direct official application gateways.
             </p>
             <div className="flex items-center gap-3 pt-2">
               <a 

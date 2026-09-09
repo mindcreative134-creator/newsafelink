@@ -211,7 +211,8 @@ export async function runSyncRoutine(customBatchLimit) {
       const items = await scrapeSite(feed);
 
       if (Array.isArray(items) && items.length > 0) {
-        // 1. Collect and format genuine verified items with clear source attribution
+        // 1. Collect and format genuine verified items with full authentic media & content
+        let clonedCountForThisFeed = 0;
         for (const item of items) {
           const cleanTitle = (item.title || '').replace(/\s*-\s*[^-]+$/, '').trim();
           if (!cleanTitle) continue;
@@ -222,6 +223,29 @@ export async function runSyncRoutine(customBatchLimit) {
             const { category: detectedCat, badge: detectedBadge } = detectPostCategory(cleanTitle, item.contentSnippet || '', feed);
             const postCategory = (!feed.category || feed.category.includes('Auto Detect')) ? detectedCat : (item.category || feed.category || detectedCat);
             const postBadge = item.badge || detectedBadge;
+
+            // Clone authentic full article for top items in each feed to capture 100% full content & original images
+            let authenticImage = (item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.startsWith('http')) ? item.imageUrl : '';
+            let authenticBodyHtml = '';
+            let officialApplyUrl = item.link || feed.url;
+
+            if (clonedCountForThisFeed < 4 && item.link && item.link.startsWith('http')) {
+              try {
+                const cloned = await cloneAuthenticArticle(item.link, postCategory);
+                if (cloned) {
+                  if (cloned.featuredImage && cloned.featuredImage.startsWith('http')) {
+                    authenticImage = cloned.featuredImage;
+                  }
+                  if (cloned.applyOnlineUrl) {
+                    officialApplyUrl = cloned.applyOnlineUrl;
+                  }
+                  if (cloned.bodyContentHtml && cloned.bodyContentHtml.length > 150) {
+                    authenticBodyHtml = buildClonedHtmlArticle(cloned, postCategory, item.sourceName || feed.name);
+                  }
+                }
+                clonedCountForThisFeed++;
+              } catch {}
+            }
 
             scrapedMap.set(key, {
               id: `scraped-${cleanSlug}`,
@@ -236,11 +260,12 @@ export async function runSyncRoutine(customBatchLimit) {
               lastDate: 'Active',
               status: 'Active',
               badge: postBadge,
-              applyUrl: item.link || feed.url,
+              applyUrl: officialApplyUrl,
               summary: item.contentSnippet || `${postCategory} update from ${feed.name}: ${cleanTitle}`,
               publishedDate: new Date().toISOString().split('T')[0],
               ageLimit: 'As per official norms',
-              imageUrl: (item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.startsWith('http')) ? item.imageUrl : getCategoryBannerImage(cleanTitle, postCategory),
+              imageUrl: authenticImage,
+              bodyContentHtml: authenticBodyHtml,
               isScrapedLive: true,
               fetchedAt: new Date().toISOString(),
             });
@@ -276,7 +301,7 @@ export async function runSyncRoutine(customBatchLimit) {
               ? cloned.featuredImage
               : (item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.startsWith('http'))
                 ? item.imageUrl
-                : getCategoryBannerImage(cleanTitle, finalBloggerCategory);
+                : '';
 
             let postTitle = cleanTitle;
             let htmlContent = '';

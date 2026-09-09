@@ -48,6 +48,31 @@ export async function cloneAuthenticArticle(articleUrl, defaultCategory = 'Lates
 
     const $ = cheerio.load(html);
 
+function isValidArticleImage(imgUrl) {
+  if (!imgUrl || typeof imgUrl !== 'string') return false;
+  const lower = imgUrl.toLowerCase().trim();
+  if (!lower.startsWith('http://') && !lower.startsWith('https://')) return false;
+
+  const junkPatterns = [
+    'flaticon', 'favicon', 'site-logo', 'logo.png', 'biharhelp.png', 'gravatar',
+    'telegram', 'whatsapp', 'facebook', 'twitter', 'instagram', 'youtube',
+    'pixel', 'spinner', 'loading', 'placeholder', 'blank.gif', 'share-icon',
+    '1x1', 'arrow', 'badge-icon', 'rss.png', 'feed-icon', 'icon-', 'avatar'
+  ];
+  if (junkPatterns.some(p => lower.includes(p))) return false;
+  return true;
+}
+
+function resolveUrl(url, base) {
+  if (!url) return '';
+  try {
+    if (url.startsWith('//')) return `https:${url}`;
+    return new URL(url, base).toString();
+  } catch {
+    return url;
+  }
+}
+
     // 1. Exact Title
     const rawTitle =
       $('h1.entry-title').first().text().trim() ||
@@ -58,17 +83,30 @@ export async function cloneAuthenticArticle(articleUrl, defaultCategory = 'Lates
 
     const cleanTitle = rawTitle.replace(/\s*-\s*[^-]+$/, '').trim();
 
-    // 2. Real Featured Banner Image
-    let featuredImage =
-      $('meta[property="og:image"]').attr('content') ||
-      $('meta[name="twitter:image"]').attr('content') ||
-      $('article img.wp-post-image').attr('src') ||
-      $('.entry-content img').first().attr('src') ||
-      $('article img').first().attr('src') ||
-      '';
+    // 2. Real Authentic Featured Banner Image
+    let featuredImage = '';
 
-    if (featuredImage.startsWith('//')) {
-      featuredImage = `https:${featuredImage}`;
+    // Priority candidates
+    const imageCandidates = [
+      $('meta[property="og:image"]').attr('content'),
+      $('meta[property="og:image:secure_url"]').attr('content'),
+      $('meta[name="twitter:image"]').attr('content'),
+      $('meta[name="twitter:image:src"]').attr('content'),
+      $('article img.wp-post-image').attr('src') || $('article img.wp-post-image').attr('data-src') || $('article img.wp-post-image').attr('data-lazy-src'),
+      $('.featured-image img').attr('src') || $('.featured-image img').attr('data-src'),
+      $('.entry-content img').first().attr('src') || $('.entry-content img').first().attr('data-src') || $('.entry-content img').first().attr('data-lazy-src'),
+      $('article figure img').first().attr('src') || $('article figure img').first().attr('data-src'),
+      $('article img').first().attr('src') || $('article img').first().attr('data-src'),
+    ];
+
+    for (const cand of imageCandidates) {
+      if (cand) {
+        const resolved = resolveUrl(cand, articleUrl);
+        if (isValidArticleImage(resolved)) {
+          featuredImage = resolved;
+          break;
+        }
+      }
     }
 
     // 3. Locate Main Article Content Container across News, Media, and Blog architectures
@@ -108,10 +146,10 @@ export async function cloneAuthenticArticle(articleUrl, defaultCategory = 'Lates
     let notificationPdfUrl = '';
     let officialWebsiteUrl = '';
 
-    contentContainer.find('table tr').each((_, tr) => {
-      const label = $(tr).find('th, td').first().text().trim().toLowerCase();
-      const a = $(tr).find('a').first();
+    contentContainer.find('table tr, p a, div a').each((_, el) => {
+      const a = el.tagName.toLowerCase() === 'a' ? $(el) : $(el).find('a').first();
       const href = a.attr('href');
+      const label = (a.text() || $(el).text()).trim().toLowerCase();
 
       if (
         !href ||
@@ -119,16 +157,17 @@ export async function cloneAuthenticArticle(articleUrl, defaultCategory = 'Lates
         href.includes('wp-admin') ||
         href.includes('t.me') ||
         href.includes('whatsapp') ||
-        href.includes('facebook')
+        href.includes('facebook') ||
+        href.includes('twitter')
       ) {
         return;
       }
 
-      if (!applyOnlineUrl && (label.includes('apply') || label.includes('registration') || label.includes('online form') || label.includes('login'))) {
+      if (!applyOnlineUrl && (label.includes('apply online') || label.includes('registration') || label.includes('online form') || label.includes('direct apply'))) {
         applyOnlineUrl = href;
-      } else if (!notificationPdfUrl && (label.includes('notification') || label.includes('advt') || label.includes('notice') || href.endsWith('.pdf'))) {
+      } else if (!notificationPdfUrl && (label.includes('notification') || label.includes('advt') || label.includes('download pdf') || href.endsWith('.pdf'))) {
         notificationPdfUrl = href;
-      } else if (!officialWebsiteUrl && (label.includes('official website') || label.includes('portal') || label.includes('board'))) {
+      } else if (!officialWebsiteUrl && (label.includes('official website') || label.includes('official portal') || label.includes('home page'))) {
         officialWebsiteUrl = href;
       }
     });
@@ -136,7 +175,7 @@ export async function cloneAuthenticArticle(articleUrl, defaultCategory = 'Lates
     if (!applyOnlineUrl) applyOnlineUrl = officialWebsiteUrl || articleUrl;
     if (!officialWebsiteUrl) officialWebsiteUrl = applyOnlineUrl;
 
-    // 5. Extract Real Tables (e.g. Vacancy details, dates, fees, eligibility)
+    // 5. Extract Real Tables (Vacancy details, dates, fees, eligibility)
     const tablesHtml = [];
     contentContainer.find('table').each((i, tbl) => {
       $(tbl).attr('style', 'width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; border: 1px solid #cbd5e1;');
@@ -145,31 +184,32 @@ export async function cloneAuthenticArticle(articleUrl, defaultCategory = 'Lates
       
       const tblText = $(tbl).text().toLowerCase();
       if (tblText.length > 30) {
-        tablesHtml.push($.html(tbl));
+        tablesHtml.push(`<div style="overflow-x: auto; margin: 20px 0;">${$.html(tbl)}</div>`);
       }
     });
 
-    // 6. Extract Clean Informative Paragraphs, Headings, and Quotes
-    const paragraphs = [];
+    // 6. Extract Clean Informative Paragraphs, Headings, and Quotes (Full Article Content)
+    const elements = [];
     contentContainer.find('p, h2, h3, h4, blockquote, ul, ol').each((_, el) => {
       const tag = el.tagName.toLowerCase();
       const text = $(el).text().trim();
 
       if (!text || text.length < 15) return;
-      if (text.includes('Join Telegram') || text.includes('WhatsApp') || text.includes('All Rights Reserved')) return;
+      if (text.includes('Join Telegram') || text.includes('WhatsApp Group') || text.includes('All Rights Reserved') || text.includes('Click Here To Join')) return;
 
       if (tag === 'h2' || tag === 'h3' || tag === 'h4') {
-        paragraphs.push(`<${tag} style="color: #0f172a; font-size: 20px; margin-top: 28px; margin-bottom: 12px; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">${text}</${tag}>`);
+        elements.push(`<${tag} style="color: #0f172a; font-size: 20px; margin-top: 26px; margin-bottom: 12px; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">${text}</${tag}>`);
       } else if (tag === 'blockquote') {
-        paragraphs.push(`<blockquote style="border-left: 4px solid #4f46e5; padding: 12px 18px; margin: 20px 0; background: #f8fafc; font-style: italic; color: #1e293b; border-radius: 0 12px 12px 0;">${text}</blockquote>`);
+        elements.push(`<blockquote style="border-left: 4px solid #4f46e5; padding: 12px 18px; margin: 20px 0; background: #f8fafc; font-style: italic; color: #1e293b; border-radius: 0 12px 12px 0;">${text}</blockquote>`);
       } else if (tag === 'p') {
-        paragraphs.push(`<p style="font-size: 16px; line-height: 1.85; color: #334155; margin-bottom: 16px;">${text}</p>`);
+        elements.push(`<p style="font-size: 16px; line-height: 1.85; color: #334155; margin-bottom: 16px;">${text}</p>`);
       } else if (tag === 'ul' || tag === 'ol') {
-        paragraphs.push(`<${tag} style="padding-left: 24px; font-size: 15px; line-height: 1.8; color: #334155; margin: 16px 0;">${$(el).html()}</${tag}>`);
+        elements.push(`<${tag} style="padding-left: 24px; font-size: 15px; line-height: 1.8; color: #334155; margin: 16px 0;">${$(el).html()}</${tag}>`);
       }
     });
 
-    const bodyContentHtml = paragraphs.slice(0, 30).join('\n');
+    // Include full elements up to 80 items so complete coverage is imported
+    const bodyContentHtml = elements.slice(0, 80).join('\n');
 
     // 7. Author / Byline if present
     const author =
