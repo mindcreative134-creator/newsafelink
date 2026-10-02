@@ -189,7 +189,7 @@ export default function PostDetail() {
           
           {/* Main Article Container - Clean GeneratePress Style */}
           <main className="flex-1 min-w-0">
-            <article ref={articleRef} className="bg-white dark:bg-zinc-900 rounded-lg p-6 sm:p-10 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex flex-col gap-6">
+            <article ref={articleRef} className="bg-white dark:bg-zinc-900 rounded-lg p-5 sm:px-8 sm:pt-8 sm:pb-3 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex flex-col gap-4">
               
               {/* Category & Share */}
               <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -284,7 +284,7 @@ export default function PostDetail() {
                 totalSteps={totalSteps || 3}
                 isUnlocked={isStepVerified}
                 adSlot1="7317709042"
-                adSlot2="9320506924"
+                adSlot2="1909584638"
                 onContinue={() => {
                   navigate('/readmore');
                 }}
@@ -292,13 +292,10 @@ export default function PostDetail() {
 
             </article>
 
-            {/* Related Articles Feed with Native In-Feed Ad */}
+            {/* Related Articles Feed */}
             {relatedPosts.length > 0 && (
-              <div className="mt-8">
-                <div className="mb-6">
-                  <AdUnit variant="fluid" slot="1909584638" minHeight="120px" />
-                </div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-white font-heading mb-4 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+              <div className="mt-4">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-white font-heading mb-3 pb-2 border-b border-zinc-200 dark:border-zinc-800">
                   Related Stories &amp; Updates
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

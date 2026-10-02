@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 /**
  * Authentic Ad Unit Component (TechMint Style)
@@ -6,7 +6,7 @@ import React, { useEffect, useRef } from 'react';
  * 1. Clean, native ad wrapper that mimics GeneratePress / TechMint ad inserter blocks.
  * 2. Does NOT show fake "Advertisement" labels when ads are empty or loading.
  * 3. Gracefully pushes to window.adsbygoogle queue.
- * 4. Zero artificial borders or empty gray dummy boxes.
+ * 4. Automatically collapses to zero height if Google AdSense marks the slot unfilled.
  */
 
 const DEFAULT_CLIENT = import.meta.env?.VITE_ADSENSE_CLIENT_ID || 'ca-pub-9543073887536718';
@@ -16,12 +16,13 @@ function AdUnitComponent({
   client = DEFAULT_CLIENT,
   variant = 'banner', // 'banner' | 'fluid' | 'in-article' | 'rectangle'
   format = 'auto',
-  minHeight = '90px',
+  minHeight = '0px',
   className = '',
   style = {},
 }) {
   const insRef = useRef(null);
   const pushedRef = useRef(false);
+  const [unfilled, setUnfilled] = useState(false);
 
   useEffect(() => {
     if (pushedRef.current) return;
@@ -35,10 +36,37 @@ function AdUnitComponent({
       } catch (err) {
         // Silently catch adblock / loading exceptions
       }
-    }, 200);
+    }, 150);
 
     return () => clearTimeout(timer);
   }, [slot]);
+
+  // Monitor for Google AdSense unfilled status to collapse zero height immediately
+  useEffect(() => {
+    const el = insRef.current;
+    if (!el) return;
+
+    const checkStatus = () => {
+      if (el.getAttribute('data-ad-status') === 'unfilled') {
+        setUnfilled(true);
+      }
+    };
+
+    const observer = new MutationObserver(checkStatus);
+    observer.observe(el, { attributes: true, attributeFilter: ['data-ad-status', 'style'] });
+
+    const timeout = setTimeout(checkStatus, 3000);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  if (unfilled) {
+    // If ad is unfilled, collapse completely with ZERO margin/padding/gap!
+    return null;
+  }
 
   const isFluid = variant === 'fluid';
   const isInArticle = variant === 'in-article';
@@ -46,7 +74,7 @@ function AdUnitComponent({
   return (
     <div
       className={`ad-container text-center overflow-hidden clear-both ${className}`}
-      style={{ minHeight: minHeight || '90px', ...style }}
+      style={{ minHeight: style.minHeight !== undefined ? style.minHeight : minHeight, ...style }}
     >
       <ins
         ref={insRef}
@@ -55,7 +83,6 @@ function AdUnitComponent({
           display: 'block',
           width: '100%',
           textAlign: 'center',
-          minHeight: minHeight || '90px',
         }}
         data-ad-client={client}
         data-ad-slot={slot}
@@ -69,3 +96,4 @@ function AdUnitComponent({
 
 const AdUnit = React.memo(AdUnitComponent);
 export default AdUnit;
+

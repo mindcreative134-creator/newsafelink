@@ -183,7 +183,7 @@ export function TechmintBottomSection({
   onContinue,
   isUnlocked = false,
   adSlot1 = "7317709042",
-  adSlot2 = "9320506924"
+  adSlot2 = "1909584638"
 }) {
   const handleContinue = (e) => {
     e.preventDefault();
@@ -194,7 +194,7 @@ export function TechmintBottomSection({
     <div id="techmint-bottom-section" className="techmint-bottom-tight-container">
       {/* ── Ad Unit Directly Above Continue Button ("Sata hua") ── */}
       <div className="techmint-ad-tight-unit">
-        <AdUnit variant="banner" slot={adSlot1} minHeight="90px" />
+        <AdUnit variant="banner" slot={adSlot1} minHeight="0px" style={{ minHeight: 0 }} />
       </div>
 
       {/* ── Continue Button Section (#btn7) ── */}
@@ -217,11 +217,12 @@ export function TechmintBottomSection({
 
       {/* ── Ad Unit Directly Below Continue Button ("Sata hua") ── */}
       <div className="techmint-ad-tight-unit">
-        <AdUnit variant="banner" slot={adSlot2} minHeight="90px" />
+        <AdUnit variant="banner" slot={adSlot2} minHeight="0px" style={{ minHeight: 0 }} />
       </div>
     </div>
   );
 }
+
 
 export default TechmintTopSection;
 
