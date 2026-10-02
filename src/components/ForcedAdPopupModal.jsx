@@ -25,6 +25,12 @@ export default function ForcedAdPopupModal({
   const [hasInteracted, setHasInteracted] = useState(false);
   const modalRef = useRef(null);
 
+  const handleClose = React.useCallback(() => {
+    setIsOpen(false);
+    sessionStorage.setItem(`TECHMINT_AD_UNLOCKED_STEP_${step}`, '1');
+    if (onAdClicked) onAdClicked();
+  }, [step, onAdClicked]);
+
   useEffect(() => {
     if (!enabled) return;
 
@@ -107,13 +113,7 @@ export default function ForcedAdPopupModal({
       window.removeEventListener('blur', handleBlur);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [enabled, graceCloseDelaySec, autoCloseTimeoutSec, hasInteracted]);
-
-  const handleClose = () => {
-    setIsOpen(false);
-    sessionStorage.setItem(`TECHMINT_AD_UNLOCKED_STEP_${step}`, '1');
-    if (onAdClicked) onAdClicked();
-  };
+  }, [enabled, graceCloseDelaySec, autoCloseTimeoutSec, hasInteracted, handleClose, step]);
 
   if (!isOpen) return null;
 

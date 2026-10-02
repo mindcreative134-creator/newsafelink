@@ -149,6 +149,27 @@ export function SafelinkProvider({ children }) {
     }
   }, []);
 
+  const clearSafelink = useCallback(() => {
+    sessionStorage.removeItem('SAFE_L');
+    sessionStorage.removeItem('SAFE_STEP');
+    sessionStorage.removeItem('SAFE_S1_VERIFIED');
+    sessionStorage.removeItem('SAFE_VISITED');
+    setVisitedPostIds([]);
+    setTargetUrl('');
+    setCurrentStep(0);
+    setStep1Verified(false);
+    setStep2TimerDone(false);
+    setStep3TimerDone(false);
+  }, []);
+
+  const completeAndRedirect = useCallback(() => {
+    const dest = targetUrl || sessionStorage.getItem('SAFE_L');
+    if (dest) {
+      clearSafelink();
+      window.location.href = dest;
+    }
+  }, [targetUrl, clearSafelink]);
+
   // When clicking to continue to next step (Step 1 -> 2, or Step 2 -> Final Destination)
   const goToNextStep = useCallback(async (navigate, currentPostId = '') => {
     const nextVal = currentStep + 1;
@@ -175,27 +196,6 @@ export function SafelinkProvider({ children }) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [currentStep, totalSteps, visitedPostIds, completeAndRedirect]);
-
-  const clearSafelink = useCallback(() => {
-    sessionStorage.removeItem('SAFE_L');
-    sessionStorage.removeItem('SAFE_STEP');
-    sessionStorage.removeItem('SAFE_S1_VERIFIED');
-    sessionStorage.removeItem('SAFE_VISITED');
-    setVisitedPostIds([]);
-    setTargetUrl('');
-    setCurrentStep(0);
-    setStep1Verified(false);
-    setStep2TimerDone(false);
-    setStep3TimerDone(false);
-  }, []);
-
-  const completeAndRedirect = useCallback(() => {
-    const dest = targetUrl || sessionStorage.getItem('SAFE_L');
-    if (dest) {
-      clearSafelink();
-      window.location.href = dest;
-    }
-  }, [targetUrl, clearSafelink]);
 
   return (
     <SafelinkContext.Provider

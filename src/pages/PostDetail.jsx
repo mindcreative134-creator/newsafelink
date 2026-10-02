@@ -86,9 +86,6 @@ export default function PostDetail() {
         setLoading(false);
       });
 
-    // Clean up SEO tags when navigating away
-    return () => cleanupPostSeo();
-
     // Related posts
     getUnifiedPosts({ maxResults: 4 })
       .then((res) => {
@@ -97,6 +94,9 @@ export default function PostDetail() {
         }
       })
       .catch(() => {});
+
+    // Clean up SEO tags when navigating away
+    return () => cleanupPostSeo();
   }, [postId]);
 
   const handleShare = () => {

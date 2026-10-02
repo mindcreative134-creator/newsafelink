@@ -299,7 +299,7 @@ function formatJobAsPost(item) {
   const titleLower = (item.title || '').toLowerCase();
   const isJob = cat.includes('job') || cat.includes('admit') || cat.includes('result') || titleLower.includes('recruitment') || titleLower.includes('vacancy');
   
-  let contentHtml = '';
+  let contentHtml;
   if (item.bodyContentHtml && item.bodyContentHtml.length > 200) {
     contentHtml = item.bodyContentHtml;
   } else if (isJob) {
@@ -512,7 +512,7 @@ export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label =
   const localFormatted = (defaultJobs || []).map((item) => formatJobAsPost(item));
 
   // 2. Fetch or retrieve cached Blogger posts
-  let bloggerList = [];
+  let bloggerList;
   try {
     bloggerList = await getCachedOrFreshBloggerPosts();
   } catch (_e) {
@@ -546,15 +546,16 @@ export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label =
  */
 export async function getRandomSafelinkPost(excludeIds = []) {
   let pool = [];
-  try {
-    const res = await getUnifiedPosts({ maxResults: 150 });
-    if (res.items && res.items.length > 0) {
-      pool = res.items;
-    }
-  } catch (_e) {}
-
-  if (!pool || pool.length === 0) {
-    pool = (defaultJobs || []).map(formatJobAsPost);
+  // Use cached Blogger posts if ready, else instant local verified jobs (0ms zero latency)
+  if (cachedBloggerPosts && cachedBloggerPosts.length > 0) {
+    pool = cachedBloggerPosts;
+  } else if (defaultJobs && defaultJobs.length > 0) {
+    pool = defaultJobs.map(formatJobAsPost);
+  } else {
+    try {
+      const res = await getUnifiedPosts({ maxResults: 50 });
+      if (res.items && res.items.length > 0) pool = res.items;
+    } catch (_e) {}
   }
 
   const excludeSet = new Set((excludeIds || []).filter(Boolean));
@@ -562,6 +563,6 @@ export async function getRandomSafelinkPost(excludeIds = []) {
   const candidatePool = available.length > 0 ? available : pool;
 
   const chosen = candidatePool[Math.floor(Math.random() * candidatePool.length)];
-  return chosen || pool[0];
+  return chosen || pool[0] || { id: 'emrs-teaching-post', title: 'EMRS Teaching Post' };
 }
 
