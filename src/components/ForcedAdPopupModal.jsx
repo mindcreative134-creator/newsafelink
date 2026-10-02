@@ -140,7 +140,14 @@ export default function ForcedAdPopupModal({
           </div>
 
           {/* Ad Container inside popup */}
-          <div className="techmint-popup-ad-slot">
+          <div
+            className="techmint-popup-ad-slot cursor-pointer relative"
+            onClick={() => {
+              setHasInteracted(true);
+              document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
+              sessionStorage.setItem('TECHMINT_AD_UNLOCKED', '1');
+            }}
+          >
             <AdUnit variant="banner" slot={adSlot} minHeight="250px" className="!my-0" />
           </div>
 
