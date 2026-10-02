@@ -30,6 +30,18 @@ function PostCardSkeleton() {
   );
 }
 
+// Helper to safely decode base64 URLs
+function tryDecodeBase64(str) {
+  if (!str) return str;
+  try {
+    if (/^[A-Za-z0-9+/=]{8,}$/.test(str)) {
+      const decoded = atob(str);
+      if (decoded.startsWith('http')) return decoded;
+    }
+  } catch {}
+  return str;
+}
+
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [featuredPost, setFeaturedPost] = useState(null);
@@ -37,21 +49,38 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const { currentStep, isSafelinkActive, startSafelink, step1Verified } = useSafelink();
   const navigate = useNavigate();
 
-  // Handle Safelink Landing Page Query (?sarkaritrend=..., ?code=..., ?url=..., etc.)
+  // INSTANT CHECK: if safelink params present, show splash immediately (avoid blank page)
+  const _hasSafelinkParams = (() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      return !!(p.get('url') || p.get('sarkaritrend') || p.get('code') || p.get('alias') ||
+        p.get('short') || p.get('universtityeducations') || p.get('educationsscholorships') ||
+        p.get('o') || p.get('target') || p.get('link') || p.get('safelink') || p.get('dest') ||
+        p.get('go') || p.get('adlinkfly') || p.get('wpsafelink') || p.get('newwpsafelink'));
+    } catch { return false; }
+  })();
+
+  // Handle Safelink Landing Page Query (?url=base64, ?sarkaritrend=..., ?code=..., etc.)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sarkariParam = params.get('sarkaritrend') || params.get('code') || params.get('alias') || params.get('short') || params.get('universtityeducations') || params.get('educationsscholorships');
     const oParam = params.get('o');
-    const urlParam = params.get('url') || params.get('target') || params.get('link') || params.get('safelink') || params.get('dest') || params.get('go');
-    const adlinkflyParam = params.get('adlinkfly') || params.get('wpsafelink') || params.get('newwpsafelink');
+    // Decode base64 URL if needed
+    const rawUrlParam = params.get('url') || params.get('target') || params.get('link') || params.get('safelink') || params.get('dest') || params.get('go');
+    const urlParam = tryDecodeBase64(rawUrlParam);
+    const rawAdlinkflyParam = params.get('adlinkfly') || params.get('wpsafelink') || params.get('newwpsafelink');
+    const adlinkflyParam = tryDecodeBase64(rawAdlinkflyParam);
     const stepParam = Number(params.get('step')) || Number(params.get('st')) || 1;
 
     if (sarkariParam || oParam || urlParam || adlinkflyParam) {
-      const target = sarkariParam
-        ? (sarkariParam.startsWith('http') ? sarkariParam : `https://sarkaritrend.boats/${sarkariParam}`)
+      setIsRedirecting(true);
+      const rawSarkari = sarkariParam ? tryDecodeBase64(sarkariParam) : null;
+      const target = rawSarkari
+        ? (rawSarkari.startsWith('http') ? rawSarkari : `https://sarkaritrend.boats/${rawSarkari}`)
         : oParam
         ? `https://piko.site.je/?o=${oParam}`
         : adlinkflyParam
@@ -64,6 +93,8 @@ export default function Home() {
       getRandomSafelinkPost().then((post) => {
         const postId = post?.id || 'emrs-teaching-post';
         navigate(`/post/${postId}?step=${stepParam}`);
+      }).catch(() => {
+        navigate(`/post/emrs-teaching-post?step=${stepParam}`);
       });
     }
   }, [navigate, startSafelink]);
@@ -144,6 +175,20 @@ export default function Home() {
     { id: 'Govt Schemes & Yojana', name: 'Govt Schemes' },
     { id: 'Technology', name: 'Technology' },
   ];
+
+  // Show TechMint-style loading splash immediately when safelink params detected
+  if (_hasSafelinkParams || isRedirecting) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col items-center justify-center p-4">
+        <div className="text-center p-8 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm max-w-md w-full">
+          <div className="inline-block w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4" />
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Generating....</h2>
+          <p className="text-sm font-semibold text-zinc-600 dark:text-zinc-400 mb-1">Please Wait.</p>
+          <span className="text-xs text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-mono">Securing your link...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
