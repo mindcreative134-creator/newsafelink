@@ -118,7 +118,31 @@ setTimeout(function() {
         // Loads Google Ad Manager Rewarded Ad via googletag.enums.OutOfPageFormat.REWARDED
     }
 }, 35000);
+### C. The Forced Ad-Click Blur Popup Overlay (`#contntblock` & `#blockcont`)
+Upon entering the article, TechMint triggers a forced ad-click modal that blocks the entire viewport with a blurred background:
+
+```html
+<div class="blockcont" id="blockcont"></div>
+<div class="contntblock" id="contntblock">
+  <h5 id="continue1">👇 Click Image & Wait & Come back this page to <span style="color:red;">Get Link - Download</span>.</h5>
+  <h5 id="continue1">▼ <span style="color:red;">LINK पाने और DOWNLOAD करने</span> के लिए, 👇 फोटो पर क्लिक करें, <span style="color:blue;">15 सेकंड रुकें</span> और फिर इसी पेज पर वापस आएं</h5>
+  <div id="gads">
+    <!-- 300x250 / 336x280 Ad Slot -->
+  </div>
+  <div class="closeis" id="close-btn" onclick="hidecontntblock()">Close</div>
+</div>
 ```
+
+#### How the Ad-Click & Return Detection Works:
+1. **Backdrop Blur**: `#blockcont` uses `backdrop-filter: blur(10px)` and fixed 100vw/100vh overlay to prevent any reading or interaction with the article.
+2. **Iframe Active Element & Blur Detection**:
+   When the user clicks the ad inside the iframe, the browser triggers `document.activeElement.tagName === 'IFRAME'` and a `window.blur` event.
+3. **Visibility Change Detection (`document.addEventListener('visibilitychange')`)**:
+   - When the ad opens in a new tab, `document.hidden` becomes `true`.
+   - When the user returns back to this tab, `document.hidden` becomes `false`.
+   - The script detects the return, sets cookie `adcadg`, and calls `hidecontntblock()` to close the popup and unlock the countdown timer!
+4. **Safety Grace Fallback**:
+   A `setTimeout` displays a small "Close" button after 4-5 seconds so visitors using ad blockers or slow networks never get trapped.
 
 ---
 
