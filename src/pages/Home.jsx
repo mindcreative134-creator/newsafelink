@@ -43,26 +43,27 @@ export default function Home() {
   // Handle Safelink Landing Page Query (?sarkaritrend=..., ?code=..., ?url=..., etc.)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const sarkariParam = params.get('sarkaritrend') || params.get('code') || params.get('alias') || params.get('short') || params.get('universtityeducations');
+    const sarkariParam = params.get('sarkaritrend') || params.get('code') || params.get('alias') || params.get('short') || params.get('universtityeducations') || params.get('educationsscholorships');
     const oParam = params.get('o');
-    const urlParam = params.get('url') || params.get('target') || params.get('link') || params.get('safelink') || params.get('dest');
-    const adlinkflyParam = params.get('adlinkfly');
+    const urlParam = params.get('url') || params.get('target') || params.get('link') || params.get('safelink') || params.get('dest') || params.get('go');
+    const adlinkflyParam = params.get('adlinkfly') || params.get('wpsafelink') || params.get('newwpsafelink');
+    const stepParam = Number(params.get('step')) || Number(params.get('st')) || 1;
 
     if (sarkariParam || oParam || urlParam || adlinkflyParam) {
       const target = sarkariParam
-        ? `https://sarkaritrend.boats/${sarkariParam}`
+        ? (sarkariParam.startsWith('http') ? sarkariParam : `https://sarkaritrend.boats/${sarkariParam}`)
         : oParam
         ? `https://piko.site.je/?o=${oParam}`
         : adlinkflyParam
-        ? `https://sarkaritrend.boats/${adlinkflyParam}`
+        ? (adlinkflyParam.startsWith('http') ? adlinkflyParam : `https://sarkaritrend.boats/${adlinkflyParam}`)
         : urlParam;
 
-      startSafelink(target, 1);
+      startSafelink(target, stepParam);
 
-      // Auto-forward to Step 1 article (TechMint Splash Landing UX)
+      // Auto-forward to article (TechMint Splash Landing UX)
       getRandomSafelinkPost().then((post) => {
         const postId = post?.id || 'emrs-teaching-post';
-        navigate(`/post/${postId}?step=1`);
+        navigate(`/post/${postId}?step=${stepParam}`);
       });
     }
   }, [navigate, startSafelink]);

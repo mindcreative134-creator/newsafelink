@@ -9,6 +9,8 @@ import StaticPages from './pages/StaticPages';
 import StickyBottomAd from './components/StickyBottomAd';
 import { useSafelink } from './context/SafelinkContext';
 
+import StudyEducationsLanding from './pages/StudyEducationsLanding';
+import ReadMoreHandler from './pages/ReadMoreHandler';
 import ErrorBoundary from './components/ErrorBoundary';
 
 export default function App() {
@@ -37,6 +39,10 @@ export default function App() {
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/studyeducations" element={<StudyEducationsLanding />} />
+            <Route path="/studyeducations/*" element={<StudyEducationsLanding />} />
+            <Route path="/readmore" element={<ReadMoreHandler />} />
+            <Route path="/readmore/*" element={<ReadMoreHandler />} />
             <Route path="/post/:postId" element={<PostDetail />} />
             <Route path="/category/:label" element={<Category />} />
             <Route path="/about" element={<StaticPages type="about" />} />
@@ -44,6 +50,7 @@ export default function App() {
             <Route path="/privacy-policy" element={<StaticPages type="privacy" />} />
             <Route path="/disclaimer" element={<StaticPages type="disclaimer" />} />
             <Route path="/terms-conditions" element={<StaticPages type="terms" />} />
+            <Route path="*" element={<Home />} />
           </Routes>
         </ErrorBoundary>
       </div>

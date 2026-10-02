@@ -91,9 +91,18 @@ export function SafelinkProvider({ children }) {
         // Automatically verify robot entry for direct shortlink traffic (TechMint UX)
         sessionStorage.setItem('SAFE_S1_VERIFIED', '1');
         setStep1Verified(true);
-      } else if (stepParam >= 1 && stepParam <= activeTotalSteps) {
-        setCurrentStep(stepParam);
-        sessionStorage.setItem('SAFE_STEP', String(stepParam));
+      } else {
+        // Ensure default target and step for testing and direct article browsing
+        const existing = sessionStorage.getItem('SAFE_L');
+        if (!existing) {
+          sessionStorage.setItem('SAFE_L', 'https://sarkaritrend.boats/');
+          setTargetUrl('https://sarkaritrend.boats/');
+        } else {
+          setTargetUrl(existing);
+        }
+        const initialStep = (stepParam >= 1 && stepParam <= activeTotalSteps) ? stepParam : 1;
+        setCurrentStep(initialStep);
+        sessionStorage.setItem('SAFE_STEP', String(initialStep));
       }
     } catch {}
   }, []);
@@ -194,7 +203,7 @@ export function SafelinkProvider({ children }) {
         targetUrl,
         currentStep,
         totalSteps,
-        isSafelinkActive: currentStep > 0 && Boolean(targetUrl || sessionStorage.getItem('SAFE_L')),
+        isSafelinkActive: true,
         step1Verified,
         markStep1Verified,
         step2TimerDone,

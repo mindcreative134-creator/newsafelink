@@ -13,10 +13,11 @@ import './ForcedAdPopupModal.css';
  * 5. Provides a fallback close button after a grace delay so users with ad blockers aren't trapped.
  */
 export default function ForcedAdPopupModal({
+  step = 1,
   onAdClicked,
   adSlot = "9320506924",
   autoCloseTimeoutSec = 45,
-  graceCloseDelaySec = 5,
+  graceCloseDelaySec = 4,
   enabled = true
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,17 +28,19 @@ export default function ForcedAdPopupModal({
   useEffect(() => {
     if (!enabled) return;
 
-    // Check if user already clicked/unlocked in this session
-    const alreadyUnlocked = sessionStorage.getItem('TECHMINT_AD_UNLOCKED') === '1' ||
-                            document.cookie.includes('adcadg=');
-    if (alreadyUnlocked) {
+    // Reset interaction for the current step
+    setHasInteracted(false);
+
+    // Check if user already unlocked this specific step
+    const stepKey = `TECHMINT_AD_UNLOCKED_STEP_${step}`;
+    if (sessionStorage.getItem(stepKey) === '1') {
       return;
     }
 
-    // Show popup immediately or after brief 300ms delay
+    // Show popup after short 350ms delay
     const showTimer = setTimeout(() => {
       setIsOpen(true);
-    }, 400);
+    }, 350);
 
     // Grace delay to show close button (fallback for adblockers)
     const closeBtnTimer = setTimeout(() => {
@@ -108,7 +111,7 @@ export default function ForcedAdPopupModal({
 
   const handleClose = () => {
     setIsOpen(false);
-    sessionStorage.setItem('TECHMINT_AD_UNLOCKED', '1');
+    sessionStorage.setItem(`TECHMINT_AD_UNLOCKED_STEP_${step}`, '1');
     if (onAdClicked) onAdClicked();
   };
 

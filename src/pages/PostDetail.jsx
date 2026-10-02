@@ -147,33 +147,32 @@ export default function PostDetail() {
     (rawJob.qualification && !rawJob.qualification.toLowerCase().includes('notice'))
   );
 
+  const activeStep = currentStep > 0 ? currentStep : 1;
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
       {/* ── Authentic TechMint Forced Ad-Click Popup Modal ── */}
-      {isSafelinkActive && (
-        <ForcedAdPopupModal
-          onAdClicked={() => {
-            // Unlocks timer and speeds up verification
-            document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
-          }}
-          adSlot="9320506924"
-          graceCloseDelaySec={5}
-        />
-      )}
+      <ForcedAdPopupModal
+        step={activeStep}
+        onAdClicked={() => {
+          // Unlocks timer and speeds up verification
+          document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
+        }}
+        adSlot="9320506924"
+        graceCloseDelaySec={4}
+      />
 
       {/* ── Modern TechMint Safelink: Top Section (Ad -> Countdown -> Verify -> Guidance -> Ad) ── */}
-      {isSafelinkActive && (
-        <div className="max-w-4xl mx-auto px-4 pt-4">
-          <TechmintTopSection
-            currentStep={currentStep}
-            totalSteps={totalSteps || 2}
-            isVerified={isStepVerified}
-            onVerify={() => setIsStepVerified(true)}
-            timerSeconds={20}
-          />
-        </div>
-      )}
+      <div className="max-w-4xl mx-auto px-4 pt-4">
+        <TechmintTopSection
+          currentStep={activeStep}
+          totalSteps={totalSteps || 2}
+          isVerified={isStepVerified}
+          onVerify={() => setIsStepVerified(true)}
+          timerSeconds={20}
+        />
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
@@ -321,20 +320,14 @@ export default function PostDetail() {
               )}
 
               {/* ── Modern TechMint Safelink: Bottom Section (Ad -> Continue Button -> Ad) ── */}
-              {isSafelinkActive && (
-                <TechmintBottomSection
-                  currentStep={currentStep}
-                  totalSteps={totalSteps || 2}
-                  isUnlocked={isStepVerified}
-                  onContinue={() => {
-                    if (currentStep >= (totalSteps || 2)) {
-                      completeAndRedirect();
-                    } else {
-                      goToNextStep(navigate, postId);
-                    }
-                  }}
-                />
-              )}
+              <TechmintBottomSection
+                currentStep={activeStep}
+                totalSteps={totalSteps || 2}
+                isUnlocked={isStepVerified}
+                onContinue={() => {
+                  navigate('/readmore');
+                }}
+              />
 
             </article>
 
