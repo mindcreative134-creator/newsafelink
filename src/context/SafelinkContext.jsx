@@ -20,6 +20,8 @@ export function SafelinkProvider({ children }) {
   const [step2TimerDone, setStep2TimerDone] = useState(false);
   const [step3TimerDone, setStep3TimerDone] = useState(false);
 
+  const [totalSteps, setTotalSteps] = useState(() => Number(sessionStorage.getItem('SAFE_TOTAL_STEPS')) || 2);
+
   // Helper to safely extract destination URL from varied query params / base64 payloads
   const extractDestination = (raw) => {
     if (!raw) return '';
@@ -38,25 +40,38 @@ export function SafelinkProvider({ children }) {
     return candidate;
   };
 
-  // Auto-detect URL queries on page load or query change (?o=..., ?url=..., ?target=..., ?safelink=..., ?adlinkfly=..., ?newwpsafelink=...)
+  // Auto-detect URL queries on page load or query change
+  // Supports: sarkaritrend.boats, arolinks/techmint (?universtityeducations=...), AdLinkFly (?adlinkfly=...), WP-Safelink (?wpsafelink=...), and direct (?url=...)
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const oParam = params.get('o');
-      const urlParam = params.get('url') || params.get('target') || params.get('link') || params.get('safelink');
+      const urlParam = params.get('url') || params.get('target') || params.get('link') || params.get('safelink') || params.get('dest');
       const adlinkflyParam = params.get('adlinkfly');
       const wpsafeParam = params.get('wpsafelink') || params.get('safelink_redirect') || params.get('go') || params.get('newwpsafelink');
-      const stepParam = Number(params.get('step'));
+      
+      // Sarkaritrend.boats & TechMint-style Shortener Parameters
+      const sarkariParam = params.get('sarkaritrend') || params.get('code') || params.get('alias') || params.get('short') || params.get('universtityeducations') || params.get('educationsscholorships');
+      
+      const stepParam = Number(params.get('step')) || Number(params.get('st'));
+      const stepsConfigParam = Number(params.get('steps'));
+      const activeTotalSteps = stepsConfigParam && stepsConfigParam >= 1 && stepsConfigParam <= 3 ? stepsConfigParam : 2;
+
+      setTotalSteps(activeTotalSteps);
+      sessionStorage.setItem('SAFE_TOTAL_STEPS', String(activeTotalSteps));
 
       let rawTarget = '';
-      if (oParam) {
+      if (sarkariParam) {
+        // Connected to user's shortener: sarkaritrend.boats
+        rawTarget = urlParam || `https://sarkaritrend.boats/${sarkariParam}`;
+      } else if (oParam) {
         rawTarget = `https://piko.site.je/?o=${oParam}`;
       } else if (urlParam) {
         rawTarget = urlParam;
       } else if (wpsafeParam) {
         rawTarget = extractDestination(wpsafeParam);
       } else if (adlinkflyParam) {
-        rawTarget = `https://shortxlinks.com/${adlinkflyParam}`;
+        rawTarget = `https://sarkaritrend.boats/${adlinkflyParam}`;
       }
 
       const finalDecoded = extractDestination(rawTarget);
@@ -65,17 +80,25 @@ export function SafelinkProvider({ children }) {
         sessionStorage.setItem('SAFE_L', finalDecoded);
         setTargetUrl(finalDecoded);
 
-        const initialStep = (stepParam >= 1 && stepParam <= 3) ? stepParam : 1;
+        // Inject High-CPC Ad keyword cookies (matches TechMint uopusi)
+        try {
+          document.cookie = "uopusi=education%2Cloan%2Cinsurance%2Cjobvacancy; path=/; max-age=10000";
+        } catch {}
+
+        const initialStep = (stepParam >= 1 && stepParam <= activeTotalSteps) ? stepParam : 1;
         sessionStorage.setItem('SAFE_STEP', String(initialStep));
         setCurrentStep(initialStep);
-      } else if (stepParam >= 1 && stepParam <= 3) {
+        // Automatically verify robot entry for direct shortlink traffic (TechMint UX)
+        sessionStorage.setItem('SAFE_S1_VERIFIED', '1');
+        setStep1Verified(true);
+      } else if (stepParam >= 1 && stepParam <= activeTotalSteps) {
         setCurrentStep(stepParam);
         sessionStorage.setItem('SAFE_STEP', String(stepParam));
       }
     } catch {}
   }, []);
 
-  const startSafelink = useCallback((url, step = 1) => {
+  const startSafelink = useCallback((url, step = 1, configSteps = 2) => {
     let decodedUrl = url;
     try {
       if (url && url.match(/^[A-Za-z0-9+/=]+$/) && url.length > 8) {
@@ -85,12 +108,14 @@ export function SafelinkProvider({ children }) {
 
     sessionStorage.setItem('SAFE_L', decodedUrl || '');
     sessionStorage.setItem('SAFE_STEP', String(step));
-    sessionStorage.removeItem('SAFE_S1_VERIFIED');
+    sessionStorage.setItem('SAFE_TOTAL_STEPS', String(configSteps));
+    sessionStorage.setItem('SAFE_S1_VERIFIED', '1');
     sessionStorage.removeItem('SAFE_VISITED');
     setVisitedPostIds([]);
     setTargetUrl(decodedUrl || '');
     setCurrentStep(step);
-    setStep1Verified(false);
+    setTotalSteps(configSteps);
+    setStep1Verified(true);
     setStep2TimerDone(false);
     setStep3TimerDone(false);
   }, []);
@@ -115,10 +140,14 @@ export function SafelinkProvider({ children }) {
     }
   }, []);
 
-  // When clicking to continue to next step (Step 1 -> 2, or Step 2 -> 3)
+  // When clicking to continue to next step (Step 1 -> 2, or Step 2 -> Final Destination)
   const goToNextStep = useCallback(async (navigate, currentPostId = '') => {
     const nextVal = currentStep + 1;
-    if (nextVal > 3) return;
+    if (nextVal > totalSteps) {
+      // Completed all steps!
+      completeAndRedirect();
+      return;
+    }
 
     sessionStorage.setItem('SAFE_STEP', String(nextVal));
     setCurrentStep(nextVal);
@@ -136,7 +165,7 @@ export function SafelinkProvider({ children }) {
       navigate(`/post/${chosenId}?step=${nextVal}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [currentStep, visitedPostIds]);
+  }, [currentStep, totalSteps, visitedPostIds, completeAndRedirect]);
 
   const clearSafelink = useCallback(() => {
     sessionStorage.removeItem('SAFE_L');
@@ -164,6 +193,7 @@ export function SafelinkProvider({ children }) {
       value={{
         targetUrl,
         currentStep,
+        totalSteps,
         isSafelinkActive: currentStep > 0 && Boolean(targetUrl || sessionStorage.getItem('SAFE_L')),
         step1Verified,
         markStep1Verified,

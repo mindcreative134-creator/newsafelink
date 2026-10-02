@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getUnifiedPosts } from '../services/postService';
+import { getUnifiedPosts, getRandomSafelinkPost } from '../services/postService';
 import { useSafelink } from '../context/SafelinkContext';
 import { getPostThumbnail } from '../utils/postThumbnail';
 import Sidebar from '../components/Sidebar';
@@ -40,17 +40,32 @@ export default function Home() {
   const { currentStep, isSafelinkActive, startSafelink, step1Verified } = useSafelink();
   const navigate = useNavigate();
 
-  // Handle Safelink Landing Page Query (?o=... or ?url=...)
+  // Handle Safelink Landing Page Query (?sarkaritrend=..., ?code=..., ?url=..., etc.)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const sarkariParam = params.get('sarkaritrend') || params.get('code') || params.get('alias') || params.get('short') || params.get('universtityeducations');
     const oParam = params.get('o');
-    const urlParam = params.get('url') || params.get('target');
+    const urlParam = params.get('url') || params.get('target') || params.get('link') || params.get('safelink') || params.get('dest');
+    const adlinkflyParam = params.get('adlinkfly');
 
-    if (oParam || urlParam) {
-      const target = oParam ? `https://piko.site.je/?o=${oParam}` : urlParam;
+    if (sarkariParam || oParam || urlParam || adlinkflyParam) {
+      const target = sarkariParam
+        ? `https://sarkaritrend.boats/${sarkariParam}`
+        : oParam
+        ? `https://piko.site.je/?o=${oParam}`
+        : adlinkflyParam
+        ? `https://sarkaritrend.boats/${adlinkflyParam}`
+        : urlParam;
+
       startSafelink(target, 1);
+
+      // Auto-forward to Step 1 article (TechMint Splash Landing UX)
+      getRandomSafelinkPost().then((post) => {
+        const postId = post?.id || 'emrs-teaching-post';
+        navigate(`/post/${postId}?step=1`);
+      });
     }
-  }, [startSafelink]);
+  }, [navigate, startSafelink]);
 
   // Fetch posts
   const fetchPosts = (label = '') => {

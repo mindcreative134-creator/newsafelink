@@ -4,8 +4,7 @@ import { getPostById } from '../services/postService';
 import { getUnifiedPosts } from '../services/postService';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
-import WpSafelinkTopSection from '../components/WpSafelinkTopSection';
-import WpSafelinkBottomSection from '../components/WpSafelinkBottomSection';
+import { TechmintTopSection, TechmintBottomSection } from '../components/TechmintSafelinkWidget';
 import RobotVerificationWidget from '../components/RobotVerificationWidget';
 import { 
   Calendar, Clock, User, ArrowRight, ShieldCheck, 
@@ -43,7 +42,8 @@ function PostDetailSkeleton() {
 export default function PostDetail() {
   const { postId } = useParams();
   const navigate = useNavigate();
-  const { currentStep, isSafelinkActive, step1Verified } = useSafelink();
+  const { currentStep, totalSteps, isSafelinkActive, goToNextStep, completeAndRedirect } = useSafelink();
+  const [isStepVerified, setIsStepVerified] = useState(false);
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -54,7 +54,8 @@ export default function PostDetail() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [postId]);
+    setIsStepVerified(false);
+  }, [postId, currentStep]);
 
   useEffect(() => {
     if (!post || !articleRef.current) return;
@@ -148,17 +149,16 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
-      {/* ── WP-Safelink 3-Page Flow: Top Section (Ad -> Timer / Generate -> Ad) at very top ── */}
-      {isSafelinkActive && step1Verified && currentStep >= 1 && currentStep <= 3 && (
+      {/* ── Modern TechMint Safelink: Top Section (Ad -> Countdown -> Verify -> Guidance -> Ad) ── */}
+      {isSafelinkActive && (
         <div className="max-w-4xl mx-auto px-4 pt-4">
-          <WpSafelinkTopSection currentPostId={postId} />
-        </div>
-      )}
-
-      {/* ── Initial Entry: I am not a robot (Ad -> Robot Check -> Ad) ── */}
-      {isSafelinkActive && !step1Verified && (
-        <div className="max-w-4xl mx-auto px-4 pt-4">
-          <RobotVerificationWidget currentPostId={postId} />
+          <TechmintTopSection
+            currentStep={currentStep}
+            totalSteps={totalSteps || 2}
+            isVerified={isStepVerified}
+            onVerify={() => setIsStepVerified(true)}
+            timerSeconds={20}
+          />
         </div>
       )}
 
@@ -307,9 +307,20 @@ export default function PostDetail() {
                 </div>
               )}
 
-              {/* ── WP-Safelink 3-Page Flow: Bottom Section (Ad -> Wait -> Action Button -> Ad) ── */}
-              {isSafelinkActive && step1Verified && currentStep >= 1 && currentStep <= 3 && (
-                <WpSafelinkBottomSection currentPostId={postId} />
+              {/* ── Modern TechMint Safelink: Bottom Section (Ad -> Continue Button -> Ad) ── */}
+              {isSafelinkActive && (
+                <TechmintBottomSection
+                  currentStep={currentStep}
+                  totalSteps={totalSteps || 2}
+                  isUnlocked={isStepVerified}
+                  onContinue={() => {
+                    if (currentStep >= (totalSteps || 2)) {
+                      completeAndRedirect();
+                    } else {
+                      goToNextStep(navigate, postId);
+                    }
+                  }}
+                />
               )}
 
             </article>
