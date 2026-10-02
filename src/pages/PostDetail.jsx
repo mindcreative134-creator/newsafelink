@@ -152,13 +152,24 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-[#f8f9fa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
+      {/* ── Forced Ad Popup Modal (Engaging Ad Popup with fallbacks) ── */}
+      <ForcedAdPopupModal
+        step={activeStep}
+        adSlot="7317709042"
+        enabled={true}
+        autoCloseTimeoutSec={35}
+        graceCloseDelaySec={4}
+      />
+
       {/* ── Fixed Sticky Step Bar (From TechmintTopSection) ── */}
       <TechmintTopSection
         currentStep={activeStep}
-        totalSteps={totalSteps || 2}
+        totalSteps={totalSteps || 3}
         isVerified={isStepVerified}
         onVerify={() => setIsStepVerified(true)}
-        timerSeconds={20}
+        timerSeconds={15}
+        adSlotTop="9320506924"
+        adSlotBottom="4392273015"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -228,8 +239,8 @@ export default function PostDetail() {
               )}
 
 
-              {/* Native Fluid Ad Unit 1 */}
-              <AdUnit variant="fluid" slot="9320506924" minHeight="120px" className="my-2" />
+              {/* Native Fluid In-Article Ad Unit */}
+              <AdUnit variant="fluid" slot="1909584638" minHeight="120px" className="my-2" />
 
               {/* Recruitment Overview Box (If it's an authentic job with specifics) */}
               {isRecruitment && (
@@ -265,39 +276,15 @@ export default function PostDetail() {
               />
 
               {/* Native In-Article Ad Unit 2 */}
-              <AdUnit variant="in-article" slot="4392273015" minHeight="140px" className="my-4" />
+              <AdUnit variant="in-article" slot="4392273015" minHeight="140px" className="my-3" />
 
-              {/* Official Verified Direct Action Box */}
-              {applyUrl && (
-                <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-zinc-900 to-indigo-950 text-white border border-indigo-900/50 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div>
-                    <h4 className="text-sm sm:text-base font-bold text-white mb-1 flex items-center gap-2">
-                      <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
-                      Official Portal &amp; Direct Access
-                    </h4>
-                    <p className="text-xs text-zinc-300">
-                      Direct verified gateway provided by {post.sourceName || 'official authority'}.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <a
-                      href={applyUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs uppercase tracking-wider flex items-center gap-2 shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Open Official Portal ➔
-                    </a>
-                  </div>
-                </div>
-              )}
-
-              {/* ── Modern TechMint Safelink: Bottom Section (Ad -> Continue Button -> Ad) ── */}
+              {/* ── Safelink Bottom Section: Top Ad -> Continue Button -> Bottom Ad ("Sata hua") ── */}
               <TechmintBottomSection
                 currentStep={activeStep}
-                totalSteps={totalSteps || 2}
+                totalSteps={totalSteps || 3}
                 isUnlocked={isStepVerified}
+                adSlot1="7317709042"
+                adSlot2="9320506924"
                 onContinue={() => {
                   navigate('/readmore');
                 }}

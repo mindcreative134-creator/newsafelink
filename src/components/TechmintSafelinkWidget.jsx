@@ -9,10 +9,10 @@ import './TechmintSafelink.css';
  */
 export function TechmintTopSection({
   currentStep = 1,
-  totalSteps = 2,
+  totalSteps = 3,
   onVerify,
   isVerified = false,
-  timerSeconds = 20,
+  timerSeconds = 15,
   adSlotTop = "9320506924",
   adSlotBottom = "4392273015"
 }) {
@@ -23,7 +23,7 @@ export function TechmintTopSection({
   useEffect(() => {
     // Check if user has ad reward cookie
     const hasAdCookie = typeof document !== 'undefined' && document.cookie.includes('adcadg=');
-    const startCount = hasAdCookie ? 12 : timerSeconds;
+    const startCount = hasAdCookie ? 10 : timerSeconds;
     setSeconds(startCount);
     setTimerFinished(false);
 
@@ -43,7 +43,7 @@ export function TechmintTopSection({
       const activeEl = document.activeElement;
       if (activeEl && activeEl.tagName === 'IFRAME') {
         document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
-        setSeconds((curr) => (curr > 5 ? 5 : curr));
+        setSeconds((curr) => (curr > 4 ? 4 : curr));
         clearInterval(monitor);
       }
     }, 200);
@@ -64,19 +64,12 @@ export function TechmintTopSection({
 
   const handleVerifyClick = () => {
     if (onVerify) onVerify();
-
-    // Smooth scroll down to the continue button at bottom
-    setTimeout(() => {
-      const bottomSection = document.getElementById('techmint-bottom-section');
-      if (bottomSection) {
-        bottomSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 150);
+    // Do NOT auto-scroll to bottom - User explicitly requested staying and showing guidance
   };
 
   return (
     <>
-      {/* ── 1. TechMint Fixed Sticky Step Bar (#tm-stick) ── */}
+      {/* ── 1. Sticky Step Bar (#tm-stick) ── */}
       <div id="tm-stick" role="alert">
         <strong>
           You are currently on step <span style={{ color: '#e60023' }}>{currentStep}/{totalSteps}</span>
@@ -85,12 +78,12 @@ export function TechmintTopSection({
       </div>
 
       <div className="techmint-widget-container">
-        {/* ── 2. TechMint Green Instruction Banner ── */}
+        {/* ── 2. Green Instruction Banner ── */}
         <div className="tm-instruction-banner">
           Click On The Below Image Ad, Wait 15 Sec &amp; Come Back To This Page To Get The Verified Link
         </div>
 
-        {/* ── 3. Top Banner Ad ── */}
+        {/* ── 3. Top Banner Ad (Always reserved height so it never collapses) ── */}
         <div className="techmint-ad-wrapper">
           <AdUnit variant="banner" slot={adSlotTop} minHeight="90px" />
         </div>
@@ -123,12 +116,27 @@ export function TechmintTopSection({
           </div>
         )}
 
-        {/* ── 6. Guidance Instruction (#ce-text) ── */}
+        {/* ── 6. Guidance Instruction (#ce-text) - Does NOT auto-scroll, shows clear instructions ── */}
         {isVerified && (
           <div className="techmint-center my-3">
-            <h4 id="ce-text" className="techmint-guidance-text">
-              Scroll down &amp; click on <span className="highlight-blue">Continue</span> button for your destination link
-            </h4>
+            <div id="ce-text" className="techmint-scroll-guidance-card">
+              <div className="techmint-guidance-badge">
+                <span className="binking-emoji">👇</span>
+                <span>STEP {currentStep} VERIFIED</span>
+                <span className="binking-emoji">👇</span>
+              </div>
+              <h4 className="techmint-guidance-heading">
+                👇 Scroll down and click on <span className="highlight-red">Continue</span> button 👇
+              </h4>
+              <p className="techmint-guidance-subtext">
+                Please scroll down to the bottom of the article to click the Continue button.
+              </p>
+              <div className="techmint-down-arrows-row">
+                <span>👇</span>
+                <span className="binking-emoji">👇</span>
+                <span>👇</span>
+              </div>
+            </div>
           </div>
         )}
 
@@ -165,16 +173,17 @@ export function TechmintTopSection({
 }
 
 /**
- * Authentic TechMint Safelink Bottom Widget
+ * Authentic Safelink Bottom Widget
  * Placed at the bottom of the article.
+ * Tightly sandwiches Continue button between top and bottom ads with ZERO large gaps ("Sata hua").
  */
 export function TechmintBottomSection({
   currentStep = 1,
-  totalSteps = 2,
+  totalSteps = 3,
   onContinue,
   isUnlocked = false,
-  adSlot1 = "5930219482",
-  adSlot2 = "8301948271"
+  adSlot1 = "7317709042",
+  adSlot2 = "9320506924"
 }) {
   const handleContinue = (e) => {
     e.preventDefault();
@@ -182,28 +191,23 @@ export function TechmintBottomSection({
   };
 
   return (
-    <div id="techmint-bottom-section" className="techmint-bottom-container">
-      {/* Ad Unit Above Continue Button */}
-      <div className="techmint-ad-wrapper">
+    <div id="techmint-bottom-section" className="techmint-bottom-tight-container">
+      {/* ── Ad Unit Directly Above Continue Button ("Sata hua") ── */}
+      <div className="techmint-ad-tight-unit">
         <AdUnit variant="banner" slot={adSlot1} minHeight="90px" />
       </div>
 
-      {/* Continue Button Section (#btn7) */}
-      <div className="techmint-center my-4">
+      {/* ── Continue Button Section (#btn7) ── */}
+      <div className="techmint-continue-tight-wrapper">
         {isUnlocked ? (
-          <a
+          <button
             id="btn7"
-            href="#continue"
+            type="button"
             onClick={handleContinue}
-            style={{ textDecoration: 'none', display: 'inline-block' }}
+            className="ce-btn ce-blue techmint-continue-glow"
           >
-            <button
-              type="button"
-              className="ce-btn ce-blue techmint-continue-glow"
-            >
-              Continue
-            </button>
-          </a>
+            Continue ➔
+          </button>
         ) : (
           <div className="techmint-locked-notice">
             <span>🔒 Please complete verification at the top of the article</span>
@@ -211,8 +215,8 @@ export function TechmintBottomSection({
         )}
       </div>
 
-      {/* Ad Unit Below Continue Button */}
-      <div className="techmint-ad-wrapper">
+      {/* ── Ad Unit Directly Below Continue Button ("Sata hua") ── */}
+      <div className="techmint-ad-tight-unit">
         <AdUnit variant="banner" slot={adSlot2} minHeight="90px" />
       </div>
     </div>
@@ -220,3 +224,4 @@ export function TechmintBottomSection({
 }
 
 export default TechmintTopSection;
+

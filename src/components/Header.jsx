@@ -110,15 +110,15 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
             
-            {/* Brand Logo - Clean TechMint Style */}
+            {/* Brand Logo - SarkariTrend */}
             <div className="flex-shrink-0">
-              <Link to="/" className="flex items-center gap-2 group" aria-label="Home">
-                <div className="w-8 h-8 rounded-lg bg-[#e60023] flex items-center justify-center text-white font-black text-base shadow-sm">
-                  TM
+              <Link to="/" className="flex items-center gap-2 group" aria-label="SarkariTrend Home">
+                <div className="w-8 h-8 rounded-lg bg-[#e60023] flex items-center justify-center text-white font-black text-sm shadow-sm">
+                  ST
                 </div>
                 <div className="flex items-baseline">
                   <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white font-sans">
-                    Tech<span className="text-[#e60023]">Mint</span>
+                    Sarkari<span className="text-[#e60023]">Trend</span>
                   </span>
                 </div>
               </Link>

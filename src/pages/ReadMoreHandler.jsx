@@ -18,7 +18,7 @@ export default function ReadMoreHandler() {
 
   useEffect(() => {
     const rawStep = Number(sessionStorage.getItem('SAFE_STEP')) || currentStep || 1;
-    const maxSteps = Number(sessionStorage.getItem('SAFE_TOTAL_STEPS')) || totalSteps || 2;
+    const maxSteps = Number(sessionStorage.getItem('SAFE_TOTAL_STEPS')) || totalSteps || 3;
 
     const timer = setTimeout(async () => {
       if (rawStep >= maxSteps) {

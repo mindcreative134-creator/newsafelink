@@ -145,13 +145,42 @@ export default function ForcedAdPopupModal({
           {/* Ad Container inside popup */}
           <div
             className="techmint-popup-ad-slot cursor-pointer relative"
+            style={{ minHeight: '260px', width: '100%', maxWidth: '336px', margin: '0 auto' }}
             onClick={() => {
               setHasInteracted(true);
               document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
               sessionStorage.setItem('TECHMINT_AD_UNLOCKED', '1');
             }}
           >
-            <AdUnit variant="banner" slot={adSlot} minHeight="250px" className="!my-0" />
+            <AdUnit 
+              variant="rectangle" 
+              format="rectangle" 
+              slot={adSlot} 
+              minHeight="250px" 
+              className="!my-0 w-full" 
+            />
+
+            {/* High-CPC Sponsor Link Fallback if AdSense is pending */}
+            <div className="techmint-sponsor-fallback p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-zinc-800 dark:to-zinc-850 rounded-lg border border-blue-200 dark:border-zinc-700 mt-2 text-left w-full">
+              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
+                ⭐ Featured Sponsor Offer
+              </span>
+              <p className="text-xs font-bold text-zinc-900 dark:text-white mt-0.5 leading-snug">
+                Top Online Degrees &amp; Global Education Grants 2026
+              </p>
+              <a
+                href="https://sarkaritrend.boats/"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  setHasInteracted(true);
+                  setTimeout(() => handleClose(), 1500);
+                }}
+                className="mt-2 inline-flex items-center justify-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded transition-colors"
+              >
+                👉 Click Here to Visit Sponsor (Unlocks Link) 👈
+              </a>
+            </div>
           </div>
 
           {/* Grace Close Button */}
@@ -172,3 +201,4 @@ export default function ForcedAdPopupModal({
     </>
   );
 }
+

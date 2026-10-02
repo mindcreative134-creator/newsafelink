@@ -20,7 +20,7 @@ export function SafelinkProvider({ children }) {
   const [step2TimerDone, setStep2TimerDone] = useState(false);
   const [step3TimerDone, setStep3TimerDone] = useState(false);
 
-  const [totalSteps, setTotalSteps] = useState(() => Number(sessionStorage.getItem('SAFE_TOTAL_STEPS')) || 2);
+  const [totalSteps, setTotalSteps] = useState(() => Number(sessionStorage.getItem('SAFE_TOTAL_STEPS')) || 3);
 
   // Helper to safely extract destination URL from varied query params / base64 payloads
   const extractDestination = (raw) => {
@@ -55,7 +55,7 @@ export function SafelinkProvider({ children }) {
       
       const stepParam = Number(params.get('step')) || Number(params.get('st'));
       const stepsConfigParam = Number(params.get('steps'));
-      const activeTotalSteps = stepsConfigParam && stepsConfigParam >= 1 && stepsConfigParam <= 3 ? stepsConfigParam : 2;
+      const activeTotalSteps = stepsConfigParam && stepsConfigParam >= 1 && stepsConfigParam <= 3 ? stepsConfigParam : 3;
 
       setTotalSteps(activeTotalSteps);
       sessionStorage.setItem('SAFE_TOTAL_STEPS', String(activeTotalSteps));
@@ -107,7 +107,7 @@ export function SafelinkProvider({ children }) {
     } catch {}
   }, []);
 
-  const startSafelink = useCallback((url, step = 1, configSteps = 2) => {
+  const startSafelink = useCallback((url, step = 1, configSteps = 3) => {
     let decodedUrl = url;
     try {
       if (url && url.match(/^[A-Za-z0-9+/=]+$/) && url.length > 8) {

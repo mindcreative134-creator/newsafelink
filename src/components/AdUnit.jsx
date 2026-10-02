@@ -11,7 +11,7 @@ import React, { useEffect, useRef } from 'react';
 
 const DEFAULT_CLIENT = import.meta.env?.VITE_ADSENSE_CLIENT_ID || 'ca-pub-9543073887536718';
 
-export default function AdUnit({
+function AdUnitComponent({
   slot = '9320506924',
   client = DEFAULT_CLIENT,
   variant = 'banner', // 'banner' | 'fluid' | 'in-article' | 'rectangle'
@@ -35,18 +35,18 @@ export default function AdUnit({
       } catch (err) {
         // Silently catch adblock / loading exceptions
       }
-    }, 150);
+    }, 200);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [slot]);
 
   const isFluid = variant === 'fluid';
   const isInArticle = variant === 'in-article';
 
   return (
     <div
-      className={`ad-container my-3 text-center overflow-hidden clear-both ${className}`}
-      style={{ minHeight: 'auto', ...style }}
+      className={`ad-container text-center overflow-hidden clear-both ${className}`}
+      style={{ minHeight: minHeight || '90px', ...style }}
     >
       <ins
         ref={insRef}
@@ -55,6 +55,7 @@ export default function AdUnit({
           display: 'block',
           width: '100%',
           textAlign: 'center',
+          minHeight: minHeight || '90px',
         }}
         data-ad-client={client}
         data-ad-slot={slot}
@@ -65,3 +66,6 @@ export default function AdUnit({
     </div>
   );
 }
+
+const AdUnit = React.memo(AdUnitComponent);
+export default AdUnit;
