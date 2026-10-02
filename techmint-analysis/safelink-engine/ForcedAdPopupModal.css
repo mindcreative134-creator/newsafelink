@@ -1,0 +1,182 @@
+/* TechMint Forced Ad-Click Overlay & Modal Styles */
+
+.techmint-blockcont {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 99998;
+  animation: fadeInOverlay 0.3s ease;
+}
+
+.techmint-contntblock {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  z-index: 99999;
+  width: 95%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  text-align: center;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  animation: scaleUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .techmint-contntblock {
+  background-color: #18181b;
+  border-color: #27272a;
+  color: #f4f4f5;
+}
+
+.techmint-modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.techmint-instruction-box {
+  width: 100%;
+  background: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.dark .techmint-instruction-box {
+  background: #27272a;
+  border-color: #3f3f46;
+}
+
+.techmint-inst-en {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+  color: #1e293b;
+}
+
+.dark .techmint-inst-en {
+  color: #f1f5f9;
+}
+
+.techmint-inst-hi {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.dark .techmint-inst-hi {
+  color: #e4e4e7;
+}
+
+.highlight-red {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.dark .highlight-red {
+  color: #f87171;
+}
+
+.highlight-blue {
+  color: #2563eb;
+  font-weight: 800;
+}
+
+.dark .highlight-blue {
+  color: #60a5fa;
+}
+
+.techmint-steps-pill {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  background: #eff6ff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border-left: 3px solid #2563eb;
+  margin-top: 4px;
+}
+
+.dark .techmint-steps-pill {
+  background: #1e293b;
+  color: #cbd5e1;
+  border-left-color: #60a5fa;
+}
+
+.techmint-popup-ad-slot {
+  width: 100%;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0;
+  background: #fdfdfd;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dark .techmint-popup-ad-slot {
+  background: #27272a;
+  border-color: #3f3f46;
+}
+
+.techmint-popup-footer {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.techmint-closeis-btn {
+  background: transparent;
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 14px;
+  border: 1px solid #fecaca;
+  padding: 8px 24px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.techmint-closeis-btn:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.dark .techmint-closeis-btn {
+  color: #f87171;
+  border-color: #7f1d1d;
+}
+
+.dark .techmint-closeis-btn:hover {
+  background: #450a0a;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUpModal {
+  from { opacity: 0; transform: translate(-50%, -46%) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}

@@ -5,6 +5,7 @@ import { getUnifiedPosts } from '../services/postService';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import { TechmintTopSection, TechmintBottomSection } from '../components/TechmintSafelinkWidget';
+import ForcedAdPopupModal from '../components/ForcedAdPopupModal';
 import RobotVerificationWidget from '../components/RobotVerificationWidget';
 import { 
   Calendar, Clock, User, ArrowRight, ShieldCheck, 
@@ -149,6 +150,18 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
+      {/* ── Authentic TechMint Forced Ad-Click Popup Modal ── */}
+      {isSafelinkActive && (
+        <ForcedAdPopupModal
+          onAdClicked={() => {
+            // Unlocks timer and speeds up verification
+            document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
+          }}
+          adSlot="9320506924"
+          graceCloseDelaySec={5}
+        />
+      )}
+
       {/* ── Modern TechMint Safelink: Top Section (Ad -> Countdown -> Verify -> Guidance -> Ad) ── */}
       {isSafelinkActive && (
         <div className="max-w-4xl mx-auto px-4 pt-4">
