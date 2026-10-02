@@ -40,7 +40,7 @@ export default function ReadMoreHandler() {
         } catch {}
 
         const chosenPost = await getRandomSafelinkPost(visited);
-        const nextId = chosenPost?.id || 'emrs-teaching-post';
+        const nextId = chosenPost?.id || 'highest-paying-online-degrees-2026';
         
         visited.push(nextId);
         sessionStorage.setItem('SAFE_VISITED', JSON.stringify(visited));

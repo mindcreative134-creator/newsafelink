@@ -29,10 +29,38 @@ export default function Sidebar({ hideAds = false }) {
   return (
     <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-6">
       
-      {/* ── Recent Stories Widget ── */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
-        <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-3.5 pb-2.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center gap-2 font-heading">
-          <Flame className="w-4 h-4 text-indigo-500" /> Recent Stories
+      {/* ── Search Widget (GeneratePress Style) ── */}
+      <div className="bg-white dark:bg-zinc-900 rounded-lg p-5 border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
+        <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-3 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+          Search
+        </h3>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const q = e.target.elements.sidebarSearch?.value?.trim();
+            if (q) window.location.href = `/category/${encodeURIComponent(q)}`;
+          }}
+          className="flex gap-2"
+        >
+          <input
+            name="sidebarSearch"
+            type="text"
+            placeholder="Search..."
+            className="flex-1 px-3 py-2 text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-[#e60023]"
+          />
+          <button
+            type="submit"
+            className="px-3 py-2 bg-[#e60023] text-white text-xs font-semibold rounded hover:bg-[#c8001d] transition-colors"
+          >
+            Search
+          </button>
+        </form>
+      </div>
+
+      {/* ── Recent Posts Widget ── */}
+      <div className="bg-white dark:bg-zinc-900 rounded-lg p-5 border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
+        <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-3.5 pb-2 border-b border-zinc-100 dark:border-zinc-800 flex items-center gap-2">
+          Recent Posts
         </h3>
         <ul className="flex flex-col gap-3.5">
           {recentPosts.length === 0 ? (
@@ -42,15 +70,15 @@ export default function Sidebar({ hideAds = false }) {
               const postImg = getPostThumbnail(post);
               return (
                 <li key={post.id} className="flex gap-3 group items-center">
-                  <Link to={`/post/${post.id}`} className="w-13 h-13 w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-zinc-200/60 dark:border-zinc-800 relative block bg-zinc-100 dark:bg-zinc-800">
+                  <Link to={`/post/${post.id}`} className="w-12 h-12 rounded overflow-hidden flex-shrink-0 border border-zinc-200/60 dark:border-zinc-800 relative block bg-zinc-100 dark:bg-zinc-800">
                     <img src={postImg} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                   </Link>
                   <div className="flex flex-col gap-0.5 min-w-0">
-                    <Link to={`/post/${post.id}`} className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-2 leading-snug transition-colors">
+                    <Link to={`/post/${post.id}`} className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-[#e60023] line-clamp-2 leading-snug transition-colors">
                       {post.title}
                     </Link>
                     <span className="text-[10px] text-zinc-400 font-medium">
-                      {new Date(post.published).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      {new Date(post.published).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                   </div>
                 </li>

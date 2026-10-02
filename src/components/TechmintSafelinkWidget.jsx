@@ -4,8 +4,8 @@ import './TechmintSafelink.css';
 
 /**
  * Authentic TechMint Safelink Top Widget
- * Exact recreation of TechMint countdown, iframe ad-click monitor, verify button,
- * and high-converting rewarded ad prompt.
+ * Exact recreation of TechMint countdown, sticky step indicator, green instruction banner,
+ * iframe ad-click monitor, verify button, and rewarded ad prompt.
  */
 export function TechmintTopSection({
   currentStep = 1,
@@ -75,77 +75,92 @@ export function TechmintTopSection({
   };
 
   return (
-    <div className="techmint-widget-container">
-      {/* Top Banner Ad */}
-      <div className="techmint-ad-wrapper">
-        <AdUnit variant="banner" slot={adSlotTop} minHeight="90px" className="!my-1" />
+    <>
+      {/* ── 1. TechMint Fixed Sticky Step Bar (#tm-stick) ── */}
+      <div id="tm-stick" role="alert">
+        <strong>
+          You are currently on step <span style={{ color: '#e60023' }}>{currentStep}/{totalSteps}</span>
+        </strong>
+        &nbsp;&nbsp;👉 <span className="binking-emoji">👇</span>
       </div>
 
-      {/* Countdown Timer Box */}
-      {!timerFinished && !isVerified && (
-        <div id="ce-wait1" className="techmint-wait-box">
-          <div id="countdown" className="techmint-countdown-text">
-            <b>Please wait <span id="ce-time">{seconds}</span> Seconds...</b>
+      <div className="techmint-widget-container">
+        {/* ── 2. TechMint Green Instruction Banner ── */}
+        <div className="tm-instruction-banner">
+          Click On The Below Image Ad, Wait 15 Sec &amp; Come Back To This Page To Get The Verified Link
+        </div>
+
+        {/* ── 3. Top Banner Ad ── */}
+        <div className="techmint-ad-wrapper">
+          <AdUnit variant="banner" slot={adSlotTop} minHeight="90px" />
+        </div>
+
+        {/* ── 4. Countdown Timer Box (#ce-wait1) ── */}
+        {!timerFinished && !isVerified && (
+          <div id="ce-wait1" className="techmint-wait-box">
+            <div id="countdown" className="techmint-countdown-text">
+              <b>Please wait <span id="ce-time">{seconds}</span> Seconds...</b>
+            </div>
+            <div className="techmint-progress-bar-bg">
+              <div
+                className="techmint-progress-bar-fill"
+                style={{ width: `${((timerSeconds - seconds) / timerSeconds) * 100}%` }}
+              />
+            </div>
           </div>
-          <div className="techmint-progress-bar-bg">
-            <div
-              className="techmint-progress-bar-fill"
-              style={{ width: `${((timerSeconds - seconds) / timerSeconds) * 100}%` }}
-            />
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Verify Button (Shows when timer hits 0) */}
-      {timerFinished && !isVerified && (
-        <div className="techmint-center my-3">
-          <button
-            id="btn6"
-            onClick={handleVerifyClick}
-            className="ce-btn ce-blue techmint-pulse-btn"
-          >
-            Verify Step {currentStep}/{totalSteps}
-          </button>
-        </div>
-      )}
-
-      {/* Guidance Instruction (Shows after Verify is clicked) */}
-      {isVerified && (
-        <div className="techmint-center my-3">
-          <h4 id="ce-text" className="techmint-guidance-text">
-            Scroll down &amp; click on <span className="highlight-blue">Continue</span> button for your destination link
-          </h4>
-        </div>
-      )}
-
-      {/* In-Content Ad Below Verify */}
-      <div className="techmint-ad-wrapper">
-        <AdUnit variant="in-article" slot={adSlotBottom} minHeight="120px" className="!my-1" />
-      </div>
-
-      {/* Rewarded Ad Action Required Overlay Modal */}
-      {showRewardedModal && (
-        <div className="techmint-rewarded-overlay">
-          <div className="techmint-rewarded-modal">
-            <h2 className="techmint-modal-title">⚠️ Action Required</h2>
-            <p className="techmint-modal-desc">
-              <strong>Click "Continue" and view the sponsor ad</strong><br />
-              to unlock your destination link.
-            </p>
+        {/* ── 5. Verify Button (#btn6) ── */}
+        {timerFinished && !isVerified && (
+          <div className="techmint-center my-3">
             <button
-              onClick={() => {
-                setShowRewardedModal(false);
-                handleVerifyClick();
-              }}
-              className="techmint-modal-btn"
+              id="btn6"
+              onClick={handleVerifyClick}
+              className="ce-btn ce-blue"
             >
-              CONTINUE ➜
+              Verify
             </button>
-            <p className="techmint-modal-sub">This helps keep our service 100% free</p>
           </div>
+        )}
+
+        {/* ── 6. Guidance Instruction (#ce-text) ── */}
+        {isVerified && (
+          <div className="techmint-center my-3">
+            <h4 id="ce-text" className="techmint-guidance-text">
+              Scroll down &amp; click on <span className="highlight-blue">Continue</span> button for your destination link
+            </h4>
+          </div>
+        )}
+
+        {/* ── 7. In-Content Ad Below Verify ── */}
+        <div className="techmint-ad-wrapper">
+          <AdUnit variant="in-article" slot={adSlotBottom} minHeight="120px" />
         </div>
-      )}
-    </div>
+
+        {/* ── 8. Rewarded Ad Modal Overlay ── */}
+        {showRewardedModal && (
+          <div className="techmint-rewarded-overlay">
+            <div className="techmint-rewarded-modal">
+              <h2 className="techmint-modal-title">⚠️ Action Required</h2>
+              <p className="techmint-modal-desc">
+                <strong>Click "Continue" and view the sponsor ad</strong><br />
+                to unlock your destination link.
+              </p>
+              <button
+                onClick={() => {
+                  setShowRewardedModal(false);
+                  handleVerifyClick();
+                }}
+                className="techmint-modal-btn"
+              >
+                CONTINUE ➜
+              </button>
+              <p className="techmint-modal-sub">This helps keep our service 100% free</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -161,23 +176,34 @@ export function TechmintBottomSection({
   adSlot1 = "5930219482",
   adSlot2 = "8301948271"
 }) {
+  const handleContinue = (e) => {
+    e.preventDefault();
+    if (onContinue) onContinue();
+  };
+
   return (
     <div id="techmint-bottom-section" className="techmint-bottom-container">
       {/* Ad Unit Above Continue Button */}
       <div className="techmint-ad-wrapper">
-        <AdUnit variant="banner" slot={adSlot1} minHeight="90px" className="!my-1" />
+        <AdUnit variant="banner" slot={adSlot1} minHeight="90px" />
       </div>
 
-      {/* Continue Button Section */}
+      {/* Continue Button Section (#btn7) */}
       <div className="techmint-center my-4">
         {isUnlocked ? (
-          <button
+          <a
             id="btn7"
-            onClick={onContinue}
-            className="ce-btn ce-blue techmint-continue-glow"
+            href="#continue"
+            onClick={handleContinue}
+            style={{ textDecoration: 'none', display: 'inline-block' }}
           >
-            {currentStep >= totalSteps ? "Get Destination Link ➔" : `Continue to Step ${currentStep + 1} ➔`}
-          </button>
+            <button
+              type="button"
+              className="ce-btn ce-blue techmint-continue-glow"
+            >
+              Continue
+            </button>
+          </a>
         ) : (
           <div className="techmint-locked-notice">
             <span>🔒 Please complete verification at the top of the article</span>
@@ -187,8 +213,10 @@ export function TechmintBottomSection({
 
       {/* Ad Unit Below Continue Button */}
       <div className="techmint-ad-wrapper">
-        <AdUnit variant="banner" slot={adSlot2} minHeight="90px" className="!my-1" />
+        <AdUnit variant="banner" slot={adSlot2} minHeight="90px" />
       </div>
     </div>
   );
 }
+
+export default TechmintTopSection;

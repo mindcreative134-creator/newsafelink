@@ -1,6 +1,7 @@
 import { getPosts as getBloggerPosts, getPostById as getBloggerPostById } from './bloggerApi.js';
 import { getLiveSarkariUpdates } from './rssService.js';
 import defaultJobs from '../data/liveJobs.json';
+import techmintPosts from '../data/techmintPosts.json';
 import { getPostThumbnail } from '../utils/postThumbnail.js';
 
 /**
@@ -433,29 +434,38 @@ async function getCachedOrFreshBloggerPosts() {
 }
 
 /**
- * Get single post by ID (Instant 0ms resolution via local cache + Blogger API)
+ * Get single post by ID (Instant 0ms resolution via techmintPosts + local cache + Blogger API)
  */
 export async function getPostById(postId) {
   if (!postId) {
+    if (techmintPosts && techmintPosts.length > 0) {
+      return techmintPosts[0];
+    }
     if (defaultJobs && defaultJobs.length > 0) {
       return formatJobAsPost(defaultJobs[0]);
     }
     throw new Error('Post ID is required');
   }
 
-  // 1. Instant check in local verified jobs (0ms - zero delay)
+  // 1. Instant check in authentic TechMint scraped posts (0ms - highest priority)
+  const techmintFound = (techmintPosts || []).find((p) => p && (p.id === postId || p.slug === postId));
+  if (techmintFound) {
+    return techmintFound;
+  }
+
+  // 2. Instant check in local verified jobs (0ms - zero delay)
   const localFound = (defaultJobs || []).find((j) => j && j.id === postId);
   if (localFound) {
     return formatJobAsPost(localFound);
   }
 
-  // 2. Check in cached Blogger posts (0ms)
+  // 3. Check in cached Blogger posts (0ms)
   if (cachedBloggerPosts) {
     const cachedBlogger = cachedBloggerPosts.find((p) => p && p.id === postId);
     if (cachedBlogger) return cachedBlogger;
   }
 
-  // 3. Try fetching directly from Blogger API by ID
+  // 4. Try fetching directly from Blogger API by ID
   try {
     const bloggerPost = await getBloggerPostById(postId);
     if (bloggerPost && bloggerPost.id) {
@@ -467,13 +477,21 @@ export async function getPostById(postId) {
     }
   } catch (_err) {}
 
-  // 4. Try matching by slug or title in local repository
+  // 5. Try matching by slug or title in techmint & local repository
   const slug = postId
     .replace(/^(sarkari-rss-|scraped-|sarkari-|blogger-)/, '')
     .replace(/-\d+$/, '')
     .toLowerCase();
 
   if (slug.length > 3) {
+    const tmMatch = (techmintPosts || []).find((p) => {
+      if (!p) return false;
+      const pId = (p.id || '').toLowerCase();
+      const pTitle = (p.title || '').toLowerCase();
+      return pId.includes(slug) || slug.split('-').slice(0, 3).every((w) => pTitle.includes(w));
+    });
+    if (tmMatch) return tmMatch;
+
     const slugMatch = (defaultJobs || []).find((j) => {
       if (!j) return false;
       const jId = (j.id || '').toLowerCase();
@@ -485,7 +503,7 @@ export async function getPostById(postId) {
     }
   }
 
-  // 5. Check live RSS updates
+  // 6. Check live RSS updates
   try {
     const liveUpdates = await getLiveSarkariUpdates();
     const liveFound = (liveUpdates || []).find((j) => j && j.id === postId);
@@ -494,9 +512,12 @@ export async function getPostById(postId) {
     }
   } catch (_e) {}
 
-  // 6. Resilient Fallback: Always return first verified post so user NEVER sees blank or error screen
+  // 7. Resilient Fallback: Return first authentic TechMint post
+  if (techmintPosts && techmintPosts.length > 0) {
+    return techmintPosts[0];
+  }
+
   if (defaultJobs && defaultJobs.length > 0) {
-    console.warn(`[postService] Post "${postId}" served with verified default post.`);
     return formatJobAsPost(defaultJobs[0]);
   }
 
@@ -504,14 +525,16 @@ export async function getPostById(postId) {
 }
 
 /**
- * Get unified posts feed (Blogger real posts + Sarkari/Yojana posts combined)
- * Guaranteed to return posts instantly for every category and tab!
+ * Get unified posts feed (TechMint posts + Blogger real posts + Sarkari/Yojana posts)
  */
 export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label = '' } = {}) {
-  // 1. Instantly prepare local formatted jobs (0ms)
+  // 1. Prepare authentic TechMint posts
+  const tmPosts = techmintPosts || [];
+
+  // 2. Prepare local formatted jobs
   const localFormatted = (defaultJobs || []).map((item) => formatJobAsPost(item));
 
-  // 2. Fetch or retrieve cached Blogger posts
+  // 3. Fetch or retrieve cached Blogger posts
   let bloggerList;
   try {
     bloggerList = await getCachedOrFreshBloggerPosts();
@@ -519,8 +542,8 @@ export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label =
     bloggerList = [];
   }
 
-  // Combine: Blogger real posts + local verified jobs
-  const allPosts = [...bloggerList, ...localFormatted];
+  // Combine: TechMint authentic articles + Blogger real posts + local verified jobs
+  const allPosts = [...tmPosts, ...bloggerList, ...localFormatted];
 
   // Apply intelligent category matcher
   let filtered = allPosts;
@@ -528,7 +551,7 @@ export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label =
     filtered = allPosts.filter((post) => matchesCategory(post, label));
   }
 
-  // Fallback: If filter returned nothing (e.g. obscure query), return top posts rather than empty screen!
+  // Fallback: If filter returned nothing, return top posts
   if (filtered.length === 0 && allPosts.length > 0) {
     filtered = allPosts;
   }
@@ -540,29 +563,15 @@ export async function getUnifiedPosts({ pageToken = '', maxResults = 12, label =
 }
 
 /**
- * Pick a random post guaranteed to be distinct and natural
- * Draws from all combined posts (Blogger real posts + 155 live verified jobs)
- * Excludes any post IDs passed in excludeIds
+ * Pick an authentic post for safelink steps (prioritizes high-CPC TechMint articles)
  */
 export async function getRandomSafelinkPost(excludeIds = []) {
-  let pool = [];
-  // Use cached Blogger posts if ready, else instant local verified jobs (0ms zero latency)
-  if (cachedBloggerPosts && cachedBloggerPosts.length > 0) {
-    pool = cachedBloggerPosts;
-  } else if (defaultJobs && defaultJobs.length > 0) {
-    pool = defaultJobs.map(formatJobAsPost);
-  } else {
-    try {
-      const res = await getUnifiedPosts({ maxResults: 50 });
-      if (res.items && res.items.length > 0) pool = res.items;
-    } catch (_e) {}
-  }
-
   const excludeSet = new Set((excludeIds || []).filter(Boolean));
+  const pool = (techmintPosts && techmintPosts.length > 0) ? techmintPosts : (defaultJobs || []).map(formatJobAsPost);
   const available = pool.filter(p => p && p.id && !excludeSet.has(p.id));
   const candidatePool = available.length > 0 ? available : pool;
 
   const chosen = candidatePool[Math.floor(Math.random() * candidatePool.length)];
-  return chosen || pool[0] || { id: 'emrs-teaching-post', title: 'EMRS Teaching Post' };
+  return chosen || pool[0] || { id: 'fully-funded-scholarships-2026', title: 'Fully Funded Scholarships 2026' };
 }
 

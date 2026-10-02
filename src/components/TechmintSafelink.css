@@ -1,10 +1,64 @@
-/* TechMint Safelink UI & Animations */
+/* ==========================================
+   TechMint Authentic Safelink UI
+   Exact match to techmint.in GeneratePress theme
+   ========================================== */
 
+/* ── Sticky Step Indicator (TechMint #stick) ── */
+#tm-stick {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 100%;
+  background-color: #f8f9fa;
+  border: 1px solid #333;
+  border-radius: 5px;
+  padding: 6px 12px;
+  font-size: 15px;
+  font-family: 'Open Sans', Arial, sans-serif;
+  color: #222;
+  text-align: center;
+  box-sizing: border-box;
+  z-index: 9999;
+  line-height: normal;
+}
+
+/* ── Blink animation for emoji ── */
+@keyframes blink {
+  0%   { visibility: visible; }
+  50%  { visibility: hidden; }
+  100% { visibility: visible; }
+}
+
+.binking-emoji {
+  animation: blink 1s step-start infinite;
+  font-size: 18px;
+}
+
+/* ── Instruction banner (green background like TechMint) ── */
+.tm-instruction-banner {
+  display: block;
+  padding: 5px 8px;
+  font-weight: bold;
+  color: #000;
+  border: 2px solid #0000ff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'Open Sans', Arial, sans-serif;
+  margin: 6px auto;
+  background: rgba(58, 209, 52, 0.85);
+  text-align: center;
+  max-width: 680px;
+}
+
+/* ── Widget container ── */
 .techmint-widget-container {
   width: 100%;
   max-width: 760px;
-  margin: 16px auto;
+  margin: 0 auto 16px;
   text-align: center;
+  padding-top: 42px; /* clearance for fixed sticky bar */
 }
 
 .techmint-center {
@@ -14,230 +68,199 @@
   width: 100%;
 }
 
+/* ── Ad wrappers ── */
 .techmint-ad-wrapper {
   width: 100%;
   max-width: 728px;
   margin: 8px auto;
   overflow: hidden;
+  text-align: center;
 }
 
-/* Authentic TechMint Blue Button */
+/* ── Authentic TechMint Red Verify / Continue button ── */
 .ce-btn {
   display: inline-block;
-  padding: 14px 44px;
+  padding: 8px 16px;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 600;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 100px;
   border: none;
-  transition: all 0.25s ease-in-out;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.14);
+  text-transform: none;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out;
 }
 
+/* TechMint's .ce-blue is actually RED (#e60023) */
 .ce-blue {
-  background-color: #2563eb;
-  color: #ffffff !important;
+  background: #e60023;
+  color: #fff;
+  border: none;
 }
 
 .ce-blue:hover {
-  background-color: #1d4ed8;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+  background: #c8001d;
+  color: #fff;
 }
 
-.ce-blue:active {
-  transform: translateY(0);
-}
-
-/* TechMint Wait Box */
+/* ── Countdown box (TechMint: black border, white background) ── */
 .techmint-wait-box {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin: 12px auto;
-  max-width: 480px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.dark .techmint-wait-box {
-  background: #18181b;
-  border-color: #27272a;
+  background-color: #f8f9fa;
+  border: 2px solid #000;
+  border-radius: 5px;
+  font-size: 15px;
+  padding: 8px 18px;
+  margin: 8px auto;
+  max-width: 420px;
+  display: inline-block;
 }
 
 .techmint-countdown-text {
-  font-size: 17px;
-  color: #1e293b;
-  margin-bottom: 8px;
-}
-
-.dark .techmint-countdown-text {
-  color: #f4f4f5;
+  font-size: 15px;
+  color: #222;
+  font-family: 'Open Sans', Arial, sans-serif;
 }
 
 .techmint-countdown-text #ce-time {
-  color: #2563eb;
+  color: #e60023;
   font-weight: 800;
-  font-size: 22px;
-}
-
-.dark .techmint-countdown-text #ce-time {
-  color: #60a5fa;
+  font-size: 18px;
 }
 
 /* Progress bar */
 .techmint-progress-bar-bg {
   width: 100%;
-  height: 6px;
-  background-color: #e2e8f0;
+  height: 4px;
+  background-color: #dee2e6;
   border-radius: 9999px;
   overflow: hidden;
-}
-
-.dark .techmint-progress-bar-bg {
-  background-color: #27272a;
+  margin-top: 6px;
 }
 
 .techmint-progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  background: #e60023;
   transition: width 0.9s linear;
 }
 
-/* TechMint Guidance text */
+/* ── Guidance text (after verify) ── */
 .techmint-guidance-text {
   margin: 0;
   font-size: 16px;
-  color: #334155;
-  font-weight: 700;
+  color: #212121;
+  font-weight: 600;
   line-height: 1.5;
-  padding: 10px 18px;
+  padding: 8px 16px;
   background: #eff6ff;
-  border-left: 4px solid #2563eb;
-  border-radius: 8px;
+  border-left: 4px solid #1b78e2;
+  border-radius: 5px;
   display: inline-block;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
-}
-
-.dark .techmint-guidance-text {
-  background: #1e293b;
-  color: #f1f5f9;
-  border-left-color: #60a5fa;
+  font-family: 'Open Sans', Arial, sans-serif;
+  text-align: left;
 }
 
 .techmint-guidance-text .highlight-blue {
-  color: #2563eb;
-  font-weight: 800;
+  color: #0000ff;
+  font-weight: 700;
 }
 
-.dark .techmint-guidance-text .highlight-blue {
-  color: #60a5fa;
-}
-
-/* Bottom Container */
+/* ── Bottom container ── */
 .techmint-bottom-container {
   width: 100%;
   max-width: 760px;
-  margin: 32px auto 16px;
+  margin: 24px auto 12px;
   text-align: center;
 }
 
 .techmint-continue-glow {
-  font-size: 17px;
-  padding: 16px 52px;
-  animation: pulseGlow 2s infinite;
+  animation: tmPulse 2s infinite;
+  font-size: 16px;
+  padding: 10px 36px;
 }
 
+@keyframes tmPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(230, 0, 35, 0.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(230, 0, 35, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(230, 0, 35, 0); }
+}
+
+/* ── Locked notice ── */
 .techmint-locked-notice {
-  font-size: 14px;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 12px 24px;
-  border-radius: 8px;
+  font-size: 13px;
+  color: #555;
+  background: #f8f9fa;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
   display: inline-block;
-  font-weight: 600;
+  font-weight: 500;
 }
 
-.dark .techmint-locked-notice {
-  background: #27272a;
-  color: #a1a1aa;
-}
-
-/* Rewarded Ad Overlay Modal */
+/* ── Rewarded Ad Overlay Modal ── */
 .techmint-rewarded-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.88);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.9);
   z-index: 999999;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 .techmint-rewarded-modal {
-  background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
-  padding: 36px 30px;
-  border-radius: 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 36px 28px;
+  border-radius: 15px;
   text-align: center;
-  max-width: 480px;
+  max-width: 500px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-  animation: slideDown 0.4s ease;
-  color: #ffffff;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: slideDown 0.5s ease;
+  color: #fff;
 }
 
 .techmint-modal-title {
   font-size: 26px;
-  margin: 0 0 16px 0;
+  margin: 0 0 18px 0;
   font-weight: 800;
 }
 
 .techmint-modal-desc {
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.6;
-  margin: 0 0 26px 0;
-  color: #e2e8f0;
+  margin: 0 0 28px 0;
+  color: rgba(255,255,255,0.9);
 }
 
 .techmint-modal-btn {
-  background: linear-gradient(135deg, #f43f5e 0%, #fb923c 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  color: #fff;
   border: none;
-  padding: 16px 44px;
-  font-size: 18px;
+  padding: 16px 48px;
+  font-size: 19px;
   font-weight: 800;
   border-radius: 50px;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(244, 63, 94, 0.4);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 24px rgba(250, 112, 154, 0.45);
+  transition: all 0.3s ease;
+  animation: tmPulse 2s infinite;
 }
 
-.techmint-modal-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 32px rgba(244, 63, 94, 0.6);
-}
+.techmint-modal-btn:hover { transform: scale(1.05); }
 
 .techmint-modal-sub {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
   margin-top: 18px;
 }
 
-@keyframes pulseGlow {
-  0% { transform: scale(1); box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); }
-  50% { transform: scale(1.03); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6); }
-  100% { transform: scale(1); box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); }
-}
-
 @keyframes slideDown {
-  from { transform: translateY(-50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { transform: translateY(-80px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
 }

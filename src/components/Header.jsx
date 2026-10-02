@@ -95,88 +95,60 @@ export default function Header() {
   };
 
   const navLinks = [
-    { name: 'News', path: '/category/News%20%26%20Updates', icon: Newspaper },
-    { name: 'Jobs', path: '/category/Latest%20Jobs', icon: Briefcase },
-    { name: 'Admit Cards', path: '/category/Admit%20Cards', icon: FileCheck },
-    { name: 'Results', path: '/category/Results', icon: Award },
-    { name: 'University', path: '/category/University%20%26%20Admissions', icon: GraduationCap },
-    { name: 'Schemes', path: '/category/Govt%20Schemes%20%26%20Yojana', icon: Landmark },
+    { name: 'Technology', path: '/category/Technology' },
+    { name: 'Scholarships', path: '/category/Education' },
+    { name: 'Education', path: '/category/University%20%26%20Admissions' },
+    { name: 'Insurance', path: '/category/Insurance' },
+    { name: 'Jobs', path: '/category/Latest%20Jobs' },
+    { name: 'Guides', path: '/category/Guide' },
   ];
 
   return (
     <>
-      {/* ── Top Breaking Alert Strip ── */}
-      <div className="w-full bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 text-white text-[11px] py-1.5 px-4 border-b border-indigo-900/40 hidden sm:block">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5 overflow-hidden">
-            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-[10px] tracking-wider uppercase border border-emerald-500/30 shrink-0">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              LIVE 24/7
-            </span>
-            <span className="text-zinc-300 truncate font-medium">
-              ⚡ Verified Government Schemes, Results, Admit Cards, Admissions &amp; Job Notifications
-            </span>
-          </div>
-          <div className="text-zinc-400 font-semibold shrink-0 text-[10px] tracking-wide">
-            {new Date().toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Modern Clean Navigation Header ── */}
-      <header className="sticky top-0 z-40 w-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors duration-200">
+      {/* ── Authentic Clean Header (GeneratePress / TechMint Style) ── */}
+      <header className="sticky top-0 z-40 w-full bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 shadow-sm transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-18 gap-4">
+          <div className="flex items-center justify-between h-16 gap-4">
             
-            {/* Brand Logo */}
+            {/* Brand Logo - Clean TechMint Style */}
             <div className="flex-shrink-0">
-              <Link to="/" className="flex items-center gap-3 group" aria-label="Home">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-black text-lg shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-                  ⚡
+              <Link to="/" className="flex items-center gap-2 group" aria-label="Home">
+                <div className="w-8 h-8 rounded-lg bg-[#e60023] flex items-center justify-center text-white font-black text-base shadow-sm">
+                  TM
                 </div>
-                <div className="flex flex-col leading-none">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-xl font-black tracking-tight text-zinc-900 dark:text-white font-heading">
-                      SafeLink
-                    </span>
-                    <span className="text-xl font-black tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent font-heading">
-                      Portal
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 tracking-wider mt-0.5">
-                    AUTHENTIC NEWS &amp; NOTICES
+                <div className="flex items-baseline">
+                  <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white font-sans">
+                    Tech<span className="text-[#e60023]">Mint</span>
                   </span>
                 </div>
               </Link>
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex space-x-1 items-center">
+            <nav className="hidden lg:flex space-x-2 items-center">
               <Link 
                 to="/" 
-                className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded text-sm font-semibold transition-colors ${
                   location.pathname === '/' 
-                    ? 'bg-zinc-100 dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 font-bold' 
-                    : 'text-zinc-600 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'
+                    ? 'text-[#e60023] font-bold' 
+                    : 'text-zinc-700 dark:text-zinc-300 hover:text-[#e60023] dark:hover:text-white'
                 }`}
               >
                 Home
               </Link>
 
               {navLinks.map((link) => {
-                const Icon = link.icon;
                 const isActive = location.pathname === link.path;
                 return (
                   <Link 
                     key={link.name}
                     to={link.path} 
-                    className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                    className={`px-3 py-1.5 rounded text-sm font-semibold transition-colors ${
                       isActive 
-                        ? 'bg-zinc-100 dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 font-bold' 
-                        : 'text-zinc-600 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'
+                        ? 'text-[#e60023] font-bold' 
+                        : 'text-zinc-700 dark:text-zinc-300 hover:text-[#e60023] dark:hover:text-white'
                     }`}
                   >
-                    <Icon className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
                     {link.name}
                   </Link>
                 );

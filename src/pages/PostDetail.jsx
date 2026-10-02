@@ -150,37 +150,24 @@ export default function PostDetail() {
   const activeStep = currentStep > 0 ? currentStep : 1;
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+    <div className="min-h-screen bg-[#f8f9fa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
-      {/* ── Authentic TechMint Forced Ad-Click Popup Modal ── */}
-      <ForcedAdPopupModal
-        step={activeStep}
-        onAdClicked={() => {
-          // Unlocks timer and speeds up verification
-          document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
-        }}
-        adSlot="9320506924"
-        graceCloseDelaySec={4}
+      {/* ── Fixed Sticky Step Bar (From TechmintTopSection) ── */}
+      <TechmintTopSection
+        currentStep={activeStep}
+        totalSteps={totalSteps || 2}
+        isVerified={isStepVerified}
+        onVerify={() => setIsStepVerified(true)}
+        timerSeconds={20}
       />
 
-      {/* ── Modern TechMint Safelink: Top Section (Ad -> Countdown -> Verify -> Guidance -> Ad) ── */}
-      <div className="max-w-4xl mx-auto px-4 pt-4">
-        <TechmintTopSection
-          currentStep={activeStep}
-          totalSteps={totalSteps || 2}
-          isVerified={isStepVerified}
-          onVerify={() => setIsStepVerified(true)}
-          timerSeconds={20}
-        />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         
-        {/* Breadcrumb Navigation */}
-        <nav className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-6 overflow-x-auto whitespace-nowrap">
-          <Link to="/" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Home</Link>
+        {/* Breadcrumb Navigation - Clean TechMint Style */}
+        <nav className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-4 overflow-x-auto whitespace-nowrap">
+          <Link to="/" className="hover:text-[#e60023] transition-colors">Home</Link>
           <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
-          <Link to={`/category/${encodeURIComponent(category)}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+          <Link to={`/category/${encodeURIComponent(category)}`} className="hover:text-[#e60023] transition-colors">
             {category}
           </Link>
           <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
@@ -189,24 +176,19 @@ export default function PostDetail() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           
-          {/* Main Article Container */}
+          {/* Main Article Container - Clean GeneratePress Style */}
           <main className="flex-1 min-w-0">
-            <article ref={articleRef} className="bg-white dark:bg-zinc-900 rounded-2xl p-6 sm:p-9 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex flex-col gap-6">
+            <article ref={articleRef} className="bg-white dark:bg-zinc-900 rounded-lg p-6 sm:p-10 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex flex-col gap-6">
               
-              {/* Category Badge & Share Button */}
+              {/* Category & Share */}
               <div className="flex items-center justify-between gap-3 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-900/40">
-                    {category}
-                  </span>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                    {org}
-                  </span>
-                </div>
+                <span className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded bg-zinc-100 dark:bg-zinc-800 text-[#e60023]">
+                  {category}
+                </span>
 
                 <button
                   onClick={handleShare}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200/80 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all"
                 >
                   <Share2 className="w-3.5 h-3.5" />
                   {copied ? 'Link Copied' : 'Share'}
@@ -214,14 +196,14 @@ export default function PostDetail() {
               </div>
 
               {/* Title */}
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-900 dark:text-white leading-tight font-heading m-0 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#111827] dark:text-white leading-tight font-sans m-0 tracking-tight">
                 {post.title}
               </h1>
 
               {/* Publication Metadata */}
               <div className="flex flex-wrap items-center text-xs font-medium text-zinc-500 dark:text-zinc-400 gap-3 pb-4 border-b border-zinc-200/80 dark:border-zinc-800">
                 <span className="flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300">
-                  <User className="w-3.5 h-3.5 text-indigo-500" /> Editorial Desk
+                  <User className="w-3.5 h-3.5 text-[#e60023]" /> By Editorial Desk
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1.5">
@@ -230,21 +212,13 @@ export default function PostDetail() {
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-zinc-400" /> 3 min read
+                  <Clock className="w-3.5 h-3.5 text-zinc-400" /> 4 min read
                 </span>
-                {(post.sourceName || rawJob.sourceName) && (
-                  <>
-                    <span>•</span>
-                    <span className="text-zinc-600 dark:text-zinc-300">
-                      Source: <strong>{post.sourceName || rawJob.sourceName}</strong>
-                    </span>
-                  </>
-                )}
               </div>
 
               {/* Featured Image */}
               {postImage && (
-                <div className="w-full aspect-video max-h-[440px] overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-800">
+                <div className="w-full aspect-video max-h-[460px] overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-800">
                   <img
                     src={postImage}
                     alt={post.title}
