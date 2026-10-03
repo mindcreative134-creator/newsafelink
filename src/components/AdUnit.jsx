@@ -60,8 +60,6 @@ function AdUnitComponent({
   let adFormat = format;
   if (isFluid || isInArticle) {
     adFormat = 'fluid';
-  } else if (isRectangle) {
-    adFormat = 'rectangle';
   }
 
   return (

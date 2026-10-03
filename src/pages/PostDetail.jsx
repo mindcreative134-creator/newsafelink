@@ -152,13 +152,6 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-[#f8f9fa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
-      {/* ── Forced Ad Popup Modal (TechMint Authentic Overlay) ── */}
-      <ForcedAdPopupModal
-        step={activeStep}
-        adSlot={AD_CONFIG.SLOTS.POPUP_MODAL}
-        enabled={true}
-        emergencyFallbackSec={45}
-      />
 
       {/* ── Fixed Sticky Step Bar (From TechmintTopSection) ── */}
       <TechmintTopSection

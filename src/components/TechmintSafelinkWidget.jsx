@@ -19,7 +19,6 @@ export function TechmintTopSection({
 }) {
   const [seconds, setSeconds] = useState(timerSeconds);
   const [timerFinished, setTimerFinished] = useState(false);
-  const [showRewardedModal, setShowRewardedModal] = useState(false);
 
   useEffect(() => {
     // Check if user has ad reward cookie
@@ -49,17 +48,9 @@ export function TechmintTopSection({
       }
     }, 200);
 
-    // Reminder prompt after 35s if still unverified
-    const modalTimer = setTimeout(() => {
-      if (!isVerified) {
-        setShowRewardedModal(true);
-      }
-    }, 35000);
-
     return () => {
       clearInterval(interval);
       clearInterval(monitor);
-      clearTimeout(modalTimer);
     };
   }, [currentStep, timerSeconds, isVerified]);
 
@@ -116,57 +107,26 @@ export function TechmintTopSection({
           </div>
         )}
 
-        {/* ── 6. Guidance Instruction (#ce-text) ── */}
+        {/* ── 6. Simple Clean Guidance Instruction (#ce-text) ── */}
         {isVerified && (
-          <div className="techmint-center my-3">
-            <div id="ce-text" className="techmint-scroll-guidance-card">
-              <div className="techmint-guidance-badge">
-                <span className="binking-emoji">👇</span>
-                <span>STEP {currentStep} VERIFIED</span>
-                <span className="binking-emoji">👇</span>
-              </div>
-              <h4 className="techmint-guidance-heading">
-                👇 Scroll down and click on <span className="highlight-red">Continue</span> button 👇
-              </h4>
-              <p className="techmint-guidance-subtext">
-                Please scroll down to the bottom of the article to click the Continue button.
-              </p>
-              <div className="techmint-down-arrows-row">
-                <span>👇</span>
-                <span className="binking-emoji">👇</span>
-                <span>👇</span>
-              </div>
-            </div>
+          <div className="techmint-center my-2">
+            <h4 id="ce-text" style={{
+              margin: '6px 0',
+              fontFamily: "'Open Sans', Arial, sans-serif",
+              fontSize: '15px',
+              fontWeight: '700',
+              color: '#1e293b',
+              textAlign: 'center'
+            }}>
+              👇 Scroll down &amp; click on <span style={{ color: '#2563eb' }}>Continue</span> button for your destination link 👇
+            </h4>
           </div>
         )}
 
         {/* ── 7. Display Ad (Directly BELOW Countdown / Timing / Verify) ── */}
         <div className="techmint-ad-wrapper techmint-ad-bottom my-3">
-          <AdUnit variant="rectangle" slot={adSlotBottom} minHeight="250px" />
+          <AdUnit variant="banner" slot={adSlotBottom} minHeight="250px" />
         </div>
-
-        {/* ── 8. Action Prompt Overlay (No fake sponsor text) ── */}
-        {showRewardedModal && (
-          <div className="techmint-rewarded-overlay">
-            <div className="techmint-rewarded-modal">
-              <h2 className="techmint-modal-title">⚠️ Action Required</h2>
-              <p className="techmint-modal-desc">
-                <strong>Click "Verify" below</strong><br />
-                to proceed to your destination link.
-              </p>
-              <button
-                onClick={() => {
-                  setShowRewardedModal(false);
-                  handleVerifyClick();
-                }}
-                className="techmint-modal-btn"
-              >
-                VERIFY NOW ➜
-              </button>
-              <p className="techmint-modal-sub">Thank you for supporting our service</p>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );

@@ -334,3 +334,18 @@ h1, h2, h3, h4, h5, h6 {
   height: auto;
   margin: 1.5rem auto;
 }
+
+/* Suppress Google Funding Choices / Offerwall blocking overlays */
+.fc-message-root,
+.fc-dialog-container,
+.fc-ab-root,
+div[class*="fc-dialog"],
+div[class*="fc-message"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+html, body {
+  overflow-y: auto !important;
+}
