@@ -1,130 +1,168 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import AdUnit from './AdUnit';
 import { AD_CONFIG } from '../config/adConfig';
 import './ForcedAdPopupModal.css';
 
 /**
  * Authentic TechMint Forced Ad-Click Popup Overlay
- * Exact recreation of TechMint's #blockcont & #contntblock modal.
  * 
- * Flow:
- * 1. Blocks the page with backdrop (#blockcont).
- * 2. Instructs user (Bilingual Hindi & English) to click the ad image, wait 10-15s, and come back.
- * 3. Contains ONLY the real AdSense ad inside #gads (Zero fake sponsor links or dummy text).
- * 4. Listens for iframe click and visibilitychange: when user returns, popup auto-closes and unlocks!
- * 5. Fallback Close button displays after 4s for safety.
+ * Strict Ad-Click Enforcement:
+ * 1. NO close button after 1-2 seconds. The modal remains locked until an ad click occurs.
+ * 2. Detects user click into the ad iframe (activeElement polling + window blur + pointer interaction).
+ * 3. Records ad interaction state and sets TechMint high-CPC targeting cookie.
+ * 4. Listens for user RETURN via document 'visibilitychange', window 'focus', and 'pageshow'.
+ * 5. Automatically closes the popup and unlocks the safelink only when the user returns from the ad.
+ * 6. Safety fallback: Only if an ad fails to load or adblocker blocks iframes after 45s does an emergency skip appear.
  */
 export default function ForcedAdPopupModal({
   step = 1,
   onAdClicked,
   adSlot = AD_CONFIG.SLOTS.POPUP_MODAL,
-  autoCloseTimeoutSec = 40,
-  graceCloseDelaySec = 4,
-  enabled = true
+  enabled = true,
+  emergencyFallbackSec = 45
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [showCloseButton, setShowCloseButton] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
-  const modalRef = useRef(null);
+  const [adClicked, setAdClicked] = useState(false);
+  const [showEmergencyClose, setShowEmergencyClose] = useState(false);
+  const adClickedRef = useRef(false);
+  const isOverAdRef = useRef(false);
+  const adContainerRef = useRef(null);
 
-  const handleClose = React.useCallback(() => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
     sessionStorage.setItem(`TECHMINT_AD_UNLOCKED_STEP_${step}`, '1');
+    sessionStorage.removeItem(`TECHMINT_AD_CLICKED_STEP_${step}`);
     if (onAdClicked) onAdClicked();
   }, [step, onAdClicked]);
 
   useEffect(() => {
     if (!enabled) return;
 
-    // Reset interaction for the current step
-    setHasInteracted(false);
+    const stepUnlockKey = `TECHMINT_AD_UNLOCKED_STEP_${step}`;
+    const stepClickedKey = `TECHMINT_AD_CLICKED_STEP_${step}`;
 
-    // Check if user already unlocked this specific step
-    const stepKey = `TECHMINT_AD_UNLOCKED_STEP_${step}`;
-    if (sessionStorage.getItem(stepKey) === '1') {
+    // If user already completed this step, don't show modal
+    if (sessionStorage.getItem(stepUnlockKey) === '1') {
       return;
     }
 
-    // Show popup after short 350ms delay
-    const showTimer = setTimeout(() => {
-      setIsOpen(true);
-    }, 350);
-
-    // Grace delay to show close button (fallback for adblockers)
-    const closeBtnTimer = setTimeout(() => {
-      setShowCloseButton(true);
-    }, graceCloseDelaySec * 1000);
-
-    // Safety timeout: automatically unlock after 40s so user is never stuck
-    const safetyTimer = setTimeout(() => {
+    // If user already clicked the ad in a previous tab session and just returned/reloaded
+    if (sessionStorage.getItem(stepClickedKey) === '1') {
       handleClose();
-    }, autoCloseTimeoutSec * 1000);
+      return;
+    }
 
-    // ── IFRAME CLICK & VISIBILITY DETECTION (Exact TechMint logic) ──
-    let isWaitingForReturn = false;
+    // Open modal with short smooth delay
+    const openTimer = setTimeout(() => {
+      setIsOpen(true);
+    }, 300);
 
-    // 1. Monitor activeElement for iframe click
-    const iframeMonitor = setInterval(() => {
-      const activeEl = document.activeElement;
-      if (activeEl && activeEl.tagName === 'IFRAME') {
-        isWaitingForReturn = true;
-        setHasInteracted(true);
-        // Set high-CPC ad reward cookie (TechMint adcadg)
-        document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
-        sessionStorage.setItem('TECHMINT_AD_UNLOCKED', '1');
+    // Emergency fallback: only show close if ad completely failed to load after 45s
+    const emergencyTimer = setTimeout(() => {
+      const hasIframe = adContainerRef.current?.querySelector('iframe');
+      if (!hasIframe) {
+        setShowEmergencyClose(true);
       }
-    }, 150);
+    }, emergencyFallbackSec * 1000);
 
-    // 2. Window blur event (triggers when clicking into an ad iframe)
-    const handleBlur = () => {
-      const activeEl = document.activeElement;
-      if (activeEl && activeEl.tagName === 'IFRAME') {
-        isWaitingForReturn = true;
-        setHasInteracted(true);
+    // Register ad click handler
+    const markAdClicked = () => {
+      if (!adClickedRef.current) {
+        adClickedRef.current = true;
+        setAdClicked(true);
+        sessionStorage.setItem(stepClickedKey, '1');
         document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
-        sessionStorage.setItem('TECHMINT_AD_UNLOCKED', '1');
       }
     };
-    window.addEventListener('blur', handleBlur);
 
-    // 3. Tab visibilitychange event (triggers when user opens ad tab and returns)
+    // 1. Track pointer / touch over ad container
+    const container = adContainerRef.current;
+    const handleMouseEnter = () => { isOverAdRef.current = true; };
+    const handleMouseLeave = () => { isOverAdRef.current = false; };
+    const handleTouchStart = () => { isOverAdRef.current = true; };
+    const handlePointerDown = () => { isOverAdRef.current = true; };
+
+    if (container) {
+      container.addEventListener('mouseenter', handleMouseEnter);
+      container.addEventListener('mouseleave', handleMouseLeave);
+      container.addEventListener('touchstart', handleTouchStart, { passive: true });
+      container.addEventListener('pointerdown', handlePointerDown, { passive: true });
+    }
+
+    // 2. Window Blur: fires when focus shifts into cross-origin ad iframe
+    const handleWindowBlur = () => {
+      const activeEl = document.activeElement;
+      const isIframe = activeEl && activeEl.tagName === 'IFRAME';
+      if (isIframe || isOverAdRef.current) {
+        markAdClicked();
+      }
+    };
+    window.addEventListener('blur', handleWindowBlur);
+
+    // 3. Active element polling (every 100ms) to detect iframe click immediately
+    const pollInterval = setInterval(() => {
+      const activeEl = document.activeElement;
+      if (activeEl && activeEl.tagName === 'IFRAME') {
+        const isInsideGads = container && container.contains(activeEl);
+        if (isInsideGads || isOverAdRef.current) {
+          markAdClicked();
+        }
+      }
+    }, 100);
+
+    // 4. Return Detection: fires when user COMES BACK from the ad page/tab
+    const handleUserReturn = () => {
+      const hasClicked = adClickedRef.current || sessionStorage.getItem(stepClickedKey) === '1';
+      if (hasClicked) {
+        // User clicked ad and has returned to our page -> auto-close and unlock!
+        setTimeout(() => {
+          handleClose();
+        }, 350);
+      }
+    };
+
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // User switched to ad window/tab
-        if (isWaitingForReturn || document.activeElement?.tagName === 'IFRAME') {
-          isWaitingForReturn = true;
-          setHasInteracted(true);
-        }
+      if (!document.hidden) {
+        // Tab is visible again!
+        handleUserReturn();
       } else {
-        // User RETURNED back to our page!
-        if (isWaitingForReturn || hasInteracted) {
-          setTimeout(() => {
-            handleClose();
-          }, 300);
+        // User left tab; check if leaving after clicking ad
+        if (isOverAdRef.current || document.activeElement?.tagName === 'IFRAME') {
+          markAdClicked();
         }
       }
     };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleUserReturn);
+    window.addEventListener('pageshow', handleUserReturn);
 
     return () => {
-      clearTimeout(showTimer);
-      clearTimeout(closeBtnTimer);
-      clearTimeout(safetyTimer);
-      clearInterval(iframeMonitor);
-      window.removeEventListener('blur', handleBlur);
+      clearTimeout(openTimer);
+      clearTimeout(emergencyTimer);
+      clearInterval(pollInterval);
+      window.removeEventListener('blur', handleWindowBlur);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleUserReturn);
+      window.removeEventListener('pageshow', handleUserReturn);
+      if (container) {
+        container.removeEventListener('mouseenter', handleMouseEnter);
+        container.removeEventListener('mouseleave', handleMouseLeave);
+        container.removeEventListener('touchstart', handleTouchStart);
+        container.removeEventListener('pointerdown', handlePointerDown);
+      }
     };
-  }, [enabled, graceCloseDelaySec, autoCloseTimeoutSec, hasInteracted, handleClose, step]);
+  }, [enabled, emergencyFallbackSec, handleClose, step]);
 
   if (!isOpen) return null;
 
   return (
     <>
-      {/* Exact TechMint Blurred Backdrop */}
+      {/* TechMint Blurred Backdrop */}
       <div id="blockcont" className="blockcont" onClick={(e) => e.stopPropagation()} />
 
-      {/* Exact TechMint Centered Modal Box */}
-      <div id="contntblock" className="contntblock" ref={modalRef}>
+      {/* TechMint Centered Modal Box */}
+      <div id="contntblock" className="contntblock">
         <center>
           <h5 id="continue1" className="techmint-inst-heading">
             👇 Click Image &amp; Wait &amp; Come back this page to <span style={{ color: 'red' }}>Get Link - Download</span>.
@@ -136,8 +174,8 @@ export default function ForcedAdPopupModal({
 
         <br />
 
-        {/* Real AdSlot inside TechMint #gads container (NO FAKE SPONSOR ADS) */}
-        <div id="gads">
+        {/* Real AdSlot inside TechMint #gads container */}
+        <div id="gads" ref={adContainerRef}>
           <div className="gAd">
             <div className="gCn">
               <AdUnit
@@ -150,6 +188,26 @@ export default function ForcedAdPopupModal({
             </div>
           </div>
         </div>
+
+        {/* Visual feedback if ad click detected before leaving */}
+        {adClicked && (
+          <div style={{
+            background: '#ecfdf5',
+            border: '1px solid #a7f3d0',
+            color: '#065f46',
+            borderRadius: '6px',
+            padding: '8px 12px',
+            margin: '8px 0',
+            fontSize: '12px',
+            fontWeight: '600'
+          }}>
+            ⚡ Ad Click Detected! Switch back to this page to automatically unlock your link.
+            <br />
+            <span style={{ fontSize: '11px', color: '#047857' }}>
+              विज्ञापन पर क्लिक दर्ज हो गया! इस पेज पर वापस आते ही लिंक अपने आप खुल जाएगा।
+            </span>
+          </div>
+        )}
 
         {/* Exact TechMint Steps Guidance */}
         <div className="bottom-text" id="bottmtxt" style={{ padding: '8px' }}>
@@ -165,10 +223,15 @@ export default function ForcedAdPopupModal({
           </center>
         </div>
 
-        {/* Exact TechMint Close Button (Appears after 4s) */}
-        {showCloseButton && (
-          <div className="closeis" id="close-btn" onClick={handleClose}>
-            Close
+        {/* Emergency close button: ONLY shown if ad failed to load after 45s (e.g. adblocker) */}
+        {showEmergencyClose && (
+          <div
+            className="closeis"
+            id="close-btn"
+            style={{ display: 'inline-block' }}
+            onClick={handleClose}
+          >
+            Skip (Ad unavailable)
           </div>
         )}
       </div>

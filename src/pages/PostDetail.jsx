@@ -157,8 +157,7 @@ export default function PostDetail() {
         step={activeStep}
         adSlot={AD_CONFIG.SLOTS.POPUP_MODAL}
         enabled={true}
-        autoCloseTimeoutSec={35}
-        graceCloseDelaySec={4}
+        emergencyFallbackSec={45}
       />
 
       {/* ── Fixed Sticky Step Bar (From TechmintTopSection) ── */}
