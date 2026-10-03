@@ -76,7 +76,7 @@ export function TechmintTopSection({
 
         {/* ── 3. Top Ad (Directly ABOVE Countdown / Timing) ── */}
         <div className="techmint-ad-wrapper techmint-ad-top my-2">
-          <AdUnit slot={adSlotTop} minHeight="250px" />
+          <AdUnit slot={adSlotTop} minHeight="auto" />
         </div>
 
         {/* ── 4. Countdown Timer (#ce-wait1) - Clean text, NO box, NO border! ── */}
@@ -119,7 +119,7 @@ export function TechmintTopSection({
 
         {/* ── 7. Display Ad (Directly BELOW Countdown / Timing / Verify) ── */}
         <div className="techmint-ad-wrapper techmint-ad-bottom my-2">
-          <AdUnit slot={adSlotBottom} minHeight="250px" />
+          <AdUnit slot={adSlotBottom} minHeight="auto" />
         </div>
       </div>
     </>

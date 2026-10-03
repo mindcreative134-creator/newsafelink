@@ -61,7 +61,7 @@ function AdUnitComponent({
   host = AD_CONFIG.HOST_ID || 'ca-host-pub-1556223355139109',
   variant,
   format,
-  minHeight = '250px',
+  minHeight = 'auto',
   className = '',
   style = {},
 }) {

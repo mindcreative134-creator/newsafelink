@@ -28,10 +28,10 @@ export const AD_CONFIG = {
     IN_ARTICLE_2: '1641433819',
 
     // 6. Bottom Section: Ad Directly ABOVE Continue Button (#btn7) - Display Responsive
-    ABOVE_CONTINUE: '5754054742',
+    ABOVE_CONTINUE: '4969186882',
 
     // 7. Bottom Section: Ad Directly BELOW Continue Button (#btn7) - Display Responsive
-    BELOW_CONTINUE: '7317709042',
+    BELOW_CONTINUE: '6529422128',
 
     // 8. Sidebar Responsive / Display
     SIDEBAR: '7317709042',
