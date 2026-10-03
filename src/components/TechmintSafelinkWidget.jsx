@@ -69,9 +69,9 @@ export function TechmintTopSection({
       </div>
 
       <div className="techmint-widget-container">
-        {/* ── 2. Green Instruction Banner ── */}
+        {/* ── 2. Instruction Banner ── */}
         <div className="tm-instruction-banner">
-          Click On The Below Image Ad, Wait 15 Sec &amp; Come Back To This Page To Get The Verified Link
+          Please Wait 15 Seconds &amp; Click Verify Below To Unlock Your Destination Link
         </div>
 
         {/* ── 3. Top Ad (Directly ABOVE Countdown / Timing) ── */}

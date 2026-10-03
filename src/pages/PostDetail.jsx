@@ -5,7 +5,6 @@ import { getUnifiedPosts } from '../services/postService';
 import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import { TechmintTopSection, TechmintBottomSection } from '../components/TechmintSafelinkWidget';
-import ForcedAdPopupModal from '../components/ForcedAdPopupModal';
 import { 
   Calendar, Clock, User, ArrowRight, ShieldCheck, 
   CheckCircle2, Lock, ExternalLink, ChevronRight, Share2, FileText
@@ -152,17 +151,6 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-[#f8f9fa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
-      {/* ── Decorated Forced Ad-Click Popup Modal (ONLY when redirected via shortener on first step) ── */}
-      {isSafelinkActive && (
-        <ForcedAdPopupModal
-          step={activeStep}
-          postId={postId}
-          adSlot={AD_CONFIG.SLOTS.POPUP_MODAL}
-          onAdClicked={() => {
-            document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
-          }}
-        />
-      )}
 
       {/* ── Fixed Sticky Step Bar & Top Countdown Section (ONLY in Safelink mode) ── */}
       {isSafelinkActive && (

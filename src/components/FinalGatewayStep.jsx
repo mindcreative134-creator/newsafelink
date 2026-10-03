@@ -26,29 +26,6 @@ export default function FinalGatewayStep() {
     completeAndRedirect();
   };
 
-  const sponsorList = [
-    {
-      name: 'TheKrazyTrip & Travel Deals',
-      category: 'Travel & Vacations',
-      desc: 'Exclusive discounts on flights & hotels',
-      logoText: 'KrazyTrip',
-      color: 'from-amber-500 to-orange-600',
-    },
-    {
-      name: 'UltraFast WireGuard VPN',
-      category: 'Digital Privacy',
-      desc: 'Encrypted ultra-fast 10Gbps connectivity',
-      logoText: 'UltraVPN',
-      color: 'from-blue-600 to-cyan-600',
-    },
-    {
-      name: 'CloudDrive Instant Storage',
-      category: 'Cloud Hosting',
-      desc: '50GB free secure cloud backup',
-      logoText: 'CloudBox',
-      color: 'from-purple-600 to-indigo-600',
-    },
-  ];
 
   return (
     <div className="w-full max-w-2xl mx-auto my-8 flex flex-col items-center text-center space-y-6 animate-fadeIn">
@@ -119,40 +96,7 @@ export default function FinalGatewayStep() {
         <AdUnit variant="banner" slot="9320506924" minHeight="120px" />
       </div>
 
-      {/* ── Sponsors Section ── */}
-      <div className="w-full pt-4">
-        <h3 className="text-xs font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-4">
-          Sponsored By
-        </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {sponsorList.map((sponsor, idx) => (
-            <a
-              key={idx}
-              href="#sponsor"
-              onClick={(e) => e.preventDefault()}
-              className="group p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:shadow-md transition-all flex flex-col items-center text-center space-y-2"
-            >
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${sponsor.color} text-white font-black flex items-center justify-center text-xs shadow-sm`}>
-                {sponsor.logoText.slice(0, 3)}
-              </div>
-              <strong className="text-xs font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-indigo-600">
-                {sponsor.name}
-              </strong>
-              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                {sponsor.desc}
-              </p>
-            </a>
-          ))}
-        </div>
-
-        <button
-          onClick={() => alert('Sponsorship inquiries: contact@safelinknews.com')}
-          className="mt-5 px-5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all"
-        >
-          Become a Sponsor!
-        </button>
-      </div>
 
     </div>
   );
