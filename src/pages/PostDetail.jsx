@@ -152,34 +152,38 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-[#f8f9fa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
-      {/* ── Decorated Forced Ad-Click Popup Modal (Strict Tap-to-Unlock) ── */}
-      <ForcedAdPopupModal
-        step={activeStep}
-        postId={postId}
-        adSlot={AD_CONFIG.SLOTS.POPUP_MODAL}
-        onAdClicked={() => {
-          document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
-        }}
-      />
+      {/* ── Decorated Forced Ad-Click Popup Modal (ONLY when redirected via shortener on first step) ── */}
+      {isSafelinkActive && (
+        <ForcedAdPopupModal
+          step={activeStep}
+          postId={postId}
+          adSlot={AD_CONFIG.SLOTS.POPUP_MODAL}
+          onAdClicked={() => {
+            document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
+          }}
+        />
+      )}
 
-      {/* ── Fixed Sticky Step Bar (From TechmintTopSection) ── */}
-      <TechmintTopSection
-        currentStep={activeStep}
-        totalSteps={totalSteps || 3}
-        isVerified={isStepVerified}
-        onVerify={() => {
-          setIsStepVerified(true);
-          setTimeout(() => {
-            const btn7 = document.getElementById('btn7') || document.getElementById('techmint-bottom-section');
-            if (btn7) {
-              btn7.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          }, 300);
-        }}
-        timerSeconds={15}
-        adSlotTop={AD_CONFIG.SLOTS.TOP_BANNER}
-        adSlotBottom={AD_CONFIG.SLOTS.BELOW_VERIFY}
-      />
+      {/* ── Fixed Sticky Step Bar & Top Countdown Section (ONLY in Safelink mode) ── */}
+      {isSafelinkActive && (
+        <TechmintTopSection
+          currentStep={activeStep}
+          totalSteps={totalSteps || 3}
+          isVerified={isStepVerified}
+          onVerify={() => {
+            setIsStepVerified(true);
+            setTimeout(() => {
+              const btn7 = document.getElementById('btn7') || document.getElementById('techmint-bottom-section');
+              if (btn7) {
+                btn7.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }, 300);
+          }}
+          timerSeconds={15}
+          adSlotTop={AD_CONFIG.SLOTS.TOP_BANNER}
+          adSlotBottom={AD_CONFIG.SLOTS.BELOW_VERIFY}
+        />
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         
@@ -316,19 +320,21 @@ export default function PostDetail() {
               </div>
             )}
 
-            {/* ── Safelink Bottom Section: First Ad -> Continue Button -> Second Ad ("Sata hua") - AT THE VERY BOTTOM ("sabse niche") ── */}
-            <div className="mt-4 bg-white dark:bg-zinc-900 rounded-lg p-2 sm:p-3 border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
-              <TechmintBottomSection
-                currentStep={activeStep}
-                totalSteps={totalSteps || 3}
-                isUnlocked={isStepVerified}
-                adSlot1={AD_CONFIG.SLOTS.ABOVE_CONTINUE}
-                adSlot2={AD_CONFIG.SLOTS.BELOW_CONTINUE}
-                onContinue={() => {
-                  navigate('/readmore');
-                }}
-              />
-            </div>
+            {/* ── Safelink Bottom Section: First Ad -> Continue Button -> Second Ad ("Sata hua") - ONLY in Safelink mode ── */}
+            {isSafelinkActive && (
+              <div className="mt-4 bg-white dark:bg-zinc-900 rounded-lg p-2 sm:p-3 border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
+                <TechmintBottomSection
+                  currentStep={activeStep}
+                  totalSteps={totalSteps || 3}
+                  isUnlocked={isStepVerified}
+                  adSlot1={AD_CONFIG.SLOTS.ABOVE_CONTINUE}
+                  adSlot2={AD_CONFIG.SLOTS.BELOW_CONTINUE}
+                  onContinue={() => {
+                    navigate('/readmore');
+                  }}
+                />
+              </div>
+            )}
 
           </main>
 

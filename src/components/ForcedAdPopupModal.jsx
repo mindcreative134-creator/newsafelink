@@ -31,34 +31,36 @@ export default function ForcedAdPopupModal({
   const isOverAdRef = useRef(false);
   const adContainerRef = useRef(null);
 
-  const stepUnlockKey = `TECHMINT_AD_UNLOCKED_${postId || 'global'}_STEP_${step}`;
-  const stepClickedKey = `TECHMINT_AD_CLICKED_${postId || 'global'}_STEP_${step}`;
+  const globalPopupDoneKey = 'SAFE_POPUP_DONE';
+  const stepClickedKey = 'SAFE_POPUP_CLICKED';
 
   const handleClose = useCallback(() => {
     setClosingSoon(true);
     setTimeout(() => {
       setIsOpen(false);
       setClosingSoon(false);
-      sessionStorage.setItem(stepUnlockKey, '1');
+      // Mark popup completed for the entire session (shows ONLY first time on redirect)
+      sessionStorage.setItem(globalPopupDoneKey, '1');
       sessionStorage.removeItem(stepClickedKey);
       if (onAdClicked) onAdClicked();
     }, 400);
-  }, [stepUnlockKey, stepClickedKey, onAdClicked]);
+  }, [onAdClicked]);
 
   const markAdClicked = useCallback(() => {
     if (!adClickedRef.current) {
       adClickedRef.current = true;
       setAdClicked(true);
+      sessionStorage.setItem(globalPopupDoneKey, '1');
       sessionStorage.setItem(stepClickedKey, '1');
       document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
     }
-  }, [stepClickedKey]);
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
 
-    // Check if user already completed this step's ad click
-    if (sessionStorage.getItem(stepUnlockKey) === '1') {
+    // RULE: Shows ONLY first time when redirected via shortener. Never show if already completed or on step > 1
+    if (step > 1 || sessionStorage.getItem(globalPopupDoneKey) === '1') {
       return;
     }
 
@@ -156,7 +158,7 @@ export default function ForcedAdPopupModal({
         container.removeEventListener('pointerdown', handlePointerDown);
       }
     };
-  }, [enabled, emergencyFallbackSec, handleClose, markAdClicked, stepClickedKey, stepUnlockKey]);
+  }, [enabled, emergencyFallbackSec, handleClose, markAdClicked, stepClickedKey, globalPopupDoneKey, step]);
 
   // Handle direct tap on container (for fallback ads or touch interactions)
   const handleAdContainerClick = () => {

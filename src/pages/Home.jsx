@@ -74,7 +74,10 @@ export default function Home() {
     const adlinkflyParam = tryDecodeBase64(rawAdlinkflyParam);
     const stepParam = Number(params.get('step')) || Number(params.get('st')) || 1;
 
-    if (sarkariParam || oParam || urlParam || adlinkflyParam) {
+    const referrer = typeof document !== 'undefined' ? (document.referrer || '') : '';
+    const isFromShortener = referrer.includes('sarkaritrend') || referrer.includes('boats');
+
+    if (sarkariParam || oParam || urlParam || adlinkflyParam || isFromShortener) {
       setIsRedirecting(true);
       const rawSarkari = sarkariParam ? tryDecodeBase64(sarkariParam) : null;
       const target = rawSarkari
@@ -83,7 +86,7 @@ export default function Home() {
         ? `https://piko.site.je/?o=${oParam}`
         : adlinkflyParam
         ? (adlinkflyParam.startsWith('http') ? adlinkflyParam : `https://sarkaritrend.boats/${adlinkflyParam}`)
-        : urlParam;
+        : (urlParam || referrer || 'https://sarkaritrend.boats/');
 
       startSafelink(target, stepParam);
 
