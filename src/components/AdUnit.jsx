@@ -1,72 +1,56 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AD_CONFIG } from '../config/adConfig';
 
 /**
  * Authentic Ad Unit Component (TechMint Style)
  * 
- * 1. Clean, native ad wrapper that mimics TechMint & GeneratePress ad inserter blocks.
- * 2. Uses authentic Google AdSense publisher tags (ca-pub-9543073887536718).
- * 3. Does NOT show fake "Advertisement" labels or placeholder text.
- * 4. Gracefully pushes to window.adsbygoogle queue.
- * 5. Automatically collapses to zero height if Google AdSense marks the slot unfilled.
+ * 1. Clean, native Google AdSense container (ca-pub-9543073887536718).
+ * 2. Reliable (window.adsbygoogle = window.adsbygoogle || []).push({}) execution.
+ * 3. Does NOT prematurely delete or collapse ads with short timeouts.
+ * 4. Checks data-adsbygoogle-status to prevent duplicate initialization.
+ * 5. Full responsiveness across mobile, tablet, and desktop.
  */
-
 function AdUnitComponent({
   slot = AD_CONFIG.SLOTS.TOP_BANNER,
   client = AD_CONFIG.CLIENT_ID,
   variant = 'banner', // 'banner' | 'fluid' | 'in-article' | 'rectangle' | 'sidebar'
   format = 'auto',
-  minHeight = '0px',
+  minHeight = '90px',
   className = '',
   style = {},
 }) {
   const insRef = useRef(null);
-  const pushedRef = useRef(false);
-  const [unfilled, setUnfilled] = useState(false);
+  const isPushedRef = useRef(false);
 
   useEffect(() => {
-    if (pushedRef.current) return;
-    pushedRef.current = true;
+    // Prevent duplicate push to the same element instance
+    if (isPushedRef.current) return;
 
-    const timer = setTimeout(() => {
-      try {
-        if (typeof window !== 'undefined' && window.adsbygoogle) {
-          window.adsbygoogle.push({});
-        }
-      } catch (err) {
-        // Silently catch adblock / loading exceptions
+    const pushAd = () => {
+      const el = insRef.current;
+      if (!el) return;
+
+      // If Google AdSense already processed this ins element, don't push again
+      if (el.getAttribute('data-adsbygoogle-status')) {
+        isPushedRef.current = true;
+        return;
       }
-    }, 150);
+
+      try {
+        window.adsbygoogle = window.adsbygoogle || [];
+        window.adsbygoogle.push({});
+        isPushedRef.current = true;
+      } catch (err) {
+        // Silently catch in case of adblockers or network interruptions
+        console.debug('AdSense push caught:', err);
+      }
+    };
+
+    // Push with a microtask delay so DOM is completely mounted
+    const timer = setTimeout(pushAd, 80);
 
     return () => clearTimeout(timer);
   }, [slot]);
-
-  // Monitor for Google AdSense unfilled status to collapse zero height immediately
-  useEffect(() => {
-    const el = insRef.current;
-    if (!el) return;
-
-    const checkStatus = () => {
-      if (el.getAttribute('data-ad-status') === 'unfilled') {
-        setUnfilled(true);
-      }
-    };
-
-    const observer = new MutationObserver(checkStatus);
-    observer.observe(el, { attributes: true, attributeFilter: ['data-ad-status', 'style'] });
-
-    const timeout = setTimeout(checkStatus, 3500);
-
-    return () => {
-      observer.disconnect();
-      clearTimeout(timeout);
-    };
-  }, []);
-
-  if (unfilled) {
-    // If ad is unfilled, collapse completely with ZERO margin/padding/gap!
-    return null;
-  }
 
   const isFluid = variant === 'fluid';
   const isInArticle = variant === 'in-article';
@@ -82,8 +66,15 @@ function AdUnitComponent({
 
   return (
     <div
-      className={`ad-container text-center overflow-hidden clear-both ${className}`}
-      style={{ minHeight: style.minHeight !== undefined ? style.minHeight : minHeight, ...style }}
+      className={`ad-container text-center mx-auto overflow-hidden clear-both ${className}`}
+      style={{
+        width: '100%',
+        minHeight: style.minHeight !== undefined ? style.minHeight : minHeight,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        ...style
+      }}
     >
       <ins
         ref={insRef}
@@ -92,6 +83,8 @@ function AdUnitComponent({
           display: 'block',
           width: '100%',
           textAlign: 'center',
+          minHeight: minHeight,
+          margin: '0 auto',
         }}
         data-ad-client={client}
         data-ad-slot={slot}

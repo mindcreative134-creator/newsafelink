@@ -83,14 +83,14 @@ export function TechmintTopSection({
           Click On The Below Image Ad, Wait 15 Sec &amp; Come Back To This Page To Get The Verified Link
         </div>
 
-        {/* ── 3. Top Banner Ad ── */}
-        <div className="techmint-ad-wrapper">
+        {/* ── 3. Top Banner Ad (Directly ABOVE Countdown / Timing) ── */}
+        <div className="techmint-ad-wrapper techmint-ad-top my-3">
           <AdUnit variant="banner" slot={adSlotTop} minHeight="90px" />
         </div>
 
         {/* ── 4. Countdown Timer Box (#ce-wait1) ── */}
         {!timerFinished && !isVerified && (
-          <div id="ce-wait1" className="techmint-wait-box">
+          <div id="ce-wait1" className="techmint-wait-box my-3">
             <div id="countdown" className="techmint-countdown-text">
               <b>Please wait <span id="ce-time">{seconds}</span> Seconds...</b>
             </div>
@@ -140,9 +140,9 @@ export function TechmintTopSection({
           </div>
         )}
 
-        {/* ── 7. In-Content Ad Below Verify / Guidance ── */}
-        <div className="techmint-ad-wrapper">
-          <AdUnit variant="in-article" slot={adSlotBottom} minHeight="120px" />
+        {/* ── 7. Display Ad (Directly BELOW Countdown / Timing / Verify) ── */}
+        <div className="techmint-ad-wrapper techmint-ad-bottom my-3">
+          <AdUnit variant="rectangle" slot={adSlotBottom} minHeight="250px" />
         </div>
 
         {/* ── 8. Action Prompt Overlay (No fake sponsor text) ── */}

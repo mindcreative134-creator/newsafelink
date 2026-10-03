@@ -72,9 +72,20 @@
 .techmint-ad-wrapper {
   width: 100%;
   max-width: 728px;
-  margin: 8px auto;
-  overflow: hidden;
+  margin: 10px auto;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  clear: both;
+}
+
+.techmint-ad-top {
+  min-height: 90px;
+}
+
+.techmint-ad-bottom {
+  min-height: 250px;
 }
 
 /* ── Authentic TechMint Red Verify / Continue button ── */
