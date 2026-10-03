@@ -62,7 +62,7 @@ export default function PostDetail() {
     if (!post || !articleRef.current) return;
     try {
       if (typeof window !== 'undefined' && window.adsbygoogle) {
-        const uninitialized = articleRef.current.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])');
+        const uninitialized = articleRef.current.querySelectorAll('.article-real-body ins.adsbygoogle:not([data-adsbygoogle-status])');
         uninitialized.forEach(() => {
           try {
             (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -158,7 +158,15 @@ export default function PostDetail() {
         currentStep={activeStep}
         totalSteps={totalSteps || 3}
         isVerified={isStepVerified}
-        onVerify={() => setIsStepVerified(true)}
+        onVerify={() => {
+          setIsStepVerified(true);
+          setTimeout(() => {
+            const btn7 = document.getElementById('btn7') || document.getElementById('techmint-bottom-section');
+            if (btn7) {
+              btn7.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 300);
+        }}
         timerSeconds={15}
         adSlotTop={AD_CONFIG.SLOTS.TOP_BANNER}
         adSlotBottom={AD_CONFIG.SLOTS.BELOW_VERIFY}
@@ -267,18 +275,6 @@ export default function PostDetail() {
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
 
-              {/* ── Safelink Bottom Section: First Ad -> Continue Button -> Second Ad ("Sata hua") ── */}
-              <TechmintBottomSection
-                currentStep={activeStep}
-                totalSteps={totalSteps || 3}
-                isUnlocked={isStepVerified}
-                adSlot1={AD_CONFIG.SLOTS.ABOVE_CONTINUE}
-                adSlot2={AD_CONFIG.SLOTS.BELOW_CONTINUE}
-                onContinue={() => {
-                  navigate('/readmore');
-                }}
-              />
-
             </article>
 
             {/* Related Articles Feed */}
@@ -310,6 +306,20 @@ export default function PostDetail() {
                 </div>
               </div>
             )}
+
+            {/* ── Safelink Bottom Section: First Ad -> Continue Button -> Second Ad ("Sata hua") - AT THE VERY BOTTOM ("sabse niche") ── */}
+            <div className="mt-6 bg-white dark:bg-zinc-900 rounded-lg p-3 sm:p-5 border border-zinc-200/80 dark:border-zinc-800 shadow-sm">
+              <TechmintBottomSection
+                currentStep={activeStep}
+                totalSteps={totalSteps || 3}
+                isUnlocked={isStepVerified}
+                adSlot1={AD_CONFIG.SLOTS.ABOVE_CONTINUE}
+                adSlot2={AD_CONFIG.SLOTS.BELOW_CONTINUE}
+                onContinue={() => {
+                  navigate('/readmore');
+                }}
+              />
+            </div>
 
           </main>
 

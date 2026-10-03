@@ -28,13 +28,13 @@ export const AD_CONFIG = {
     IN_ARTICLE_2: '1641433819',
 
     // 6. Bottom Section: Ad Directly ABOVE Continue Button (#btn7) - Display Responsive
-    ABOVE_CONTINUE: '6529422128',
+    ABOVE_CONTINUE: '5754054742',
 
     // 7. Bottom Section: Ad Directly BELOW Continue Button (#btn7) - Display Responsive
-    BELOW_CONTINUE: '4969186882',
+    BELOW_CONTINUE: '7317709042',
 
-    // 8. Sidebar Responsive / Multiplex
-    SIDEBAR: '8617081290',
+    // 8. Sidebar Responsive / Display
+    SIDEBAR: '7317709042',
 
     // 9. Intermediary / Splash Screen Banner
     SPLASH_BANNER: '5754054742'

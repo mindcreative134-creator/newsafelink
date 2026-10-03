@@ -61,13 +61,12 @@ function AdUnitComponent({
   host = AD_CONFIG.HOST_ID || 'ca-host-pub-1556223355139109',
   variant,
   format,
-  minHeight = '0px',
+  minHeight = '250px',
   className = '',
   style = {},
 }) {
   const insRef = useRef(null);
   const isPushedRef = useRef(false);
-  const [isUnfilled, setIsUnfilled] = useState(false);
 
   // Derive specs
   const spec = SLOT_SPECS[slot] || {};
@@ -77,8 +76,6 @@ function AdUnitComponent({
   const isResponsive = spec.fullWidthResponsive !== undefined ? spec.fullWidthResponsive : true;
 
   useEffect(() => {
-    // Reset state if slot changes
-    setIsUnfilled(false);
     isPushedRef.current = false;
 
     const pushAd = () => {
@@ -100,33 +97,22 @@ function AdUnitComponent({
       }
     };
 
-    const timer = setTimeout(pushAd, 60);
-
-    // Watch for AdSense status changes (e.g. unfilled)
-    const el = insRef.current;
-    let observer = null;
-    if (el) {
-      observer = new MutationObserver(() => {
-        if (el.getAttribute('data-ad-status') === 'unfilled') {
-          setIsUnfilled(true);
-        }
-      });
-      observer.observe(el, { attributes: true, attributeFilter: ['data-ad-status'] });
-    }
+    const timer = setTimeout(pushAd, 80);
 
     return () => {
       clearTimeout(timer);
-      if (observer) observer.disconnect();
     };
   }, [slot]);
+
+  const effectiveMinHeight = style.minHeight !== undefined ? style.minHeight : minHeight;
 
   return (
     <div
       className={`ad-container text-center mx-auto overflow-hidden clear-both ${className}`}
       style={{
         width: '100%',
-        minHeight: isUnfilled ? '0px' : (style.minHeight !== undefined ? style.minHeight : minHeight),
-        display: isUnfilled ? 'none' : 'flex',
+        minHeight: effectiveMinHeight,
+        display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         ...style
@@ -139,7 +125,7 @@ function AdUnitComponent({
           display: 'block',
           width: '100%',
           textAlign: 'center',
-          minHeight: minHeight,
+          minHeight: effectiveMinHeight,
           margin: '0 auto',
         }}
         data-ad-client={client}
