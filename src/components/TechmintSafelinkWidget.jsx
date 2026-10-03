@@ -158,10 +158,10 @@ export function TechmintBottomSection({
   };
 
   return (
-    <div id="techmint-bottom-section" className="techmint-bottom-tight-container my-2">
+    <div id="techmint-bottom-section" className="techmint-bottom-tight-container my-1">
       {/* ── 1. First Ad (Directly ABOVE Continue Button - "Sata hua") ── */}
       <div className="techmint-ad-tight-unit">
-        <AdUnit slot={adSlot1} minHeight="250px" />
+        <AdUnit slot={adSlot1} minHeight="auto" />
       </div>
 
       {/* ── 2. Continue Button Section (#btn7) (Tightly Sandwiched in the middle) ── */}
@@ -183,7 +183,7 @@ export function TechmintBottomSection({
 
       {/* ── 3. Second Ad (Directly BELOW Continue Button - "Sata hua") ── */}
       <div className="techmint-ad-tight-unit">
-        <AdUnit slot={adSlot2} minHeight="250px" />
+        <AdUnit slot={adSlot2} minHeight="auto" />
       </div>
     </div>
   );

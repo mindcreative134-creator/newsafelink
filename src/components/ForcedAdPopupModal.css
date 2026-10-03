@@ -1,94 +1,275 @@
 /* =========================================================
-   TechMint Scraped Modal & Backdrop Styles
-   Exact match to techmint.in step_3.html
+   Decorated TechMint Modal & Backdrop Styles
+   Features:
+   - Deep glassmorphic blur backdrop
+   - Smooth scale/fade entrance animation
+   - Eye-catching bilingual typography & badges
+   - Pulsing highlighted ad frame
+   - Success banner animation
    ========================================================= */
 
-.blockcont {
+.techmint-modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.65);
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 99998;
+  transition: opacity 0.3s ease;
 }
 
-.contntblock {
+.techmint-modal-card {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.4);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(226, 232, 240, 0.8);
   z-index: 99999;
-  width: 95%;
-  max-width: 480px;
-  max-height: 90vh;
+  width: 94%;
+  max-width: 440px;
+  max-height: 92vh;
   overflow-y: auto;
   text-align: center;
-  padding: 16px 12px;
-  border: 1px solid #cbd5e1;
+  padding: 16px 14px;
+  box-sizing: border-box;
 }
 
-.dark .contntblock {
-  background-color: #18181b;
-  border-color: #3f3f46;
+.dark .techmint-modal-card {
+  background: #18181b;
+  border: 1px solid #27272a;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(63, 63, 70, 0.6);
   color: #f4f4f5;
 }
 
-.techmint-inst-heading {
-  font-size: 13px !important;
-  font-family: 'Open Sans', Arial, sans-serif !important;
-  font-weight: bold !important;
+/* Animations */
+.techmint-modal-opening {
+  animation: tmModalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.techmint-modal-closing {
+  animation: tmModalDismiss 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes tmModalPop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes tmModalDismiss {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -54%) scale(0.95);
+  }
+}
+
+/* Header Badge */
+.techmint-modal-badge-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.techmint-modal-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.dark .techmint-modal-pill {
+  background: #3b2a0c;
+  color: #fbbf24;
+  border-color: #78350f;
+}
+
+/* Headlines */
+.techmint-modal-header-text {
+  margin-bottom: 12px;
+}
+
+.techmint-modal-main-title {
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  margin: 0 0 4px 0 !important;
+  line-height: 1.3 !important;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.dark .techmint-modal-main-title {
+  color: #f8fafc !important;
+}
+
+.techmint-modal-sub-title {
+  font-size: 12px !important;
+  color: #475569 !important;
   margin: 0 !important;
-  padding: 4px 6px !important;
   line-height: 1.4 !important;
+  font-weight: 600 !important;
+}
+
+.dark .techmint-modal-sub-title {
+  color: #94a3b8 !important;
+}
+
+/* Highlighted Ad Container */
+.techmint-modal-ad-box {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 10px;
+  padding: 8px;
+  background: #f8fafc;
+  border: 2px dashed #e60023;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.dark .techmint-modal-ad-box {
+  background: #27272a;
+  border-color: #ef4444;
+}
+
+.techmint-modal-ad-box:hover {
+  transform: translateY(-1px);
+  border-style: solid;
+  box-shadow: 0 4px 16px rgba(230, 0, 35, 0.15);
+}
+
+.techmint-ad-box-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #e60023;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.techmint-ad-indicator-dot {
+  width: 7px;
+  height: 7px;
+  background: #e60023;
+  border-radius: 50%;
+  animation: tmPulseDot 1.5s infinite;
+}
+
+@keyframes tmPulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
 }
 
 #gads {
   width: 100%;
-  max-width: 336px;
   margin: 0 auto;
-  min-height: 250px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .gAd, .gCn {
   width: 100%;
+}
+
+/* Success Feedback Banner */
+.techmint-modal-success-banner {
   display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ecfdf5;
+  border: 1.5px solid #10b981;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 8px auto 4px;
+  max-width: 360px;
+}
+
+.dark .techmint-modal-success-banner {
+  background: #064e3b;
+  border-color: #059669;
+}
+
+/* Step-by-Step Guide */
+.techmint-modal-steps-guide {
+  display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  margin: 4px auto 0;
+  max-width: 360px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
 }
 
-.closeis {
-  display: inline-block;
+.dark .techmint-modal-steps-guide {
+  background: #27272a;
+  color: #94a3b8;
+}
+
+.techmint-step-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.techmint-step-num {
+  width: 16px;
+  height: 16px;
+  background: #e60023;
+  color: #ffffff;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* Emergency close button */
+.techmint-modal-emergency-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
   margin-top: 10px;
-  padding: 6px 20px;
   cursor: pointer;
-  font-size: 15px;
-  color: #dc2626;
-  font-weight: bold;
-  border: 1px solid #fecaca;
-  border-radius: 20px;
-  background: #fef2f2;
-  transition: all 0.2s ease;
+  text-decoration: underline;
+  transition: color 0.15s ease;
 }
 
-.closeis:hover {
-  background: #fee2e2;
-  color: #b91c1c;
+.techmint-modal-emergency-btn:hover {
+  color: #64748b;
 }
 
-.dark .closeis {
-  background: #450a0a;
-  border-color: #7f1d1d;
-  color: #f87171;
-}
-
-.bottom-text p {
-  margin-bottom: 4px;
+.dark .techmint-modal-emergency-btn:hover {
+  color: #cbd5e1;
 }
