@@ -139,17 +139,21 @@ export function TechmintBottomSection({
   adSlot1 = AD_CONFIG.SLOTS.ABOVE_CONTINUE,
   adSlot2 = AD_CONFIG.SLOTS.BELOW_CONTINUE
 }) {
+  const [showHelper, setShowHelper] = useState(false);
+
   const handleContinue = (e) => {
     e.preventDefault();
-    if (onContinue) onContinue();
-  };
-
-  const handleScrollToTop = () => {
-    const target = document.getElementById('btn6') || document.getElementById('ce-wait1') || document.getElementById('tm-stick');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (isUnlocked) {
+      if (onContinue) onContinue();
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setShowHelper(true);
+      setTimeout(() => setShowHelper(false), 3000);
+      const target = document.getElementById('btn6') || document.getElementById('ce-wait1') || document.getElementById('tm-stick');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   };
 
@@ -160,27 +164,20 @@ export function TechmintBottomSection({
         <AdUnit slot={adSlot1} minHeight="250px" />
       </div>
 
-      {/* ── 2. Continue Button Section (#btn7) (Sandwiched in the middle) ── */}
-      <div className="techmint-continue-tight-wrapper">
-        {isUnlocked ? (
-          <button
-            id="btn7"
-            type="button"
-            onClick={handleContinue}
-            className="ce-btn ce-blue techmint-continue-glow"
-          >
-            Continue ➔
-          </button>
-        ) : (
-          <button
-            id="btn7-locked"
-            type="button"
-            onClick={handleScrollToTop}
-            className="techmint-locked-notice hover:opacity-90 transition-opacity cursor-pointer"
-            title="Click to scroll to top verification"
-          >
-            <span>🔒 Please complete verification at the top of the article ➔</span>
-          </button>
+      {/* ── 2. Continue Button Section (#btn7) (Tightly Sandwiched in the middle) ── */}
+      <div className="techmint-continue-tight-wrapper flex flex-col items-center">
+        <button
+          id="btn7"
+          type="button"
+          onClick={handleContinue}
+          className="ce-btn ce-blue techmint-continue-glow"
+        >
+          Continue ➔
+        </button>
+        {showHelper && !isUnlocked && (
+          <span className="text-[12px] font-bold text-amber-600 dark:text-amber-400 mt-1 animate-bounce">
+            ☝️ Please complete verification timer above first!
+          </span>
         )}
       </div>
 
