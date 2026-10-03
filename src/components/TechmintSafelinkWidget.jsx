@@ -191,13 +191,13 @@ export function TechmintBottomSection({
   };
 
   return (
-    <div id="techmint-bottom-section" className="techmint-bottom-tight-container">
-      {/* ── Ad Unit Directly Above Continue Button ── */}
+    <div id="techmint-bottom-section" className="techmint-bottom-tight-container my-4">
+      {/* ── 1. First Ad (Directly ABOVE Continue Button - "Sata hua") ── */}
       <div className="techmint-ad-tight-unit">
-        <AdUnit variant="banner" slot={adSlot1} minHeight="0px" style={{ minHeight: 0 }} />
+        <AdUnit variant="banner" slot={adSlot1} minHeight="90px" />
       </div>
 
-      {/* ── Continue Button Section (#btn7) ── */}
+      {/* ── 2. Continue Button Section (#btn7) (Sandwiched in the middle) ── */}
       <div className="techmint-continue-tight-wrapper">
         {isUnlocked ? (
           <button
@@ -215,9 +215,9 @@ export function TechmintBottomSection({
         )}
       </div>
 
-      {/* ── Ad Unit Directly Below Continue Button ── */}
+      {/* ── 3. Second Ad (Directly BELOW Continue Button - "Sata hua") ── */}
       <div className="techmint-ad-tight-unit">
-        <AdUnit variant="banner" slot={adSlot2} minHeight="0px" style={{ minHeight: 0 }} />
+        <AdUnit variant="banner" slot={adSlot2} minHeight="90px" />
       </div>
     </div>
   );

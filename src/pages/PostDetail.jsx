@@ -274,10 +274,7 @@ export default function PostDetail() {
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
 
-              {/* Native In-Article Ad Unit 2 */}
-              <AdUnit variant="in-article" slot={AD_CONFIG.SLOTS.IN_ARTICLE_2} minHeight="140px" className="my-3" />
-
-              {/* ── Safelink Bottom Section: Top Ad -> Continue Button -> Bottom Ad ── */}
+              {/* ── Safelink Bottom Section: First Ad -> Continue Button -> Second Ad ("Sata hua") ── */}
               <TechmintBottomSection
                 currentStep={activeStep}
                 totalSteps={totalSteps || 3}
