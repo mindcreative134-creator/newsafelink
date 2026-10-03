@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSafelink } from '../context/SafelinkContext';
 import AdUnit from './AdUnit';
+import { AD_CONFIG } from '../config/adConfig';
 import { CheckCircle2, RefreshCw } from 'lucide-react';
 
 export default function RobotVerificationWidget({ currentPostId = '' }) {
@@ -24,7 +25,7 @@ export default function RobotVerificationWidget({ currentPostId = '' }) {
       
       {/* ── Top Ad directly above I am not a robot (Closely Attached) ── */}
       <div className="w-full max-w-[728px] mx-auto overflow-hidden">
-        <AdUnit variant="banner" slot="3056127394" minHeight="90px" className="!my-0.5" />
+        <AdUnit slot={AD_CONFIG.SLOTS.TOP_BANNER} minHeight="90px" className="!my-0.5" />
       </div>
 
       {/* ── ReCAPTCHA Style Checkbox (Directly in center, NO big card wrapper) ── */}
@@ -82,7 +83,7 @@ export default function RobotVerificationWidget({ currentPostId = '' }) {
 
       {/* ── Bottom Ad directly below I am not a robot (Closely Attached) ── */}
       <div className="w-full max-w-[728px] mx-auto overflow-hidden">
-        <AdUnit variant="banner" slot="7489201934" minHeight="90px" className="!my-0.5" />
+        <AdUnit slot={AD_CONFIG.SLOTS.BELOW_VERIFY} minHeight="90px" className="!my-0.5" />
       </div>
 
     </div>

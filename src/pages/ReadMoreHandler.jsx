@@ -41,7 +41,12 @@ export default function ReadMoreHandler() {
         } catch {}
 
         const chosenPost = await getRandomSafelinkPost(visited);
-        const nextId = chosenPost?.id || 'highest-paying-online-degrees-2026';
+        if (!chosenPost?.id) {
+          // No valid post found — go home rather than landing on a fake/spam page
+          navigate('/', { replace: true });
+          return;
+        }
+        const nextId = chosenPost.id;
         
         visited.push(nextId);
         sessionStorage.setItem('SAFE_VISITED', JSON.stringify(visited));

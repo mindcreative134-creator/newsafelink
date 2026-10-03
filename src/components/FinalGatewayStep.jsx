@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSafelink } from '../context/SafelinkContext';
 import AdUnit from './AdUnit';
+import { AD_CONFIG } from '../config/adConfig';
 import { ExternalLink, CheckCircle2, ShieldCheck, Sparkles, Heart } from 'lucide-react';
 
 export default function FinalGatewayStep() {
@@ -32,7 +33,7 @@ export default function FinalGatewayStep() {
       
       {/* ── Top Ad Unit ── */}
       <div className="w-full overflow-hidden">
-        <AdUnit variant="banner" slot="3056127394" minHeight="120px" />
+        <AdUnit slot={AD_CONFIG.SLOTS.TOP_BANNER} minHeight="120px" />
       </div>
 
       {/* ── Exact Replica of Shortxlinks Final Content Box ── */}
@@ -93,7 +94,7 @@ export default function FinalGatewayStep() {
 
       {/* ── Mid Ad Unit ── */}
       <div className="w-full overflow-hidden">
-        <AdUnit variant="banner" slot="9320506924" minHeight="120px" />
+        <AdUnit slot={AD_CONFIG.SLOTS.BELOW_VERIFY} minHeight="120px" />
       </div>
 
 
