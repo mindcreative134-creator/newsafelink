@@ -15,13 +15,15 @@ async function fetchAllBloggerPosts() {
   let pageToken = '';
   let hasNext = true;
   
-  while (hasNext) {
+  let pages = 0;
+  while (hasNext && pages < 8) {
+    pages++;
     let url = `${BASE_URL}/posts?key=${API_KEY}&maxResults=100`;
     if (pageToken) {
       url += `&pageToken=${pageToken}`;
     }
     try {
-      const res = await fetch(url);
+      const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
       if (!res.ok) {
         break;
       }
@@ -35,6 +37,7 @@ async function fetchAllBloggerPosts() {
         hasNext = false;
       }
     } catch (e) {
+      console.warn('Blogger fetch timeout or error, proceeding with existing posts.');
       hasNext = false;
     }
   }

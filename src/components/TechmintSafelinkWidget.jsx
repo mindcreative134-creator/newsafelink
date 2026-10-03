@@ -74,29 +74,23 @@ export function TechmintTopSection({
           Click On The Below Image Ad, Wait 15 Sec &amp; Come Back To This Page To Get The Verified Link
         </div>
 
-        {/* ── 3. Top Banner Ad (Directly ABOVE Countdown / Timing) ── */}
-        <div className="techmint-ad-wrapper techmint-ad-top my-3">
-          <AdUnit variant="banner" slot={adSlotTop} minHeight="90px" />
+        {/* ── 3. Top Ad (Directly ABOVE Countdown / Timing) ── */}
+        <div className="techmint-ad-wrapper techmint-ad-top my-2">
+          <AdUnit slot={adSlotTop} />
         </div>
 
-        {/* ── 4. Countdown Timer Box (#ce-wait1) ── */}
+        {/* ── 4. Countdown Timer (#ce-wait1) - Clean text, NO box, NO border! ── */}
         {!timerFinished && !isVerified && (
-          <div id="ce-wait1" className="techmint-wait-box my-3">
+          <div id="ce-wait1" className="techmint-wait-clean my-2">
             <div id="countdown" className="techmint-countdown-text">
               <b>Please wait <span id="ce-time">{seconds}</span> Seconds...</b>
-            </div>
-            <div className="techmint-progress-bar-bg">
-              <div
-                className="techmint-progress-bar-fill"
-                style={{ width: `${((timerSeconds - seconds) / timerSeconds) * 100}%` }}
-              />
             </div>
           </div>
         )}
 
         {/* ── 5. Verify Button (#btn6) ── */}
         {timerFinished && !isVerified && (
-          <div className="techmint-center my-3">
+          <div className="techmint-center my-2">
             <button
               id="btn6"
               onClick={handleVerifyClick}
@@ -118,14 +112,14 @@ export function TechmintTopSection({
               color: '#1e293b',
               textAlign: 'center'
             }}>
-              👇 Scroll down &amp; click on <span style={{ color: '#2563eb' }}>Continue</span> button for your destination link 👇
+              👇 Scroll down &amp; click on <span style={{ color: '#e60023' }}>Continue</span> button for your destination link 👇
             </h4>
           </div>
         )}
 
         {/* ── 7. Display Ad (Directly BELOW Countdown / Timing / Verify) ── */}
-        <div className="techmint-ad-wrapper techmint-ad-bottom my-3">
-          <AdUnit variant="banner" slot={adSlotBottom} minHeight="250px" />
+        <div className="techmint-ad-wrapper techmint-ad-bottom my-2">
+          <AdUnit slot={adSlotBottom} />
         </div>
       </div>
     </>
@@ -154,7 +148,7 @@ export function TechmintBottomSection({
     <div id="techmint-bottom-section" className="techmint-bottom-tight-container my-4">
       {/* ── 1. First Ad (Directly ABOVE Continue Button - "Sata hua") ── */}
       <div className="techmint-ad-tight-unit">
-        <AdUnit variant="banner" slot={adSlot1} minHeight="90px" />
+        <AdUnit slot={adSlot1} />
       </div>
 
       {/* ── 2. Continue Button Section (#btn7) (Sandwiched in the middle) ── */}
@@ -177,7 +171,7 @@ export function TechmintBottomSection({
 
       {/* ── 3. Second Ad (Directly BELOW Continue Button - "Sata hua") ── */}
       <div className="techmint-ad-tight-unit">
-        <AdUnit variant="banner" slot={adSlot2} minHeight="90px" />
+        <AdUnit slot={adSlot2} />
       </div>
     </div>
   );

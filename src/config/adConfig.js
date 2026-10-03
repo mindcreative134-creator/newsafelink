@@ -8,37 +8,36 @@ export const AD_CONFIG = {
   // Google AdSense Publisher Client ID
   CLIENT_ID: import.meta.env?.VITE_ADSENSE_CLIENT_ID || 'ca-pub-9543073887536718',
 
-  // Ad Slot Definitions mapped 1:1 to TechMint placements
+  HOST_ID: 'ca-host-pub-1556223355139109',
+
+  // Ad Slot Definitions mapped to publisher ca-pub-9543073887536718 units
   SLOTS: {
-    // 1. Forced Popup Modal (#gads in #contntblock)
+    // 1. Forced Popup Modal (if needed)
     POPUP_MODAL: '7317709042',
 
-    // 2. Top Header Banner (Above Article / Before Countdown)
-    TOP_BANNER: '9320506924',
+    // 2. Top Banner Ad (Directly ABOVE Countdown / Timing) - Display Responsive
+    TOP_BANNER: '5754054742',
 
-    // 3. Ad directly Below Countdown / Verify Button (#btn6)
+    // 3. Ad directly Below Countdown / Verify Button (#btn6) - In-Article Native
     BELOW_VERIFY: '4392273015',
 
-    // 4. Ad directly Below Scroll Guidance Card (#ce-text)
-    BELOW_GUIDANCE: '1909584638',
+    // 4. In-Content Article Paragraph Ad 1 - In-Feed Native
+    IN_ARTICLE_1: '1909584638',
 
-    // 5. In-Content Article Paragraph Ad 1
-    IN_ARTICLE_1: '5754054742',
-
-    // 6. In-Content Article Paragraph Ad 2
+    // 5. In-Content Article Paragraph Ad 2 - In-Article Native
     IN_ARTICLE_2: '1641433819',
 
-    // 7. Bottom Section: Ad Directly Above Continue Button (#btn7)
+    // 6. Bottom Section: Ad Directly ABOVE Continue Button (#btn7) - In-Feed Native
     ABOVE_CONTINUE: '9320506924',
 
-    // 8. Bottom Section: Ad Directly Below Continue Button (#btn7)
-    BELOW_CONTINUE: '4392273015',
+    // 7. Bottom Section: Ad Directly BELOW Continue Button (#btn7) - Display Responsive
+    BELOW_CONTINUE: '7317709042',
 
-    // 9. Sidebar Responsive Rectangle
-    SIDEBAR: '7317709042',
+    // 8. Sidebar Responsive / Multiplex
+    SIDEBAR: '8617081290',
 
-    // 10. Intermediary / Splash Screen Banner
-    SPLASH_BANNER: '9320506924'
+    // 9. Intermediary / Splash Screen Banner
+    SPLASH_BANNER: '5754054742'
   },
 
   // High-CPC keywords targeted across the site

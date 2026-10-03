@@ -1,30 +1,85 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AD_CONFIG } from '../config/adConfig';
+
+// Exact specifications matching publisher ca-pub-9543073887536718 units in AdSense
+const SLOT_SPECS = {
+  // In-Feed Native Units (Require layout-key and format=fluid)
+  '9320506924': {
+    format: 'fluid',
+    layoutKey: '-6t+ed+2i-1n-4w',
+  },
+  '1909584638': {
+    format: 'fluid',
+    layoutKey: '-6t+ed+2i-1n-4w',
+  },
+  // In-Article Native Units (Require data-ad-layout="in-article" and format=fluid)
+  '4392273015': {
+    format: 'fluid',
+    layout: 'in-article',
+  },
+  '1641433819': {
+    format: 'fluid',
+    layout: 'in-article',
+  },
+  // Responsive Display Units (Require format=auto and full-width-responsive)
+  '5754054742': {
+    format: 'auto',
+    fullWidthResponsive: true,
+  },
+  '7317709042': {
+    format: 'auto',
+    fullWidthResponsive: true,
+  },
+  // Multiplex Units
+  '8617081290': {
+    format: 'autorelaxed',
+    fullWidthResponsive: true,
+  },
+  // Other verified units
+  '4969186882': {
+    format: 'auto',
+    fullWidthResponsive: true,
+  },
+  '6529422128': {
+    format: 'auto',
+    fullWidthResponsive: true,
+  },
+};
 
 /**
  * Authentic Ad Unit Component (TechMint Style)
  * 
  * 1. Clean, native Google AdSense container (ca-pub-9543073887536718).
- * 2. Reliable (window.adsbygoogle = window.adsbygoogle || []).push({}) execution.
- * 3. Does NOT prematurely delete or collapse ads with short timeouts.
- * 4. Checks data-adsbygoogle-status to prevent duplicate initialization.
- * 5. Full responsiveness across mobile, tablet, and desktop.
+ * 2. Matches exact required AdSense formats (in-article, in-feed layout keys, display responsive).
+ * 3. Includes data-ad-host="ca-host-pub-1556223355139109" for Blogger hosted publisher accounts.
+ * 4. Reliable (window.adsbygoogle = window.adsbygoogle || []).push({}) execution.
+ * 5. If Google marks slot as unfilled, collapses clean without empty white gaps.
  */
 function AdUnitComponent({
   slot = AD_CONFIG.SLOTS.TOP_BANNER,
   client = AD_CONFIG.CLIENT_ID,
-  variant = 'banner', // 'banner' | 'fluid' | 'in-article' | 'rectangle' | 'sidebar'
-  format = 'auto',
-  minHeight = '90px',
+  host = AD_CONFIG.HOST_ID || 'ca-host-pub-1556223355139109',
+  variant,
+  format,
+  minHeight = '0px',
   className = '',
   style = {},
 }) {
   const insRef = useRef(null);
   const isPushedRef = useRef(false);
+  const [isUnfilled, setIsUnfilled] = useState(false);
+
+  // Derive specs
+  const spec = SLOT_SPECS[slot] || {};
+  const adFormat = format || spec.format || (variant === 'fluid' || variant === 'in-article' ? 'fluid' : 'auto');
+  const layout = spec.layout || (variant === 'in-article' ? 'in-article' : undefined);
+  const layoutKey = spec.layoutKey;
+  const isResponsive = spec.fullWidthResponsive !== undefined ? spec.fullWidthResponsive : true;
 
   useEffect(() => {
-    // Prevent duplicate push to the same element instance
-    if (isPushedRef.current) return;
+    // Reset state if slot changes
+    setIsUnfilled(false);
+    isPushedRef.current = false;
 
     const pushAd = () => {
       const el = insRef.current;
@@ -41,25 +96,33 @@ function AdUnitComponent({
         window.adsbygoogle.push({});
         isPushedRef.current = true;
       } catch (err) {
-        // Silently catch in case of adblockers or network interruptions
         console.debug('AdSense push caught:', err);
       }
     };
 
-    // Push with a microtask delay so DOM is completely mounted
-    const timer = setTimeout(pushAd, 80);
+    const timer = setTimeout(pushAd, 60);
 
-    return () => clearTimeout(timer);
+    // Watch for AdSense status changes (e.g. unfilled)
+    const el = insRef.current;
+    let observer = null;
+    if (el) {
+      observer = new MutationObserver(() => {
+        if (el.getAttribute('data-ad-status') === 'unfilled') {
+          setIsUnfilled(true);
+        }
+      });
+      observer.observe(el, { attributes: true, attributeFilter: ['data-ad-status'] });
+    }
+
+    return () => {
+      clearTimeout(timer);
+      if (observer) observer.disconnect();
+    };
   }, [slot]);
 
-  const isFluid = variant === 'fluid';
-  const isInArticle = variant === 'in-article';
-  const isRectangle = variant === 'rectangle';
-
-  // Format mapping
-  let adFormat = format;
-  if (isFluid || isInArticle) {
-    adFormat = 'fluid';
+  if (isUnfilled) {
+    // Gracefully collapse with zero margin/padding to avoid blank empty voids
+    return null;
   }
 
   return (
@@ -85,10 +148,12 @@ function AdUnitComponent({
           margin: '0 auto',
         }}
         data-ad-client={client}
+        data-ad-host={host}
         data-ad-slot={slot}
         data-ad-format={adFormat}
-        {...(isInArticle ? { 'data-ad-layout': 'in-article' } : {})}
-        data-full-width-responsive="true"
+        {...(layout ? { 'data-ad-layout': layout } : {})}
+        {...(layoutKey ? { 'data-ad-layout-key': layoutKey } : {})}
+        {...(isResponsive ? { 'data-full-width-responsive': 'true' } : {})}
       />
     </div>
   );
@@ -96,3 +161,4 @@ function AdUnitComponent({
 
 const AdUnit = React.memo(AdUnitComponent);
 export default AdUnit;
+
