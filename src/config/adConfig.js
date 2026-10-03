@@ -18,20 +18,20 @@ export const AD_CONFIG = {
     // 2. Top Banner Ad (Directly ABOVE Countdown / Timing) - Display Responsive
     TOP_BANNER: '5754054742',
 
-    // 3. Ad directly Below Countdown / Verify Button (#btn6) - In-Article Native
-    BELOW_VERIFY: '4392273015',
+    // 3. Ad directly Below Countdown / Verify Button (#btn6) - Display Responsive
+    BELOW_VERIFY: '7317709042',
 
-    // 4. In-Content Article Paragraph Ad 1 - In-Feed Native
-    IN_ARTICLE_1: '1909584638',
+    // 4. In-Content Article Paragraph Ad 1 - In-Article Native
+    IN_ARTICLE_1: '4392273015',
 
     // 5. In-Content Article Paragraph Ad 2 - In-Article Native
     IN_ARTICLE_2: '1641433819',
 
-    // 6. Bottom Section: Ad Directly ABOVE Continue Button (#btn7) - In-Feed Native
-    ABOVE_CONTINUE: '9320506924',
+    // 6. Bottom Section: Ad Directly ABOVE Continue Button (#btn7) - Display Responsive
+    ABOVE_CONTINUE: '6529422128',
 
     // 7. Bottom Section: Ad Directly BELOW Continue Button (#btn7) - Display Responsive
-    BELOW_CONTINUE: '7317709042',
+    BELOW_CONTINUE: '4969186882',
 
     // 8. Sidebar Responsive / Multiplex
     SIDEBAR: '8617081290',

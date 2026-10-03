@@ -120,18 +120,13 @@ function AdUnitComponent({
     };
   }, [slot]);
 
-  if (isUnfilled) {
-    // Gracefully collapse with zero margin/padding to avoid blank empty voids
-    return null;
-  }
-
   return (
     <div
       className={`ad-container text-center mx-auto overflow-hidden clear-both ${className}`}
       style={{
         width: '100%',
-        minHeight: style.minHeight !== undefined ? style.minHeight : minHeight,
-        display: 'flex',
+        minHeight: isUnfilled ? '0px' : (style.minHeight !== undefined ? style.minHeight : minHeight),
+        display: isUnfilled ? 'none' : 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         ...style
