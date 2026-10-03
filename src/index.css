@@ -336,14 +336,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Suppress Google Funding Choices / Offerwall blocking overlays */
+div[class*="fc-"],
+div[id*="fc-"],
 .fc-message-root,
 .fc-dialog-container,
-.fc-ab-root,
-div[class*="fc-dialog"],
-div[class*="fc-message"] {
+.fc-monetization-dialog-container,
+.fc-dialog-overlay,
+.fc-monetization-dialog,
+.fc-dialog,
+.fc-ab-root {
   display: none !important;
   visibility: hidden !important;
+  opacity: 0 !important;
   pointer-events: none !important;
+  z-index: -99999 !important;
 }
 
 html, body {

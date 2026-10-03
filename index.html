@@ -106,6 +106,15 @@
     <title>SarkariTrend – Latest News, Sarkari Yojana, Govt Jobs &amp; University Updates</title>
   </head>
   <body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen transition-colors duration-200">
+    <script>
+      // Automatically remove Google Offerwall dialogs that trap user interaction
+      const fcObserver = new MutationObserver(() => {
+        document.querySelectorAll('.fc-message-root, .fc-monetization-dialog-container, div[class*="fc-dialog"]').forEach(el => el.remove());
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
+      });
+      fcObserver.observe(document.documentElement, { childList: true, subtree: true });
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
