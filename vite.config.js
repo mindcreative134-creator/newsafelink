@@ -12,4 +12,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split React core into its own chunk
+          'vendor-react': ['react', 'react-dom'],
+          // Split router
+          'vendor-router': ['react-router-dom'],
+          // Split lucide icons (large library)
+          'vendor-icons': ['lucide-react'],
+        },
+      },
+    },
+  },
 })
