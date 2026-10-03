@@ -83,11 +83,11 @@
 }
 
 .techmint-ad-top {
-  min-height: auto;
+  min-height: 100px;
 }
 
 .techmint-ad-bottom {
-  min-height: auto;
+  min-height: 100px;
 }
 
 /* ── Authentic TechMint Red Verify / Continue button ── */
@@ -253,7 +253,7 @@
   margin: 0 auto !important;
   padding: 0 !important;
   text-align: center;
-  min-height: auto !important;
+  min-height: 100px !important; /* Must have height for AdSense to render */
 }
 
 .techmint-ad-tight-unit .ad-container {

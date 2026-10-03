@@ -4,76 +4,108 @@ import { AD_CONFIG } from '../config/adConfig';
 // Exact specifications matching publisher ca-pub-9543073887536718 units in AdSense
 const SLOT_SPECS = {
   // In-Feed Native Units (Require layout-key and format=fluid)
+  // These are Blogger-hosted native units — need data-ad-host
   '9320506924': {
     format: 'fluid',
     layoutKey: '-6t+ed+2i-1n-4w',
+    needsHost: true,
   },
   '1909584638': {
     format: 'fluid',
     layoutKey: '-6t+ed+2i-1n-4w',
+    needsHost: true,
   },
   // In-Article Native Units (Require data-ad-layout="in-article" and format=fluid)
+  // These are Blogger-hosted native units — need data-ad-host
   '4392273015': {
     format: 'fluid',
     layout: 'in-article',
+    needsHost: true,
   },
   '1641433819': {
     format: 'fluid',
     layout: 'in-article',
+    needsHost: true,
   },
-  // Responsive Display Units (Require format=auto and full-width-responsive)
+  // Standard Responsive Display Units (format=auto, full-width-responsive)
+  // DO NOT use data-ad-host for display units on non-Blogger sites
   '5754054742': {
     format: 'auto',
     fullWidthResponsive: true,
+    needsHost: false,
+    minH: 100,
   },
   '7317709042': {
     format: 'auto',
     fullWidthResponsive: true,
+    needsHost: false,
+    minH: 100,
   },
-  // Multiplex Units
+  // Multiplex / Matched Content Units
   '8617081290': {
     format: 'autorelaxed',
     fullWidthResponsive: true,
+    needsHost: false,
+    minH: 250,
   },
-  // Other verified units
+  // Other verified display units
   '4969186882': {
     format: 'auto',
     fullWidthResponsive: true,
+    needsHost: false,
+    minH: 100,
   },
   '6529422128': {
     format: 'auto',
     fullWidthResponsive: true,
+    needsHost: false,
+    minH: 100,
   },
 };
 
 /**
  * Authentic Ad Unit Component (TechMint Style)
- * 
- * 1. Clean, authentic Google AdSense container (ca-pub-9543073887536718).
- * 2. Matches exact required AdSense formats (in-article, in-feed layout keys, display responsive).
- * 3. Includes data-ad-host="ca-host-pub-1556223355139109" for Blogger hosted publisher accounts.
- * 4. Reliable (window.adsbygoogle = window.adsbygoogle || []).push({}) execution with full block width.
- * 5. Strictly displays authentic Google AdSense ads — NO mock cards, NO fake degree/scholarship fallbacks.
+ *
+ * Rules:
+ * 1. Display (auto) slots: NO data-ad-host — host param blocks display ads on non-Blogger sites.
+ * 2. Native (fluid) slots: use data-ad-host for Blogger-hosted publishers.
+ * 3. Display slots always get a minimum height so AdSense can render into visible space.
+ * 4. Strictly authentic Google AdSense — NO fake fallbacks, NO sponsored cards.
  */
 function AdUnitComponent({
   slot = AD_CONFIG.SLOTS.TOP_BANNER,
   client = AD_CONFIG.CLIENT_ID,
-  host = AD_CONFIG.HOST_ID || 'ca-host-pub-1556223355139109',
   variant,
   format,
-  minHeight = 'auto',
+  minHeight,
   className = '',
   style = {},
 }) {
   const insRef = useRef(null);
   const isPushedRef = useRef(false);
 
-  // Derive specs
+  // Derive specs from slot lookup
   const spec = SLOT_SPECS[slot] || {};
-  const adFormat = format || spec.format || (variant === 'fluid' || variant === 'in-article' ? 'fluid' : 'auto');
+  const adFormat = format || spec.format || 'auto';
   const layout = spec.layout || (variant === 'in-article' ? 'in-article' : undefined);
   const layoutKey = spec.layoutKey;
   const isResponsive = spec.fullWidthResponsive !== undefined ? spec.fullWidthResponsive : true;
+
+  // Only attach data-ad-host for native fluid units (Blogger-hosted)
+  const useHost = spec.needsHost === true;
+  const host = AD_CONFIG.HOST_ID || 'ca-host-pub-1556223355139109';
+
+  // Minimum height: caller can override; otherwise use spec default; display slots get 100px min
+  const effectiveMinHeight =
+    style.minHeight !== undefined
+      ? style.minHeight
+      : minHeight !== undefined
+      ? minHeight
+      : spec.minH
+      ? `${spec.minH}px`
+      : adFormat === 'auto'
+      ? '100px'   // display responsive needs visible space
+      : 'auto';
 
   useEffect(() => {
     isPushedRef.current = false;
@@ -82,7 +114,7 @@ function AdUnitComponent({
       const el = insRef.current;
       if (!el) return;
 
-      // If Google AdSense already processed this ins element, don't push again
+      // If AdSense already processed this ins element, skip
       if (el.getAttribute('data-adsbygoogle-status')) {
         isPushedRef.current = true;
         return;
@@ -97,14 +129,12 @@ function AdUnitComponent({
       }
     };
 
-    const timer = setTimeout(pushAd, 80);
+    const timer = setTimeout(pushAd, 100);
 
     return () => {
       clearTimeout(timer);
     };
   }, [slot]);
-
-  const effectiveMinHeight = style.minHeight !== undefined ? style.minHeight : minHeight;
 
   return (
     <div
@@ -115,7 +145,7 @@ function AdUnitComponent({
         display: 'block',
         textAlign: 'center',
         position: 'relative',
-        ...style
+        ...style,
       }}
     >
       <ins
@@ -124,14 +154,14 @@ function AdUnitComponent({
         style={{
           display: 'block',
           width: '100%',
-          textAlign: 'center',
           minHeight: effectiveMinHeight,
+          textAlign: 'center',
           margin: '0 auto',
         }}
         data-ad-client={client}
-        data-ad-host={host}
         data-ad-slot={slot}
         data-ad-format={adFormat}
+        {...(useHost ? { 'data-ad-host': host } : {})}
         {...(layout ? { 'data-ad-layout': layout } : {})}
         {...(layoutKey ? { 'data-ad-layout-key': layoutKey } : {})}
         {...(isResponsive ? { 'data-full-width-responsive': 'true' } : {})}
