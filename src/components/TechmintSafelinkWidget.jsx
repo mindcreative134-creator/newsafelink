@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import AdUnit from './AdUnit';
+import { AD_CONFIG } from '../config/adConfig';
 import './TechmintSafelink.css';
 
 /**
  * Authentic TechMint Safelink Top Widget
  * Exact recreation of TechMint countdown, sticky step indicator, green instruction banner,
- * iframe ad-click monitor, verify button, and rewarded ad prompt.
+ * iframe ad-click monitor, verify button (#btn6), and guidance card (#ce-text).
  */
 export function TechmintTopSection({
   currentStep = 1,
@@ -13,8 +14,8 @@ export function TechmintTopSection({
   onVerify,
   isVerified = false,
   timerSeconds = 15,
-  adSlotTop = "9320506924",
-  adSlotBottom = "4392273015"
+  adSlotTop = AD_CONFIG.SLOTS.TOP_BANNER,
+  adSlotBottom = AD_CONFIG.SLOTS.BELOW_VERIFY
 }) {
   const [seconds, setSeconds] = useState(timerSeconds);
   const [timerFinished, setTimerFinished] = useState(false);
@@ -23,7 +24,7 @@ export function TechmintTopSection({
   useEffect(() => {
     // Check if user has ad reward cookie
     const hasAdCookie = typeof document !== 'undefined' && document.cookie.includes('adcadg=');
-    const startCount = hasAdCookie ? 10 : timerSeconds;
+    const startCount = hasAdCookie ? 8 : timerSeconds;
     setSeconds(startCount);
     setTimerFinished(false);
 
@@ -48,7 +49,7 @@ export function TechmintTopSection({
       }
     }, 200);
 
-    // Rewarded Ad Modal trigger after 35s if unverified
+    // Reminder prompt after 35s if still unverified
     const modalTimer = setTimeout(() => {
       if (!isVerified) {
         setShowRewardedModal(true);
@@ -64,7 +65,6 @@ export function TechmintTopSection({
 
   const handleVerifyClick = () => {
     if (onVerify) onVerify();
-    // Do NOT auto-scroll to bottom - User explicitly requested staying and showing guidance
   };
 
   return (
@@ -83,7 +83,7 @@ export function TechmintTopSection({
           Click On The Below Image Ad, Wait 15 Sec &amp; Come Back To This Page To Get The Verified Link
         </div>
 
-        {/* ── 3. Top Banner Ad (Always reserved height so it never collapses) ── */}
+        {/* ── 3. Top Banner Ad ── */}
         <div className="techmint-ad-wrapper">
           <AdUnit variant="banner" slot={adSlotTop} minHeight="90px" />
         </div>
@@ -116,7 +116,7 @@ export function TechmintTopSection({
           </div>
         )}
 
-        {/* ── 6. Guidance Instruction (#ce-text) - Does NOT auto-scroll, shows clear instructions ── */}
+        {/* ── 6. Guidance Instruction (#ce-text) ── */}
         {isVerified && (
           <div className="techmint-center my-3">
             <div id="ce-text" className="techmint-scroll-guidance-card">
@@ -140,19 +140,19 @@ export function TechmintTopSection({
           </div>
         )}
 
-        {/* ── 7. In-Content Ad Below Verify ── */}
+        {/* ── 7. In-Content Ad Below Verify / Guidance ── */}
         <div className="techmint-ad-wrapper">
           <AdUnit variant="in-article" slot={adSlotBottom} minHeight="120px" />
         </div>
 
-        {/* ── 8. Rewarded Ad Modal Overlay ── */}
+        {/* ── 8. Action Prompt Overlay (No fake sponsor text) ── */}
         {showRewardedModal && (
           <div className="techmint-rewarded-overlay">
             <div className="techmint-rewarded-modal">
               <h2 className="techmint-modal-title">⚠️ Action Required</h2>
               <p className="techmint-modal-desc">
-                <strong>Click "Continue" and view the sponsor ad</strong><br />
-                to unlock your destination link.
+                <strong>Click "Verify" below</strong><br />
+                to proceed to your destination link.
               </p>
               <button
                 onClick={() => {
@@ -161,9 +161,9 @@ export function TechmintTopSection({
                 }}
                 className="techmint-modal-btn"
               >
-                CONTINUE ➜
+                VERIFY NOW ➜
               </button>
-              <p className="techmint-modal-sub">This helps keep our service 100% free</p>
+              <p className="techmint-modal-sub">Thank you for supporting our service</p>
             </div>
           </div>
         )}
@@ -175,15 +175,15 @@ export function TechmintTopSection({
 /**
  * Authentic Safelink Bottom Widget
  * Placed at the bottom of the article.
- * Tightly sandwiches Continue button between top and bottom ads with ZERO large gaps ("Sata hua").
+ * Tightly sandwiches Continue button between top and bottom ads with ZERO unwanted gaps.
  */
 export function TechmintBottomSection({
   currentStep = 1,
   totalSteps = 3,
   onContinue,
   isUnlocked = false,
-  adSlot1 = "7317709042",
-  adSlot2 = "1909584638"
+  adSlot1 = AD_CONFIG.SLOTS.ABOVE_CONTINUE,
+  adSlot2 = AD_CONFIG.SLOTS.BELOW_CONTINUE
 }) {
   const handleContinue = (e) => {
     e.preventDefault();
@@ -192,7 +192,7 @@ export function TechmintBottomSection({
 
   return (
     <div id="techmint-bottom-section" className="techmint-bottom-tight-container">
-      {/* ── Ad Unit Directly Above Continue Button ("Sata hua") ── */}
+      {/* ── Ad Unit Directly Above Continue Button ── */}
       <div className="techmint-ad-tight-unit">
         <AdUnit variant="banner" slot={adSlot1} minHeight="0px" style={{ minHeight: 0 }} />
       </div>
@@ -215,7 +215,7 @@ export function TechmintBottomSection({
         )}
       </div>
 
-      {/* ── Ad Unit Directly Below Continue Button ("Sata hua") ── */}
+      {/* ── Ad Unit Directly Below Continue Button ── */}
       <div className="techmint-ad-tight-unit">
         <AdUnit variant="banner" slot={adSlot2} minHeight="0px" style={{ minHeight: 0 }} />
       </div>
@@ -223,6 +223,4 @@ export function TechmintBottomSection({
   );
 }
 
-
 export default TechmintTopSection;
-

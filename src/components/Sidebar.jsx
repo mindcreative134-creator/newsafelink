@@ -4,6 +4,7 @@ import { getPosts } from '../services/bloggerApi';
 import { getPostThumbnail } from '../utils/postThumbnail';
 import { Folder, Flame } from 'lucide-react';
 import AdUnit from './AdUnit';
+import { AD_CONFIG } from '../config/adConfig';
 
 export default function Sidebar({ hideAds = false }) {
   const [recentPosts, setRecentPosts] = useState([]);
@@ -118,9 +119,9 @@ export default function Sidebar({ hideAds = false }) {
         </div>
       </div>
 
-      {/* ── Compliant Single Ad Slot ── */}
+      {/* ── Responsive Sidebar Ad Slot ── */}
       {!hideAds && (
-        <AdUnit variant="sidebar" slot="7317709042" minHeight="250px" />
+        <AdUnit variant="sidebar" slot={AD_CONFIG.SLOTS.SIDEBAR} minHeight="250px" />
       )}
 
     </aside>

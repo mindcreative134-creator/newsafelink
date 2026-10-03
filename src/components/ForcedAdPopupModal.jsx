@@ -1,22 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AdUnit from './AdUnit';
+import { AD_CONFIG } from '../config/adConfig';
 import './ForcedAdPopupModal.css';
 
 /**
  * Authentic TechMint Forced Ad-Click Popup Overlay
+ * Exact recreation of TechMint's #blockcont & #contntblock modal.
  * 
- * Mechanics:
- * 1. Blocks the page on arrival with a blurred backdrop.
- * 2. Instructs the user (in Hindi & English) to click the ad image, wait 10-15 seconds, and come back.
- * 3. Listens for iframe activeElement, window blur, and visibilitychange events.
- * 4. When the visitor clicks the ad and returns to the tab, the popup closes automatically and unlocks the content!
- * 5. Provides a fallback close button after a grace delay so users with ad blockers aren't trapped.
+ * Flow:
+ * 1. Blocks the page with backdrop (#blockcont).
+ * 2. Instructs user (Bilingual Hindi & English) to click the ad image, wait 10-15s, and come back.
+ * 3. Contains ONLY the real AdSense ad inside #gads (Zero fake sponsor links or dummy text).
+ * 4. Listens for iframe click and visibilitychange: when user returns, popup auto-closes and unlocks!
+ * 5. Fallback Close button displays after 4s for safety.
  */
 export default function ForcedAdPopupModal({
   step = 1,
   onAdClicked,
-  adSlot = "9320506924",
-  autoCloseTimeoutSec = 45,
+  adSlot = AD_CONFIG.SLOTS.POPUP_MODAL,
+  autoCloseTimeoutSec = 40,
   graceCloseDelaySec = 4,
   enabled = true
 }) {
@@ -53,12 +55,12 @@ export default function ForcedAdPopupModal({
       setShowCloseButton(true);
     }, graceCloseDelaySec * 1000);
 
-    // Safety timeout: automatically unlock after 45s so user is never stuck
+    // Safety timeout: automatically unlock after 40s so user is never stuck
     const safetyTimer = setTimeout(() => {
       handleClose();
     }, autoCloseTimeoutSec * 1000);
 
-    // ── IFRAME CLICK & VISIBILITY DETECTION ──
+    // ── IFRAME CLICK & VISIBILITY DETECTION (Exact TechMint logic) ──
     let isWaitingForReturn = false;
 
     // 1. Monitor activeElement for iframe click
@@ -67,13 +69,13 @@ export default function ForcedAdPopupModal({
       if (activeEl && activeEl.tagName === 'IFRAME') {
         isWaitingForReturn = true;
         setHasInteracted(true);
-        // Set high-CPC ad reward cookie
+        // Set high-CPC ad reward cookie (TechMint adcadg)
         document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
         sessionStorage.setItem('TECHMINT_AD_UNLOCKED', '1');
       }
     }, 150);
 
-    // 2. Window blur event (occurs immediately when user clicks into an ad iframe)
+    // 2. Window blur event (triggers when clicking into an ad iframe)
     const handleBlur = () => {
       const activeEl = document.activeElement;
       if (activeEl && activeEl.tagName === 'IFRAME') {
@@ -85,18 +87,17 @@ export default function ForcedAdPopupModal({
     };
     window.addEventListener('blur', handleBlur);
 
-    // 3. Tab visibilitychange event (triggers when user opens ad tab and comes back)
+    // 3. Tab visibilitychange event (triggers when user opens ad tab and returns)
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        // User switched to ad tab!
+        // User switched to ad window/tab
         if (isWaitingForReturn || document.activeElement?.tagName === 'IFRAME') {
           isWaitingForReturn = true;
           setHasInteracted(true);
         }
       } else {
-        // User RETURNED back to our tab!
+        // User RETURNED back to our page!
         if (isWaitingForReturn || hasInteracted) {
-          // Success! User clicked ad and came back!
           setTimeout(() => {
             handleClose();
           }, 300);
@@ -119,86 +120,58 @@ export default function ForcedAdPopupModal({
 
   return (
     <>
-      {/* Blurred Backdrop */}
-      <div id="blockcont" className="techmint-blockcont" onClick={(e) => e.stopPropagation()} />
+      {/* Exact TechMint Blurred Backdrop */}
+      <div id="blockcont" className="blockcont" onClick={(e) => e.stopPropagation()} />
 
-      {/* Centered Modal */}
-      <div id="contntblock" className="techmint-contntblock" ref={modalRef}>
-        <div className="techmint-modal-content">
-          
-          {/* Header Instruction Text (Hindi & English exact match) */}
-          <div className="techmint-instruction-box">
-            <h5 className="techmint-inst-en">
-              👇 Click Image &amp; Wait &amp; Come back to this page to <span className="highlight-red">Get Link - Download</span>.
-            </h5>
-            <h5 className="techmint-inst-hi">
-              ▼ <span className="highlight-red">LINK पाने और DOWNLOAD करने</span> के लिए, 👇 फोटो / Ad पर क्लिक करें, <span className="highlight-blue">15 सेकंड रुकें</span> और फिर इसी पेज पर वापस आएं
-            </h5>
-            <div className="techmint-steps-pill">
-              <span>🔴 <b>Steps to 🔗 Get Link:</b></span>
-              <span>1. Click On Ad ➔</span>
-              <span>2. Wait 10-15s on ad ➔</span>
-              <span>3. Come Back Here</span>
+      {/* Exact TechMint Centered Modal Box */}
+      <div id="contntblock" className="contntblock" ref={modalRef}>
+        <center>
+          <h5 id="continue1" className="techmint-inst-heading">
+            👇 Click Image &amp; Wait &amp; Come back this page to <span style={{ color: 'red' }}>Get Link - Download</span>.
+          </h5>
+          <h5 id="continue1" className="techmint-inst-heading">
+            ▼ <span style={{ color: 'red' }}>LINK पाने और DOWNLOAD करने</span> के लिए, 👇 फोटो पर क्लिक करें, <span style={{ color: 'blue' }}>15 सेकंड रुकें</span> और फिर इसी पेज पर वापस आएं
+          </h5>
+        </center>
+
+        <br />
+
+        {/* Real AdSlot inside TechMint #gads container (NO FAKE SPONSOR ADS) */}
+        <div id="gads">
+          <div className="gAd">
+            <div className="gCn">
+              <AdUnit
+                variant="rectangle"
+                format="rectangle"
+                slot={adSlot}
+                minHeight="250px"
+                className="!my-0 w-full"
+              />
             </div>
           </div>
-
-          {/* Ad Container inside popup */}
-          <div
-            className="techmint-popup-ad-slot cursor-pointer relative"
-            style={{ minHeight: '260px', width: '100%', maxWidth: '336px', margin: '0 auto' }}
-            onClick={() => {
-              setHasInteracted(true);
-              document.cookie = "adcadg=insurance,online_colleges,study_abroad,finance,loan; max-age=600; path=/;";
-              sessionStorage.setItem('TECHMINT_AD_UNLOCKED', '1');
-            }}
-          >
-            <AdUnit 
-              variant="rectangle" 
-              format="rectangle" 
-              slot={adSlot} 
-              minHeight="250px" 
-              className="!my-0 w-full" 
-            />
-
-            {/* High-CPC Sponsor Link Fallback if AdSense is pending */}
-            <div className="techmint-sponsor-fallback p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-zinc-800 dark:to-zinc-850 rounded-lg border border-blue-200 dark:border-zinc-700 mt-2 text-left w-full">
-              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
-                ⭐ Featured Sponsor Offer
-              </span>
-              <p className="text-xs font-bold text-zinc-900 dark:text-white mt-0.5 leading-snug">
-                Top Online Degrees &amp; Global Education Grants 2026
-              </p>
-              <a
-                href="https://sarkaritrend.boats/"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => {
-                  setHasInteracted(true);
-                  setTimeout(() => handleClose(), 1500);
-                }}
-                className="mt-2 inline-flex items-center justify-center w-full py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded transition-colors"
-              >
-                👉 Click Here to Visit Sponsor (Unlocks Link) 👈
-              </a>
-            </div>
-          </div>
-
-          {/* Grace Close Button */}
-          {showCloseButton && (
-            <div className="techmint-popup-footer">
-              <button
-                id="close-btn"
-                onClick={handleClose}
-                className="techmint-closeis-btn"
-              >
-                ✕ Close Ad &amp; Continue
-              </button>
-            </div>
-          )}
-
         </div>
+
+        {/* Exact TechMint Steps Guidance */}
+        <div className="bottom-text" id="bottmtxt" style={{ padding: '8px' }}>
+          <center>
+            <b>
+              <p style={{ color: '#2563eb', margin: '4px 0', fontSize: '12px' }}>
+                🔴 Steps to 🔗 Get link 🔗
+              </p>
+              <p style={{ margin: '4px 0', fontSize: '11px', color: '#475569' }}>
+                1. Click On banner/AD &nbsp;&nbsp; 2. Wait 10 second on ad page &nbsp;&nbsp; 3. Come Back Here
+              </p>
+            </b>
+          </center>
+        </div>
+
+        {/* Exact TechMint Close Button (Appears after 4s) */}
+        {showCloseButton && (
+          <div className="closeis" id="close-btn" onClick={handleClose}>
+            Close
+          </div>
+        )}
       </div>
     </>
   );
 }
-

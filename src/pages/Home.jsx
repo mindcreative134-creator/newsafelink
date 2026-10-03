@@ -9,9 +9,7 @@ import {
   Search, Lock, CheckCircle2, ChevronRight
 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
-import RobotVerificationWidget from '../components/RobotVerificationWidget';
-import WpSafelinkTopSection from '../components/WpSafelinkTopSection';
-import DualAdContinueSection from '../components/DualAdContinueSection';
+import { AD_CONFIG } from '../config/adConfig';
 
 function PostCardSkeleton() {
   return (
@@ -288,7 +286,7 @@ export default function Home() {
                   </Link>
                   {/* Ad banner directly after featured lead story */}
                   <div className="my-5">
-                    <AdUnit variant="fluid" slot="9320506924" minHeight="120px" />
+                    <AdUnit variant="fluid" slot={AD_CONFIG.SLOTS.TOP_BANNER} minHeight="120px" />
                   </div>
                 </div>
               )}

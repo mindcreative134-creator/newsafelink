@@ -6,7 +6,6 @@ import Home from './pages/Home';
 import PostDetail from './pages/PostDetail';
 import Category from './pages/Category';
 import StaticPages from './pages/StaticPages';
-import StickyBottomAd from './components/StickyBottomAd';
 import { useSafelink } from './context/SafelinkContext';
 
 import StudyEducationsLanding from './pages/StudyEducationsLanding';
@@ -57,9 +56,6 @@ export default function App() {
 
       {/* Policy compliant Footer */}
       <Footer />
-
-      {/* Persistent Sticky Bottom Banner Ad (matching stick-dt & stick-mob) */}
-      <StickyBottomAd />
     </div>
   );
 }

@@ -1,20 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { AD_CONFIG } from '../config/adConfig';
 
 /**
  * Authentic Ad Unit Component (TechMint Style)
  * 
- * 1. Clean, native ad wrapper that mimics GeneratePress / TechMint ad inserter blocks.
- * 2. Does NOT show fake "Advertisement" labels when ads are empty or loading.
- * 3. Gracefully pushes to window.adsbygoogle queue.
- * 4. Automatically collapses to zero height if Google AdSense marks the slot unfilled.
+ * 1. Clean, native ad wrapper that mimics TechMint & GeneratePress ad inserter blocks.
+ * 2. Uses authentic Google AdSense publisher tags (ca-pub-9543073887536718).
+ * 3. Does NOT show fake "Advertisement" labels or placeholder text.
+ * 4. Gracefully pushes to window.adsbygoogle queue.
+ * 5. Automatically collapses to zero height if Google AdSense marks the slot unfilled.
  */
 
-const DEFAULT_CLIENT = import.meta.env?.VITE_ADSENSE_CLIENT_ID || 'ca-pub-9543073887536718';
-
 function AdUnitComponent({
-  slot = '9320506924',
-  client = DEFAULT_CLIENT,
-  variant = 'banner', // 'banner' | 'fluid' | 'in-article' | 'rectangle'
+  slot = AD_CONFIG.SLOTS.TOP_BANNER,
+  client = AD_CONFIG.CLIENT_ID,
+  variant = 'banner', // 'banner' | 'fluid' | 'in-article' | 'rectangle' | 'sidebar'
   format = 'auto',
   minHeight = '0px',
   className = '',
@@ -55,7 +55,7 @@ function AdUnitComponent({
     const observer = new MutationObserver(checkStatus);
     observer.observe(el, { attributes: true, attributeFilter: ['data-ad-status', 'style'] });
 
-    const timeout = setTimeout(checkStatus, 3000);
+    const timeout = setTimeout(checkStatus, 3500);
 
     return () => {
       observer.disconnect();
@@ -70,6 +70,15 @@ function AdUnitComponent({
 
   const isFluid = variant === 'fluid';
   const isInArticle = variant === 'in-article';
+  const isRectangle = variant === 'rectangle';
+
+  // Format mapping
+  let adFormat = format;
+  if (isFluid || isInArticle) {
+    adFormat = 'fluid';
+  } else if (isRectangle) {
+    adFormat = 'rectangle';
+  }
 
   return (
     <div
@@ -86,7 +95,7 @@ function AdUnitComponent({
         }}
         data-ad-client={client}
         data-ad-slot={slot}
-        data-ad-format={isFluid || isInArticle ? 'fluid' : format}
+        data-ad-format={adFormat}
         {...(isInArticle ? { 'data-ad-layout': 'in-article' } : {})}
         data-full-width-responsive="true"
       />
@@ -96,4 +105,3 @@ function AdUnitComponent({
 
 const AdUnit = React.memo(AdUnitComponent);
 export default AdUnit;
-

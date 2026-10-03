@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSafelink } from '../context/SafelinkContext';
 import { getRandomSafelinkPost } from '../services/postService';
 import AdUnit from '../components/AdUnit';
+import { AD_CONFIG } from '../config/adConfig';
 
 /**
  * Authentic TechMint Intermediary Step Router (/readmore)
@@ -56,7 +57,7 @@ export default function ReadMoreHandler() {
     <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col items-center justify-center p-4">
       {/* Banner Ad */}
       <div className="w-full max-w-[728px] mb-8">
-        <AdUnit variant="banner" slot="9320506924" minHeight="90px" />
+        <AdUnit variant="banner" slot={AD_CONFIG.SLOTS.TOP_BANNER} minHeight="90px" />
       </div>
 
       <div className="text-center p-8 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm max-w-md w-full">
@@ -71,7 +72,7 @@ export default function ReadMoreHandler() {
 
       {/* Banner Ad */}
       <div className="w-full max-w-[728px] mt-8">
-        <AdUnit variant="banner" slot="4392273015" minHeight="90px" />
+        <AdUnit variant="banner" slot={AD_CONFIG.SLOTS.BELOW_VERIFY} minHeight="90px" />
       </div>
     </div>
   );

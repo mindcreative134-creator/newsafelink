@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useSafelink } from '../context/SafelinkContext';
 import { getRandomSafelinkPost } from '../services/postService';
 import AdUnit from '../components/AdUnit';
+import { AD_CONFIG } from '../config/adConfig';
 
 /**
  * Authentic TechMint Gateway Landing Page (/studyeducations)
@@ -62,7 +63,7 @@ export default function StudyEducationsLanding() {
     <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col items-center justify-center p-4">
       {/* Top Banner Ad */}
       <div className="w-full max-w-[728px] mb-8">
-        <AdUnit variant="banner" slot="9320506924" minHeight="90px" />
+        <AdUnit variant="banner" slot={AD_CONFIG.SLOTS.TOP_BANNER} minHeight="90px" />
       </div>
 
       {/* TechMint Splash Box */}
@@ -81,7 +82,7 @@ export default function StudyEducationsLanding() {
 
       {/* Bottom Banner Ad */}
       <div className="w-full max-w-[728px] mt-8">
-        <AdUnit variant="banner" slot="4392273015" minHeight="90px" />
+        <AdUnit variant="banner" slot={AD_CONFIG.SLOTS.BELOW_VERIFY} minHeight="90px" />
       </div>
     </div>
   );

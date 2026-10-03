@@ -6,12 +6,12 @@ import { useSafelink } from '../context/SafelinkContext';
 import Sidebar from '../components/Sidebar';
 import { TechmintTopSection, TechmintBottomSection } from '../components/TechmintSafelinkWidget';
 import ForcedAdPopupModal from '../components/ForcedAdPopupModal';
-import RobotVerificationWidget from '../components/RobotVerificationWidget';
 import { 
   Calendar, Clock, User, ArrowRight, ShieldCheck, 
   CheckCircle2, Lock, ExternalLink, ChevronRight, Share2, FileText
 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
+import { AD_CONFIG } from '../config/adConfig';
 import { updatePostSeo, cleanupPostSeo } from '../utils/seoHelper';
 import { getPostThumbnail } from '../utils/postThumbnail';
 
@@ -152,10 +152,10 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-[#f8f9fa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       
-      {/* ── Forced Ad Popup Modal (Engaging Ad Popup with fallbacks) ── */}
+      {/* ── Forced Ad Popup Modal (TechMint Authentic Overlay) ── */}
       <ForcedAdPopupModal
         step={activeStep}
-        adSlot="7317709042"
+        adSlot={AD_CONFIG.SLOTS.POPUP_MODAL}
         enabled={true}
         autoCloseTimeoutSec={35}
         graceCloseDelaySec={4}
@@ -168,8 +168,8 @@ export default function PostDetail() {
         isVerified={isStepVerified}
         onVerify={() => setIsStepVerified(true)}
         timerSeconds={15}
-        adSlotTop="9320506924"
-        adSlotBottom="4392273015"
+        adSlotTop={AD_CONFIG.SLOTS.TOP_BANNER}
+        adSlotBottom={AD_CONFIG.SLOTS.BELOW_VERIFY}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -240,7 +240,7 @@ export default function PostDetail() {
 
 
               {/* Native Fluid In-Article Ad Unit */}
-              <AdUnit variant="fluid" slot="1909584638" minHeight="120px" className="my-2" />
+              <AdUnit variant="fluid" slot={AD_CONFIG.SLOTS.IN_ARTICLE_1} minHeight="120px" className="my-2" />
 
               {/* Recruitment Overview Box (If it's an authentic job with specifics) */}
               {isRecruitment && (
@@ -276,15 +276,15 @@ export default function PostDetail() {
               />
 
               {/* Native In-Article Ad Unit 2 */}
-              <AdUnit variant="in-article" slot="4392273015" minHeight="140px" className="my-3" />
+              <AdUnit variant="in-article" slot={AD_CONFIG.SLOTS.IN_ARTICLE_2} minHeight="140px" className="my-3" />
 
-              {/* ── Safelink Bottom Section: Top Ad -> Continue Button -> Bottom Ad ("Sata hua") ── */}
+              {/* ── Safelink Bottom Section: Top Ad -> Continue Button -> Bottom Ad ── */}
               <TechmintBottomSection
                 currentStep={activeStep}
                 totalSteps={totalSteps || 3}
                 isUnlocked={isStepVerified}
-                adSlot1="7317709042"
-                adSlot2="1909584638"
+                adSlot1={AD_CONFIG.SLOTS.ABOVE_CONTINUE}
+                adSlot2={AD_CONFIG.SLOTS.BELOW_CONTINUE}
                 onContinue={() => {
                   navigate('/readmore');
                 }}
