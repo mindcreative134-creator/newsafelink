@@ -1,60 +1,50 @@
 /**
- * Ad Configuration & Placements
- * Publisher ID: ca-pub-9543073887536718
+ * Ad Configuration
+ * Publisher: ca-pub-9543073887536718
+ * Site: iwantgovjob.vercel.app (React/Vite SPA — NOT Blogger)
  *
- * IMPORTANT: Each slot ID should appear only ONCE per page.
- * Using the same slot ID in multiple AdUnit instances on the same page
- * causes AdSense to only fill the first one — all others stay blank.
+ * ⚠️  CRITICAL RULES FOR ADSENSE ON REACT SPA:
+ * 1. Each slot ID must appear ONLY ONCE per page at any time.
+ * 2. NEVER use data-ad-host on a non-Blogger site — it blocks ads.
+ * 3. NEVER use In-Article / In-Feed formats without Blogger host.
+ * 4. All display units need min-height so AdSense has space to render.
+ * 5. Use format="auto" + data-full-width-responsive="true" for all display units.
  */
 
 export const AD_CONFIG = {
-  // Google AdSense Publisher Client ID
+  // Publisher Client ID
   CLIENT_ID: import.meta.env?.VITE_ADSENSE_CLIENT_ID || 'ca-pub-9543073887536718',
 
-  // HOST_ID: Only used for native In-Article/In-Feed units on Blogger-hosted publishers
-  HOST_ID: 'ca-host-pub-1556223355139109',
-
-  // Ad Slot Definitions — each slot ID must be UNIQUE per page load
+  // ✅ All slots below are standard Responsive Display Ad units (format=auto)
+  // These work on any website — no Blogger host required.
   SLOTS: {
-    // 1. Forced Popup Modal — Display Responsive
-    POPUP_MODAL: '8617081290',
+    // Safelink Top Section — Above countdown timer
+    TOP_BANNER:     '5754054742',
 
-    // 2. Top Banner Ad (Directly ABOVE Countdown / Timing) — Display Responsive
-    TOP_BANNER: '5754054742',
+    // Safelink Top Section — Below verify button
+    BELOW_VERIFY:   '7317709042',
 
-    // 3. Ad directly Below Countdown / Verify Button (#btn6) — Display Responsive
-    BELOW_VERIFY: '7317709042',
-
-    // 4. In-Content Article Paragraph Ad 1 — In-Article Native (Blogger host required)
-    IN_ARTICLE_1: '4392273015',
-
-    // 5. In-Content Article Paragraph Ad 2 — In-Article Native (Blogger host required)
-    IN_ARTICLE_2: '1641433819',
-
-    // 6. Bottom Section: Ad Directly ABOVE Continue Button (#btn7) — Display Responsive
+    // Safelink Bottom — Above Continue button
     ABOVE_CONTINUE: '4969186882',
 
-    // 7. Bottom Section: Ad Directly BELOW Continue Button (#btn7) — Display Responsive
+    // Safelink Bottom — Below Continue button
     BELOW_CONTINUE: '6529422128',
 
-    // 8. Sidebar — uses In-Feed Native (fluid layout)
-    SIDEBAR: '9320506924',
+    // Post detail article — In-content
+    IN_ARTICLE_1:   '4392273015',
 
-    // 9. Intermediary / Splash Screen Banner — Display Responsive
-    SPLASH_BANNER: '1909584638',
+    // Sidebar ad
+    SIDEBAR:        '8617081290',
+
+    // Popup modal / Splash
+    POPUP_MODAL:    '9320506924',
+
+    // ReadMore / intermediate page
+    SPLASH_BANNER:  '1909584638',
+
+    // Home / Category page feed
+    FEED_BANNER:    '1641433819',
   },
-
-  // High-CPC keywords targeted across the site
-  TARGET_KEYWORDS: [
-    'online_mba',
-    'student_loans',
-    'lasik_surgery',
-    'travel_insurance',
-    'scholarships',
-    'study_abroad',
-    'medical_finance',
-    'university_admission'
-  ]
 };
 
 export default AD_CONFIG;

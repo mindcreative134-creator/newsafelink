@@ -121,7 +121,7 @@ export default function Sidebar({ hideAds = false }) {
 
       {/* ── Responsive Sidebar Ad Slot ── */}
       {!hideAds && (
-        <AdUnit variant="sidebar" slot={AD_CONFIG.SLOTS.SIDEBAR} minHeight="250px" />
+        <AdUnit slot={AD_CONFIG.SLOTS.SIDEBAR} />
       )}
 
     </aside>

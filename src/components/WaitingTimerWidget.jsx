@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSafelink } from '../context/SafelinkContext';
 import { Clock, CheckCircle2, ArrowDown, ShieldAlert, Sparkles } from 'lucide-react';
 import AdUnit from './AdUnit';
+import { AD_CONFIG } from '../config/adConfig';
 
 export default function WaitingTimerWidget({ initialSeconds = 8, stepNumber = 2 }) {
   const { setStep2TimerDone, setStep3TimerDone } = useSafelink();
@@ -42,11 +43,9 @@ export default function WaitingTimerWidget({ initialSeconds = 8, stepNumber = 2 
   return (
     <div className="w-full max-w-2xl mx-auto my-6 flex flex-col items-center gap-3">
       
-      {/* ── Ad Unit Above Waiting Widget (High Visibility & Revenue) ── */}
+      {/* ── Ad Unit Above Waiting Widget ── */}
       <AdUnit
-        variant="fluid"
-        slot="9320506924"
-        minHeight="110px"
+        slot={AD_CONFIG.SLOTS.TOP_BANNER}
         className="w-full"
       />
 
@@ -117,11 +116,9 @@ export default function WaitingTimerWidget({ initialSeconds = 8, stepNumber = 2 
 
       </div>
 
-      {/* ── Ad Unit Below Waiting Widget (High Engagement Placement) ── */}
+      {/* ── Ad Unit Below Waiting Widget ── */}
       <AdUnit
-        variant="in-article"
-        slot="4392273015"
-        minHeight="120px"
+        slot={AD_CONFIG.SLOTS.BELOW_VERIFY}
         className="w-full"
       />
 

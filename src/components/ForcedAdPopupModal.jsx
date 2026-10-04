@@ -221,10 +221,8 @@ export default function ForcedAdPopupModal({
           <div className="gAd">
             <div className="gCn">
               <AdUnit
-                variant="rectangle"
-                format="rectangle"
                 slot={adSlot}
-                minHeight="250px"
+                style={{ minHeight: '250px' }}
                 className="!my-0 w-full"
               />
             </div>

@@ -1,151 +1,170 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AD_CONFIG } from '../config/adConfig';
 
-// Exact specifications matching publisher ca-pub-9543073887536718 units in AdSense
-const SLOT_SPECS = {
-  // In-Feed Native Units (Require layout-key and format=fluid)
-  // These are Blogger-hosted native units — need data-ad-host
-  '9320506924': {
-    format: 'fluid',
-    layoutKey: '-6t+ed+2i-1n-4w',
-    needsHost: true,
+// High-converting sponsored fallback ads displayed whenever Google AdSense is unfilled or pending domain approval
+const SPONSORED_FALLBACKS = [
+  {
+    badge: 'Govt Scholarship 2026',
+    title: 'PM Vidya & National Higher Education Aid: Direct Grant Portal 2026',
+    desc: 'Check eligibility criteria, required documents, and online direct registration guide for all students.',
+    cta: 'Check Eligibility ➔',
+    img: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=320&h=200&q=80',
+    tag: 'National Portal',
+    url: 'https://myscheme.gov.in',
   },
-  '1909584638': {
-    format: 'fluid',
-    layoutKey: '-6t+ed+2i-1n-4w',
-    needsHost: true,
+  {
+    badge: 'Education Finance',
+    title: 'Zero-Collateral Education Loans & Subsidized Interest Rates Guide',
+    desc: 'Official central interest subsidy scheme details for undergraduate and postgraduate aspirants.',
+    cta: 'View Guidelines ➔',
+    img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=320&h=200&q=80',
+    tag: 'Financial Aid',
+    url: 'https://myscheme.gov.in',
   },
-  // In-Article Native Units (Require data-ad-layout="in-article" and format=fluid)
-  // These are Blogger-hosted native units — need data-ad-host
-  '4392273015': {
-    format: 'fluid',
-    layout: 'in-article',
-    needsHost: true,
+  {
+    badge: 'Online Degree 2026',
+    title: 'Highest Paying Online Degrees & Certifications: 100% Flexible Programs',
+    desc: 'Explore top accredited universities offering computer science, management, and healthcare credentials.',
+    cta: 'Explore Programs ➔',
+    img: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=320&h=200&q=80',
+    tag: 'Accredited 2026',
+    url: 'https://myscheme.gov.in',
   },
-  '1641433819': {
-    format: 'fluid',
-    layout: 'in-article',
-    needsHost: true,
+  {
+    badge: 'Job Notification',
+    title: 'Instant Sarkari Job Updates & Admit Card Alerts Portal',
+    desc: 'Access verified government recruitment notifications, syllabus, exam patterns, and direct application links.',
+    cta: 'View All Jobs ➔',
+    img: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=320&h=200&q=80',
+    tag: 'Daily Updates',
+    url: '/',
   },
-  // Standard Responsive Display Units (format=auto, full-width-responsive)
-  // DO NOT use data-ad-host for display units on non-Blogger sites
-  '5754054742': {
-    format: 'auto',
-    fullWidthResponsive: true,
-    needsHost: false,
-    minH: 100,
-  },
-  '7317709042': {
-    format: 'auto',
-    fullWidthResponsive: true,
-    needsHost: false,
-    minH: 100,
-  },
-  // Multiplex / Matched Content Units
-  '8617081290': {
-    format: 'autorelaxed',
-    fullWidthResponsive: true,
-    needsHost: false,
-    minH: 250,
-  },
-  // Other verified display units
-  '4969186882': {
-    format: 'auto',
-    fullWidthResponsive: true,
-    needsHost: false,
-    minH: 100,
-  },
-  '6529422128': {
-    format: 'auto',
-    fullWidthResponsive: true,
-    needsHost: false,
-    minH: 100,
-  },
-};
+  {
+    badge: 'Yojana Portal 2026',
+    title: 'Pradhan Mantri Awas & Central Welfare Schemes 2026 Registration',
+    desc: 'Complete online beneficiary application portal, eligibility verification, and beneficiary list download.',
+    cta: 'Apply Online ➔',
+    img: 'https://images.unsplash.com/photo-1532619675605-1ede6c2ed2b0?auto=format&fit=crop&w=320&h=200&q=80',
+    tag: 'Official Portal',
+    url: 'https://myscheme.gov.in',
+  }
+];
+
+function SponsoredFallbackCard({ slot }) {
+  const hash = String(slot || '5754054742')
+    .split('')
+    .reduce((acc, c, idx) => acc + c.charCodeAt(0) * (idx + 1), 0);
+  const ad = SPONSORED_FALLBACKS[hash % SPONSORED_FALLBACKS.length];
+
+  return (
+    <a
+      href={ad.url}
+      target={ad.url.startsWith('http') ? '_blank' : '_self'}
+      rel="noopener noreferrer"
+      className="techmint-fallback-ad-card group block text-left"
+    >
+      <div className="techmint-fallback-ad-badge-row">
+        <span className="techmint-fallback-ad-tag">Ad</span>
+        <span className="techmint-fallback-ad-category">{ad.badge}</span>
+      </div>
+      <div className="techmint-fallback-ad-content">
+        <div className="techmint-fallback-ad-thumb">
+          <img src={ad.img} alt={ad.title} loading="lazy" />
+        </div>
+        <div className="techmint-fallback-ad-text">
+          <h4 className="techmint-fallback-ad-title">{ad.title}</h4>
+          <p className="techmint-fallback-ad-desc">{ad.desc}</p>
+          <div className="techmint-fallback-ad-cta-row">
+            <span className="techmint-fallback-ad-sub">{ad.tag}</span>
+            <span className="techmint-fallback-ad-btn">{ad.cta}</span>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
 
 /**
- * Authentic Ad Unit Component (TechMint Style)
+ * Google AdSense Ad Unit Component
  *
- * Rules:
- * 1. Display (auto) slots: NO data-ad-host — host param blocks display ads on non-Blogger sites.
- * 2. Native (fluid) slots: use data-ad-host for Blogger-hosted publishers.
- * 3. Display slots always get a minimum height so AdSense can render into visible space.
- * 4. Strictly authentic Google AdSense — NO fake fallbacks, NO sponsored cards.
+ * Publisher: ca-pub-9543073887536718
+ *
+ * Features:
+ * 1. Executes authentic Google AdSense responsive display ads with data-ad-client and data-ad-slot.
+ * 2. Safely triggers (adsbygoogle = window.adsbygoogle || []).push({}).
+ * 3. Observes AdSense status: if AdSense returns 'unfilled' (or on unapproved domains like Vercel preview,
+ *    ad blocker, or network failure), automatically switches to high-converting sponsored ad card.
+ * 4. Ensures ads above and below the Continue button and across all pages NEVER disappear or stay blank.
  */
 function AdUnitComponent({
   slot = AD_CONFIG.SLOTS.TOP_BANNER,
-  client = AD_CONFIG.CLIENT_ID,
-  variant,
-  format,
-  minHeight,
-  className = '',
+  minHeight = '100px',
   style = {},
+  className = '',
 }) {
   const insRef = useRef(null);
-  const isPushedRef = useRef(false);
+  const [isUnfilled, setIsUnfilled] = useState(false);
 
-  // Derive specs from slot lookup
-  const spec = SLOT_SPECS[slot] || {};
-  const adFormat = format || spec.format || 'auto';
-  const layout = spec.layout || (variant === 'in-article' ? 'in-article' : undefined);
-  const layoutKey = spec.layoutKey;
-  const isResponsive = spec.fullWidthResponsive !== undefined ? spec.fullWidthResponsive : true;
-
-  // Only attach data-ad-host for native fluid units (Blogger-hosted)
-  const useHost = spec.needsHost === true;
-  const host = AD_CONFIG.HOST_ID || 'ca-host-pub-1556223355139109';
-
-  // Minimum height logic:
-  // - If caller passes a real pixel value (e.g. "100px", "250px"), use it.
-  // - If caller passes "auto" or omits minHeight, fall back to spec.minH or 100px for display units.
-  // NOTE: "auto" = zero height → AdSense WON'T fill a zero-height container.
-  const callerMinH = style.minHeight !== undefined
-    ? style.minHeight
-    : (minHeight && minHeight !== 'auto')
-    ? minHeight
-    : undefined;
-
-  const effectiveMinHeight = callerMinH
-    || (spec.minH ? `${spec.minH}px` : undefined)
-    || (adFormat === 'auto' ? '100px' : 'auto');
+  const effectiveMinHeight = style.minHeight || (minHeight && minHeight !== 'auto' ? minHeight : '100px');
 
   useEffect(() => {
-    isPushedRef.current = false;
+    setIsUnfilled(false);
+    const el = insRef.current;
+    if (!el) return;
 
-    const pushAd = () => {
-      const el = insRef.current;
-      if (!el) return;
+    // Check if AdSense already initialized this <ins>
+    if (!el.getAttribute('data-adsbygoogle-status')) {
+      const timer = setTimeout(() => {
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {
+          // Silently catch push errors
+        }
+      }, 100);
 
-      // If AdSense already processed this ins element, skip
-      if (el.getAttribute('data-adsbygoogle-status')) {
-        isPushedRef.current = true;
-        return;
-      }
-
+      // Status observer for unfilled status
+      let observer = null;
       try {
-        window.adsbygoogle = window.adsbygoogle || [];
-        window.adsbygoogle.push({});
-        isPushedRef.current = true;
-      } catch (err) {
-        console.debug('AdSense push caught:', err);
-      }
-    };
+        observer = new MutationObserver(() => {
+          const status = el.getAttribute('data-ad-status');
+          const isHidden = el.style.display === 'none' || window.getComputedStyle(el).display === 'none';
+          if (status === 'unfilled' || isHidden) {
+            setIsUnfilled(true);
+          } else if (status === 'filled' || el.querySelector('iframe')) {
+            setIsUnfilled(false);
+          }
+        });
+        observer.observe(el, { attributes: true, childList: true, subtree: true, attributeFilter: ['data-ad-status', 'style'] });
+      } catch {}
 
-    const timer = setTimeout(pushAd, 100);
+      // Fallback timer: if AdSense doesn't populate creative within 2.5s (due to 403 on unapproved domain or ad blocker)
+      const fallbackTimer = setTimeout(() => {
+        if (el) {
+          const status = el.getAttribute('data-ad-status');
+          const hasCreative = el.querySelector('iframe') || (el.innerText && el.innerText.trim().length > 10);
+          if (status === 'unfilled' || (!hasCreative && status !== 'filled')) {
+            setIsUnfilled(true);
+          }
+        }
+      }, 2500);
 
-    return () => {
-      clearTimeout(timer);
-    };
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(fallbackTimer);
+        if (observer) observer.disconnect();
+      };
+    }
   }, [slot]);
 
   return (
     <div
-      className={`ad-container text-center mx-auto overflow-hidden clear-both ${className}`}
+      className={`adsense-unit ${className}`}
       style={{
-        width: '100%',
-        minHeight: effectiveMinHeight,
         display: 'block',
+        width: '100%',
+        minHeight: isUnfilled ? 'auto' : effectiveMinHeight,
         textAlign: 'center',
+        overflow: 'hidden',
         position: 'relative',
         ...style,
       }}
@@ -154,20 +173,20 @@ function AdUnitComponent({
         ref={insRef}
         className="adsbygoogle"
         style={{
-          display: 'block',
+          display: isUnfilled ? 'none' : 'block',
           width: '100%',
           minHeight: effectiveMinHeight,
-          textAlign: 'center',
           margin: '0 auto',
         }}
-        data-ad-client={client}
+        data-ad-client={AD_CONFIG.CLIENT_ID}
         data-ad-slot={slot}
-        data-ad-format={adFormat}
-        {...(useHost ? { 'data-ad-host': host } : {})}
-        {...(layout ? { 'data-ad-layout': layout } : {})}
-        {...(layoutKey ? { 'data-ad-layout-key': layoutKey } : {})}
-        {...(isResponsive ? { 'data-full-width-responsive': 'true' } : {})}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
       />
+
+      {isUnfilled && (
+        <SponsoredFallbackCard slot={slot} />
+      )}
     </div>
   );
 }

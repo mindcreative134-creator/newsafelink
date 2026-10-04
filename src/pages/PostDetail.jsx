@@ -240,8 +240,8 @@ export default function PostDetail() {
               )}
 
 
-              {/* Native Fluid In-Article Ad Unit */}
-              <AdUnit variant="fluid" slot={AD_CONFIG.SLOTS.IN_ARTICLE_1} minHeight="120px" className="my-2" />
+              {/* In-Content Ad Unit */}
+              <AdUnit slot={AD_CONFIG.SLOTS.IN_ARTICLE_1} className="my-2" />
 
               {/* Recruitment Overview Box (If it's an authentic job with specifics) */}
               {isRecruitment && (

@@ -62,7 +62,7 @@ export default function ReadMoreHandler() {
     <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col items-center justify-center p-4">
       {/* Banner Ad */}
       <div className="w-full max-w-[728px] mb-8">
-        <AdUnit variant="banner" slot={AD_CONFIG.SLOTS.TOP_BANNER} minHeight="90px" />
+        <AdUnit slot={AD_CONFIG.SLOTS.SPLASH_BANNER} />
       </div>
 
       <div className="text-center p-8 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm max-w-md w-full">
@@ -77,7 +77,7 @@ export default function ReadMoreHandler() {
 
       {/* Banner Ad */}
       <div className="w-full max-w-[728px] mt-8">
-        <AdUnit variant="banner" slot={AD_CONFIG.SLOTS.BELOW_VERIFY} minHeight="90px" />
+        <AdUnit slot={AD_CONFIG.SLOTS.BELOW_VERIFY} />
       </div>
     </div>
   );

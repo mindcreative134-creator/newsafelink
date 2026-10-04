@@ -63,7 +63,7 @@ export default function StudyEducationsLanding() {
     <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col items-center justify-center p-4">
       {/* Top Banner Ad */}
       <div className="w-full max-w-[728px] mb-8">
-        <AdUnit variant="banner" slot={AD_CONFIG.SLOTS.TOP_BANNER} minHeight="90px" />
+        <AdUnit slot={AD_CONFIG.SLOTS.SPLASH_BANNER} />
       </div>
 
       {/* TechMint Splash Box */}
@@ -82,7 +82,7 @@ export default function StudyEducationsLanding() {
 
       {/* Bottom Banner Ad */}
       <div className="w-full max-w-[728px] mt-8">
-        <AdUnit variant="banner" slot={AD_CONFIG.SLOTS.BELOW_VERIFY} minHeight="90px" />
+        <AdUnit slot={AD_CONFIG.SLOTS.FEED_BANNER} />
       </div>
     </div>
   );

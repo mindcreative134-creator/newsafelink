@@ -16,13 +16,16 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Split React core into its own chunk
-          'vendor-react': ['react', 'react-dom'],
-          // Split router
-          'vendor-router': ['react-router-dom'],
-          // Split lucide icons (large library)
-          'vendor-icons': ['lucide-react'],
+        manualChunks(id) {
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'vendor-react';
+          }
+          if (id.includes('node_modules/react-router')) {
+            return 'vendor-router';
+          }
+          if (id.includes('node_modules/lucide-react')) {
+            return 'vendor-icons';
+          }
         },
       },
     },
