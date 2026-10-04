@@ -259,7 +259,7 @@
 .techmint-ad-tight-unit .ad-container {
   margin: 0 auto !important;
   padding: 0 !important;
-  min-height: auto !important;
+  min-height: 100px !important;  /* Must NOT override to auto — keeps height for AdSense */
   display: block !important;
   width: 100% !important;
   text-align: center !important;
@@ -268,7 +268,8 @@
 .techmint-ad-tight-unit ins.adsbygoogle {
   margin: 0 auto !important;
   width: 100% !important;
-  min-height: auto !important;
+  min-height: 100px !important;  /* ins element must have height too */
+  display: block !important;
 }
 
 .techmint-ad-tight-unit ins.adsbygoogle[style*="display: none"],

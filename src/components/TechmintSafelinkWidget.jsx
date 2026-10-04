@@ -76,7 +76,7 @@ export function TechmintTopSection({
 
         {/* ── 3. Top Ad (Directly ABOVE Countdown / Timing) ── */}
         <div className="techmint-ad-wrapper techmint-ad-top my-2">
-          <AdUnit slot={adSlotTop} minHeight="auto" />
+          <AdUnit slot={adSlotTop} minHeight="100px" />
         </div>
 
         {/* ── 4. Countdown Timer (#ce-wait1) - Clean text, NO box, NO border! ── */}
@@ -119,7 +119,7 @@ export function TechmintTopSection({
 
         {/* ── 7. Display Ad (Directly BELOW Countdown / Timing / Verify) ── */}
         <div className="techmint-ad-wrapper techmint-ad-bottom my-2">
-          <AdUnit slot={adSlotBottom} minHeight="auto" />
+          <AdUnit slot={adSlotBottom} minHeight="100px" />
         </div>
       </div>
     </>
@@ -161,7 +161,7 @@ export function TechmintBottomSection({
     <div id="techmint-bottom-section" className="techmint-bottom-tight-container my-1">
       {/* ── 1. First Ad (Directly ABOVE Continue Button - "Sata hua") ── */}
       <div className="techmint-ad-tight-unit">
-        <AdUnit slot={adSlot1} minHeight="auto" />
+        <AdUnit slot={adSlot1} minHeight="100px" />
       </div>
 
       {/* ── 2. Continue Button Section (#btn7) (Tightly Sandwiched in the middle) ── */}
@@ -183,7 +183,7 @@ export function TechmintBottomSection({
 
       {/* ── 3. Second Ad (Directly BELOW Continue Button - "Sata hua") ── */}
       <div className="techmint-ad-tight-unit">
-        <AdUnit slot={adSlot2} minHeight="auto" />
+        <AdUnit slot={adSlot2} minHeight="100px" />
       </div>
     </div>
   );

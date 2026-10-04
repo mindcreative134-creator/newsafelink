@@ -95,17 +95,19 @@ function AdUnitComponent({
   const useHost = spec.needsHost === true;
   const host = AD_CONFIG.HOST_ID || 'ca-host-pub-1556223355139109';
 
-  // Minimum height: caller can override; otherwise use spec default; display slots get 100px min
-  const effectiveMinHeight =
-    style.minHeight !== undefined
-      ? style.minHeight
-      : minHeight !== undefined
-      ? minHeight
-      : spec.minH
-      ? `${spec.minH}px`
-      : adFormat === 'auto'
-      ? '100px'   // display responsive needs visible space
-      : 'auto';
+  // Minimum height logic:
+  // - If caller passes a real pixel value (e.g. "100px", "250px"), use it.
+  // - If caller passes "auto" or omits minHeight, fall back to spec.minH or 100px for display units.
+  // NOTE: "auto" = zero height → AdSense WON'T fill a zero-height container.
+  const callerMinH = style.minHeight !== undefined
+    ? style.minHeight
+    : (minHeight && minHeight !== 'auto')
+    ? minHeight
+    : undefined;
+
+  const effectiveMinHeight = callerMinH
+    || (spec.minH ? `${spec.minH}px` : undefined)
+    || (adFormat === 'auto' ? '100px' : 'auto');
 
   useEffect(() => {
     isPushedRef.current = false;
